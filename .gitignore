@@ -1,0 +1,9 @@
+# gradle files
+.gradle
+
+# ide files
+.idea
+*.iml
+
+# target dirs
+build
