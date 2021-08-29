@@ -13,7 +13,8 @@ public class IdentifierExpression
     private final String identifier;
 
     public IdentifierExpression(String identifier) {
-        this.identifier = identifier;
+        // MoLang is case-insensitive
+        this.identifier = identifier.toLowerCase();
     }
 
     public String getIdentifier() {
