@@ -10,7 +10,7 @@ import team.unnamed.molang.expression.binary.math.AdditionExpression;
 import team.unnamed.molang.expression.CallExpression;
 import team.unnamed.molang.expression.Expression;
 import team.unnamed.molang.expression.IdentifierExpression;
-import team.unnamed.molang.expression.LiteralExpression;
+import team.unnamed.molang.expression.literal.LiteralExpression;
 import team.unnamed.molang.expression.NegationExpression;
 import team.unnamed.molang.expression.WrappedExpression;
 import team.unnamed.molang.expression.binary.math.DivisionExpression;
@@ -118,9 +118,9 @@ public class StandardMoLangParser
                 case "if":
                     return IfFunction.INSTANCE;
                 case "true":
-                    return new LiteralExpression(1);
+                    return new LiteralExpression<>(Float.class, 1F);
                 case "false":
-                    return new LiteralExpression(0);
+                    return new LiteralExpression<>(Float.class, 0F);
                 default:
                     return new IdentifierExpression(identifier);
             }
@@ -144,7 +144,7 @@ public class StandardMoLangParser
 
             // skip the last quote and following whitespaces
             context.nextNoWhitespace();
-            return new LiteralExpression(builder.toString());
+            return new LiteralExpression<>(String.class, builder.toString());
         }
         //#endregion
 
@@ -171,7 +171,7 @@ public class StandardMoLangParser
         }
         //#endregion
 
-        return new LiteralExpression(0);
+        return new LiteralExpression<>(Float.class, 0F);
     }
 
     private Expression parseMultiplication(ParseContext context, Expression left)
