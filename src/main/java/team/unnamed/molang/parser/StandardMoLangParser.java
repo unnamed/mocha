@@ -2,6 +2,7 @@ package team.unnamed.molang.parser;
 
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.expression.ExecutionScopeExpression;
+import team.unnamed.molang.expression.binary.logical.LessThanExpression;
 import team.unnamed.molang.expression.conditional.BinaryConditionalExpression;
 import team.unnamed.molang.expression.conditional.TernaryConditionalExpression;
 import team.unnamed.molang.expression.binary.NullCoalescingExpression;
@@ -263,6 +264,9 @@ public class StandardMoLangParser
             // skip second line and next spaces
             context.nextNoWhitespace();
             return new OrExpression(left, parse(context));
+        } else if (current == '<') {
+            context.nextNoWhitespace();
+            return new LessThanExpression(left, parse(context));
         }
         //#endregion
 
@@ -298,6 +302,7 @@ public class StandardMoLangParser
                 }
             }
         }
+        //#endregion
 
         return parseAddition(context, left);
     }
