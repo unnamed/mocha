@@ -49,7 +49,7 @@ public class CallExpression
             }
         }
 
-        return builder.toString();
+        return builder.append(')').toString();
     }
 
 }
