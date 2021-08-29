@@ -3,9 +3,8 @@ query.print('Hello world');
 math.sin(90) * math.cos(10) + 5;
 query.print('Hello world again') + 10;
 
-if (true, {
-    query.print('Test') + 10;
-    query.print('Test')
-});
+true ? {
+    query.print('Hello');
+};
 
 0

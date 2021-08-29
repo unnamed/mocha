@@ -2,7 +2,9 @@ package team.unnamed.molang.parser;
 
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.expression.ExecutionScopeExpression;
-import team.unnamed.molang.std.IfFunction;
+import team.unnamed.molang.expression.conditional.BinaryConditionalExpression;
+import team.unnamed.molang.expression.conditional.TernaryConditionalExpression;
+import team.unnamed.molang.expression.binary.NullCoalescingExpression;
 import team.unnamed.molang.expression.binary.AccessExpression;
 import team.unnamed.molang.expression.binary.logical.AndExpression;
 import team.unnamed.molang.expression.binary.logical.OrExpression;
@@ -115,8 +117,6 @@ public class StandardMoLangParser
             String identifier = identifierBuilder.toString();
 
             switch (identifier) {
-                case "if":
-                    return IfFunction.INSTANCE;
                 case "true":
                     return new LiteralExpression<>(Float.class, 1F);
                 case "false":
@@ -271,6 +271,32 @@ public class StandardMoLangParser
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
             return new AccessExpression(left, right);
+        }
+        //#endregion
+
+        //#region Null Coalescing, Binary Conditional and Ternary Conditional expressions
+        if (current == '?') {
+            current = context.next();
+            if (current == '?') {
+                // then it's null-coalescing expression
+                // since there are two '?' together (??)
+                context.nextNoWhitespace();
+                return new NullCoalescingExpression(left, parse(context));
+            } else {
+                // then it's a ternary or binary expression, since
+                // there is only one '?' token
+                context.skipWhitespace();
+                Expression trueValue = parse(context);
+
+                if (context.getCurrent() == ':') {
+                    // then it's a ternary expression, since there is
+                    // a ':', indicating the next expression
+                    context.skipWhitespace();
+                    return new TernaryConditionalExpression(left, trueValue, parse(context));
+                } else {
+                    return new BinaryConditionalExpression(left, trueValue);
+                }
+            }
         }
 
         return parseAddition(context, left);
