@@ -7,6 +7,7 @@ import team.unnamed.molang.expression.Expression;
 import team.unnamed.molang.expression.IdentifierExpression;
 import team.unnamed.molang.expression.LiteralExpression;
 import team.unnamed.molang.expression.NegationExpression;
+import team.unnamed.molang.expression.WrappedExpression;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class StandardMoLangParser
             // skip the closing parenthesis and
             // following spaces
             context.nextNoWhitespace();
-            return expression;
+            return new WrappedExpression(expression);
         }
         //#endregion
 
