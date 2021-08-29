@@ -2,7 +2,7 @@ package team.unnamed.molang.parser;
 
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.expression.ExecutionScopeExpression;
-import team.unnamed.molang.expression.IfFunction;
+import team.unnamed.molang.std.IfFunction;
 import team.unnamed.molang.expression.binary.AccessExpression;
 import team.unnamed.molang.expression.binary.logical.AndExpression;
 import team.unnamed.molang.expression.binary.logical.OrExpression;
