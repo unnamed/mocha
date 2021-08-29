@@ -1,9 +1,7 @@
 plugins {
     java
+    `maven-publish`
 }
-
-group = "team.unnamed"
-version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -16,4 +14,12 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }
