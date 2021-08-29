@@ -16,6 +16,12 @@ tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
 val snapshotRepository: String by project
 val releaseRepository: String by project
 
