@@ -2,6 +2,7 @@ package team.unnamed.molang.expression;
 
 import team.unnamed.molang.context.EvalContext;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,6 +34,22 @@ public class CallExpression
 
     @Override
     public String toString() {
-        return "call(" + function + ", " + arguments + ")";
+        StringBuilder builder = new StringBuilder()
+                .append(function)
+                .append('(');
+
+        Iterator<Expression> argIterator = arguments.iterator();
+
+        while (argIterator.hasNext()) {
+            Expression argument = argIterator.next();
+            builder.append(argument);
+
+            if (argIterator.hasNext()) {
+                builder.append(", ");
+            }
+        }
+
+        return builder.toString();
     }
+
 }
