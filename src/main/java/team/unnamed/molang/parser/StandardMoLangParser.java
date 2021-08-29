@@ -118,9 +118,9 @@ public class StandardMoLangParser
                 case "if":
                     return IfFunction.INSTANCE;
                 case "true":
-                    return new LiteralExpression(true);
+                    return new LiteralExpression(1);
                 case "false":
-                    return new LiteralExpression(false);
+                    return new LiteralExpression(0);
                 default:
                     return new IdentifierExpression(identifier);
             }
