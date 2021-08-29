@@ -1,13 +1,21 @@
 package team.unnamed.molang.parser;
 
 import team.unnamed.molang.context.ParseContext;
-import team.unnamed.molang.expression.BinaryExpression;
+import team.unnamed.molang.expression.ExecutionScopeExpression;
+import team.unnamed.molang.expression.IfFunction;
+import team.unnamed.molang.expression.binary.AccessExpression;
+import team.unnamed.molang.expression.binary.logical.AndExpression;
+import team.unnamed.molang.expression.binary.logical.OrExpression;
+import team.unnamed.molang.expression.binary.math.AdditionExpression;
 import team.unnamed.molang.expression.CallExpression;
 import team.unnamed.molang.expression.Expression;
 import team.unnamed.molang.expression.IdentifierExpression;
 import team.unnamed.molang.expression.LiteralExpression;
 import team.unnamed.molang.expression.NegationExpression;
 import team.unnamed.molang.expression.WrappedExpression;
+import team.unnamed.molang.expression.binary.math.DivisionExpression;
+import team.unnamed.molang.expression.binary.math.MultiplicationExpression;
+import team.unnamed.molang.expression.binary.math.SubtractionExpression;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -65,15 +73,57 @@ public class StandardMoLangParser
         }
         //#endregion
 
-        //#region Identifier expression
+        //#region Execution scope
+        if (current == '{') {
+            context.nextNoWhitespace();
+
+            List<Expression> expressions = new ArrayList<>();
+            while (true) {
+                expressions.add(parse(context));
+                current = context.getCurrent();
+                if (current == '}') {
+                    // skip last '}' and next whitespace
+                    context.nextNoWhitespace();
+                    break;
+                } else if (current == -1) {
+                    // end reached but not closed yet huh?
+                    throw new ParseException(
+                            "Found the end before the execution scope closing token",
+                            context.getCursor()
+                    );
+                } else {
+                    assertToken(context, ';');
+                    // skip current semicolon and
+                    // following whitespace
+                    context.nextNoWhitespace();
+                }
+            }
+
+            return new ExecutionScopeExpression(expressions);
+        }
+        //#endregion
+
+        //#region Identifier expression and keywords
         if (Tokens.isValidForIdentifier(current)) {
-            StringBuilder identifier = new StringBuilder();
+            StringBuilder identifierBuilder = new StringBuilder();
             do {
-                identifier.append((char) current);
+                identifierBuilder.append((char) current);
             } while (Tokens.isValidForIdentifier(current = context.next()));
             // skip whitespace
             context.skipWhitespace();
-            return new IdentifierExpression(identifier.toString());
+
+            String identifier = identifierBuilder.toString();
+
+            switch (identifier) {
+                case "if":
+                    return IfFunction.INSTANCE;
+                case "true":
+                    return new LiteralExpression(true);
+                case "false":
+                    return new LiteralExpression(false);
+                default:
+                    return new IdentifierExpression(identifier);
+            }
         }
         //#endregion
 
@@ -106,15 +156,18 @@ public class StandardMoLangParser
 
         //#region Negation
         if (current == Tokens.HYPHEN) {
-            current = context.next();
+            current = context.nextNoWhitespace();
             if (Character.isDigit(current)) {
                 // if negated expression is numeral, make it
                 // negative instead of creating a negation expression
                 return LiteralExpression.parseFloat(context, -1);
             } else {
                 Expression expression = parseSingle(context);
-                return new NegationExpression(expression);
+                return new NegationExpression(expression, Tokens.HYPHEN);
             }
+        } else if (current == Tokens.EXCLAMATION) {
+            context.nextNoWhitespace();
+            return new NegationExpression(parseSingle(context), Tokens.EXCLAMATION);
         }
         //#endregion
 
@@ -127,11 +180,11 @@ public class StandardMoLangParser
         if (current == '*') {
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
-            return new BinaryExpression.Multiplication(left, right);
+            return new MultiplicationExpression(left, right);
         } else if (current == '/') {
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
-            return new BinaryExpression.Division(left, right);
+            return new DivisionExpression(left, right);
         }
         return left;
     }
@@ -142,11 +195,11 @@ public class StandardMoLangParser
         if (current == '+') {
             context.nextNoWhitespace();
             Expression right = parse(context);
-            return new BinaryExpression.Addition(left, right);
+            return new AdditionExpression(left, right);
         } else if (current == '-') {
             context.nextNoWhitespace();
             Expression right = parse(context);
-            return new BinaryExpression.Subtraction(left, right);
+            return new SubtractionExpression(left, right);
         }
         // try fallback-ing to multiplication/division
         return parseMultiplication(context, left);
@@ -187,11 +240,37 @@ public class StandardMoLangParser
         }
         //#endregion
 
+        //#region Logical Operators
+        if (current == Tokens.AMPERSAND) {
+            current = context.next();
+
+            if (current != Tokens.AMPERSAND) {
+                failUnexpectedToken(context, (char) current, Tokens.AMPERSAND);
+                return null; // should never happen
+            }
+
+            // skip second ampersand and next spaces
+            context.nextNoWhitespace();
+            return new AndExpression(left, parse(context));
+        } else if (current == Tokens.LINE) {
+            current = context.next();
+
+            if (current != Tokens.LINE) {
+                failUnexpectedToken(context, (char) current, Tokens.LINE);
+                return null; // should never happen
+            }
+
+            // skip second line and next spaces
+            context.nextNoWhitespace();
+            return new OrExpression(left, parse(context));
+        }
+        //#endregion
+
         //#region Dot access expression
-        if (current == '.') {
+        if (current == Tokens.DOT) {
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
-            return new BinaryExpression.Access(left, right);
+            return new AccessExpression(left, right);
         }
 
         return parseAddition(context, left);

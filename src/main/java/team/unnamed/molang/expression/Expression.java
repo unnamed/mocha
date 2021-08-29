@@ -46,11 +46,29 @@ public interface Expression {
      */
     default float evalAsFloat(EvalContext context) {
         Object result = eval(context);
-        if (!(result instanceof Number)) {
+        if (result instanceof Boolean) {
+            return ((Boolean) result) ? 1 : 0;
+        } else if (!(result instanceof Number)) {
             return 0;
         } else {
             return ((Number) result).floatValue();
         }
+    }
+
+    /**
+     * Evaluates the expression using the
+     * given {@code context} and trying to
+     * convert it to a boolean.
+     */
+    default boolean evalAsBoolean(EvalContext context) {
+        Object result = eval(context);
+        if (result instanceof Boolean) {
+            return (Boolean) result;
+        } else if (result instanceof Number) {
+            // '0' is considered false here
+            return ((Number) result).floatValue() != 0;
+        }
+        return true;
     }
 
 }

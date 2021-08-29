@@ -10,6 +10,11 @@ public final class Tokens {
     public static final char UNDERSCORE = '_';
     public static final char HYPHEN = '-';
     public static final char DOT = '.';
+    public static final char AMPERSAND = '&';
+    public static final char EXCLAMATION = '!';
+
+    // I don't know the name of this character, it's just a line
+    public static final char LINE = '|';
 
     // MoLang currently only supports single quotes for string
     public static final char QUOTE = '\'';
