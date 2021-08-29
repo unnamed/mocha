@@ -1,7 +1,8 @@
-package team.unnamed.molang.expression;
+package team.unnamed.molang.expression.literal;
 
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.context.ParseContext;
+import team.unnamed.molang.expression.Expression;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.Tokens;
 
@@ -10,13 +11,20 @@ import team.unnamed.molang.parser.Tokens;
  * the parsed value is the same as the
  * evaluated
  */
-public class LiteralExpression
+public class LiteralExpression<T>
         implements Expression {
 
-    private final Object value;
+    private final Class<T> type;
+    private final T value;
 
-    public LiteralExpression(Object value) {
+    public LiteralExpression(Class<T> type, T value) {
+        this.type = type;
         this.value = value;
+    }
+
+    @Override
+    public Class<T> getType() {
+        return type;
     }
 
     @Override
@@ -66,7 +74,7 @@ public class LiteralExpression
             }
         }
 
-        return new LiteralExpression(value / divideBy);
+        return new LiteralExpression<>(Float.class, value / divideBy);
     }
 
 }

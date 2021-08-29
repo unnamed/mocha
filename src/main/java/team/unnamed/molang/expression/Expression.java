@@ -12,6 +12,14 @@ import java.util.List;
 public interface Expression {
 
     /**
+     * Returns the expected return type
+     * when evaluating this expression
+     */
+    default Class<?> getType() {
+        return Object.class;
+    }
+
+    /**
      * Evaluates the expression using
      * the given {@code context}
      */
@@ -58,17 +66,23 @@ public interface Expression {
     /**
      * Evaluates the expression using the
      * given {@code context} and trying to
-     * convert it to a boolean.
+     * convert it to boolean.
+     *
+     * As written in specification, "for boolean
+     * tests, a float value equivalent to 0.0 is
+     * false, and anything not equal to 0.0 is true"
      */
     default boolean evalAsBoolean(EvalContext context) {
         Object result = eval(context);
         if (result instanceof Boolean) {
             return (Boolean) result;
         } else if (result instanceof Number) {
-            // '0' is considered false here
+            // '0' is considered false here, anything else
+            // is considered true.
             return ((Number) result).floatValue() != 0;
+        } else {
+            return true;
         }
-        return true;
     }
 
 }
