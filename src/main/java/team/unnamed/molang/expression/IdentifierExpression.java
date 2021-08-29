@@ -56,7 +56,7 @@ public class IdentifierExpression
 
     @Override
     public String toString() {
-        return "identifier(" + identifier + ")";
+        return identifier;
     }
 
 }

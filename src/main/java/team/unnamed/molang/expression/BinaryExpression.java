@@ -59,7 +59,7 @@ public abstract class BinaryExpression
 
         @Override
         public String toString() {
-            return "sum(" + leftHand + ", " + rightHand + ")";
+            return leftHand + " + " + rightHand;
         }
 
     }
@@ -92,7 +92,7 @@ public abstract class BinaryExpression
 
         @Override
         public String toString() {
-            return "subtract(" + leftHand + ", " + rightHand + ")";
+            return leftHand + " - " + rightHand;
         }
     }
 
@@ -124,7 +124,7 @@ public abstract class BinaryExpression
 
         @Override
         public String toString() {
-            return "multiply(" + leftHand + ", " + rightHand + ")";
+            return leftHand + " * " + rightHand;
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class BinaryExpression
 
         @Override
         public String toString() {
-            return "divide(" + leftHand + ", " + rightHand + ")";
+            return leftHand + " / " + rightHand;
         }
     }
 
@@ -187,7 +187,7 @@ public abstract class BinaryExpression
 
         @Override
         public String toString() {
-            return "access(" + leftHand + ", " + rightHand + ")";
+            return leftHand + "." + rightHand;
         }
     }
     //#endregion

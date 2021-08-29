@@ -21,4 +21,8 @@ public class NegationExpression
         return evalAsFloat(context);
     }
 
+    @Override
+    public String toString() {
+        return "-" + expression;
+    }
 }

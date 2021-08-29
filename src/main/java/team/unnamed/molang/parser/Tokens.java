@@ -11,6 +11,9 @@ public final class Tokens {
     public static final char HYPHEN = '-';
     public static final char DOT = '.';
 
+    // MoLang currently only supports single quotes for string
+    public static final char QUOTE = '\'';
+
     private Tokens() {
     }
 

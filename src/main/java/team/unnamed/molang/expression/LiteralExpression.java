@@ -26,7 +26,10 @@ public class LiteralExpression
 
     @Override
     public String toString() {
-        return "literal(" + value.toString() + ")";
+        if (value instanceof String) {
+            return Tokens.QUOTE + value.toString() + Tokens.QUOTE;
+        }
+        return value.toString();
     }
 
     public static Expression parseFloat(

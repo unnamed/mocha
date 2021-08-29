@@ -32,9 +32,6 @@ import java.util.List;
 public class StandardMoLangParser
         implements MoLangParser {
 
-    // MoLang currently only supports single quotes for string
-    private static final char QUOTE = '\'';
-
     private void failUnexpectedToken(ParseContext context, char current, char expected)
             throws ParseException {
         throw new ParseException(
@@ -80,9 +77,9 @@ public class StandardMoLangParser
         //#endregion
 
         //#region String literal expression
-        if (current == QUOTE) {
+        if (current == Tokens.QUOTE) {
             StringBuilder builder = new StringBuilder();
-            while ((current = context.next()) != QUOTE && current != -1) {
+            while ((current = context.next()) != Tokens.QUOTE && current != -1) {
                 builder.append((char) current);
             }
 
