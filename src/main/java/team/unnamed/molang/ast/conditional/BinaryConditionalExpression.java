@@ -5,8 +5,10 @@ import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
- * Implementation of the binary conditional expression,
- * it's similar to an "if {...} " expression.
+ * Implementation of MoLang 1.17 binary conditional
+ * expression, it's similar to an "if {...} " expression.
+ *
+ * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang#Conditionals
  *
  * <p>If the evaluated value of the {@code conditional}
  * expression is considered true, it evaluates the
@@ -32,8 +34,13 @@ public class BinaryConditionalExpression
     }
 
     @Override
+    public String toSource() {
+        return leftHand.toSource() + " ? " + rightHand.toSource();
+    }
+
+    @Override
     public String toString() {
-        return leftHand + " ? " + rightHand;
+        return "Condition(" + leftHand + ", " + rightHand + ")";
     }
 
 }
