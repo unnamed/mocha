@@ -1,8 +1,6 @@
-package team.unnamed.molang.ast.binary.math;
+package team.unnamed.molang.ast;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
  * {@link BinaryExpression} implementation for

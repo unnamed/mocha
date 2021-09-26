@@ -1,8 +1,6 @@
-package team.unnamed.molang.ast.conditional;
+package team.unnamed.molang.ast;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
  * Implementation of MoLang 1.17 binary conditional

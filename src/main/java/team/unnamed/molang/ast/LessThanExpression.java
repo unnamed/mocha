@@ -1,20 +1,19 @@
-package team.unnamed.molang.ast.binary.logical;
+package team.unnamed.molang.ast;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
 
 /**
- * Implementation of the 'less than or equal' expression,
+ * Implementation of the 'less than' expression,
  * it's a boolean binary expression (value is always
  * true or false and has two expression components).
  *
  * Returns true if the 'leftHand' expression is less
- * or equal to the 'rightHand' expression value
+ * than the 'rightHand' expression
  */
-public class LessThanOrEqualExpression
-        extends LessThanExpression {
+public class LessThanExpression
+        extends BinaryExpression {
 
-    public LessThanOrEqualExpression(
+    public LessThanExpression(
             Expression leftHand,
             Expression rightHand
     ) {
@@ -23,12 +22,17 @@ public class LessThanOrEqualExpression
 
     @Override
     public boolean evalAsBoolean(EvalContext context) {
-        return leftHand.evalAsFloat(context) <= rightHand.evalAsFloat(context);
+        return leftHand.evalAsFloat(context) < rightHand.evalAsFloat(context);
+    }
+
+    @Override
+    public Object eval(EvalContext context) {
+        return evalAsBoolean(context);
     }
 
     @Override
     public String toSource() {
-        return leftHand.toSource() + " <= " + rightHand.toSource();
+        return leftHand.toSource() + " < " + rightHand.toSource();
     }
 
 }

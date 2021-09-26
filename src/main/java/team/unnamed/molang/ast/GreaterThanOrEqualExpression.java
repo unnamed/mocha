@@ -1,7 +1,6 @@
-package team.unnamed.molang.ast.binary.logical;
+package team.unnamed.molang.ast;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
 
 /**
  * Implementation of the 'greater than or equal'
