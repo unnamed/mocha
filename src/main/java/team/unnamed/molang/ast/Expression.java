@@ -85,4 +85,15 @@ public interface Expression {
         }
     }
 
+    /**
+     * Returns the expression as source string,
+     *
+     * <p>It represents the source string used to parse
+     * this expression instance, but may not be exact
+     * since spaces and line breaks aren't stored.</p>
+     *
+     * @return The expression as source string
+     */
+    String toSource();
+
 }

@@ -7,6 +7,12 @@ package team.unnamed.molang.parser;
  */
 public final class Tokens {
 
+    /**
+     * Character used to escape other characters
+     * to consider them special characters or
+     * non-tokens
+     */
+    public static final char ESCAPE = '\\';
     public static final char UNDERSCORE = '_';
     public static final char HYPHEN = '-';
     public static final char DOT = '.';

@@ -1,5 +1,7 @@
 package team.unnamed.molang.parser;
 
+import team.unnamed.molang.ast.literal.DoubleExpression;
+import team.unnamed.molang.ast.literal.StringExpression;
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.ast.ExecutionScopeExpression;
 import team.unnamed.molang.ast.binary.logical.GreaterThanExpression;
@@ -16,7 +18,6 @@ import team.unnamed.molang.ast.binary.math.AdditionExpression;
 import team.unnamed.molang.ast.CallExpression;
 import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.ast.IdentifierExpression;
-import team.unnamed.molang.ast.literal.LiteralExpression;
 import team.unnamed.molang.ast.NegationExpression;
 import team.unnamed.molang.ast.WrappedExpression;
 import team.unnamed.molang.ast.binary.math.DivisionExpression;
@@ -122,9 +123,9 @@ public class StandardMoLangParser
 
             switch (identifier) {
                 case "true":
-                    return new LiteralExpression<>(Float.class, 1F);
+                    return new DoubleExpression(1D);
                 case "false":
-                    return new LiteralExpression<>(Float.class, 0F);
+                    return new DoubleExpression(0F);
                 default:
                     return new IdentifierExpression(identifier);
             }
@@ -148,13 +149,13 @@ public class StandardMoLangParser
 
             // skip the last quote and following whitespaces
             context.nextNoWhitespace();
-            return new LiteralExpression<>(String.class, builder.toString());
+            return new StringExpression(builder.toString());
         }
         //#endregion
 
         //#region Float literal expression
         if (Character.isDigit(current)) {
-            return LiteralExpression.parseFloat(context, 1);
+            return DoubleExpression.parse(context, 1);
         }
         //#endregion
 
@@ -164,7 +165,7 @@ public class StandardMoLangParser
             if (Character.isDigit(current)) {
                 // if negated expression is numeral, make it
                 // negative instead of creating a negation expression
-                return LiteralExpression.parseFloat(context, -1);
+                return DoubleExpression.parse(context, -1);
             } else {
                 Expression expression = parseSingle(context);
                 return new NegationExpression(expression, Tokens.HYPHEN);
@@ -175,7 +176,7 @@ public class StandardMoLangParser
         }
         //#endregion
 
-        return new LiteralExpression<>(Float.class, 0F);
+        return new DoubleExpression(0F);
     }
 
     private Expression parseMultiplication(ParseContext context, Expression left)
