@@ -9,7 +9,7 @@ import java.util.List;
  * A fundamental interface representing every
  * possible expression in the MoLang language
  */
-public interface Expression {
+public interface Expression extends Node {
 
     /**
      * Determines if this expression returns
