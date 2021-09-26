@@ -12,6 +12,17 @@ import java.util.List;
 public interface Expression {
 
     /**
+     * Determines if this expression returns
+     * a value when calling {@link Expression#eval}
+     * TODO: We should create statement types
+     * @return True if this is an expression
+     * with value
+     */
+    default boolean hasReturnValue() {
+        return true;
+    }
+
+    /**
      * Returns the expected return type
      * when evaluating this expression
      */
