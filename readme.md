@@ -1,6 +1,6 @@
 # MoLang Engine
 A MoLang scripting engine for Java 8+<br>
-See the MoLang specification [here](https://bedrock.dev/docs/stable/MoLang)
+See the MoLang specification [here](https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang)
 
 ## Install
 Add the repository and to your pom.xml or build.gradle(.kts):
