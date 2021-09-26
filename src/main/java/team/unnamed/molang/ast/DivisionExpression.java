@@ -3,11 +3,11 @@ package team.unnamed.molang.ast;
 import team.unnamed.molang.context.EvalContext;
 
 /**
- * {@link BinaryExpression} implementation for
+ * {@link InfixExpression} implementation for
  * division of two numerical expressions
  */
 public class DivisionExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public DivisionExpression(
             Expression leftHand,

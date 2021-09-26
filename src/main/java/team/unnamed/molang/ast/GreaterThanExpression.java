@@ -11,7 +11,7 @@ import team.unnamed.molang.context.EvalContext;
  * 'rightHand' value.
  */
 public class GreaterThanExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public GreaterThanExpression(
             Expression leftHand,

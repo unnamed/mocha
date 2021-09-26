@@ -8,7 +8,7 @@ import team.unnamed.molang.ast.GreaterThanExpression;
 import team.unnamed.molang.ast.GreaterThanOrEqualExpression;
 import team.unnamed.molang.ast.LessThanExpression;
 import team.unnamed.molang.ast.LessThanOrEqualExpression;
-import team.unnamed.molang.ast.BinaryConditionalExpression;
+import team.unnamed.molang.ast.InfixConditionalExpression;
 import team.unnamed.molang.ast.TernaryConditionalExpression;
 import team.unnamed.molang.ast.NullCoalescingExpression;
 import team.unnamed.molang.ast.AccessExpression;
@@ -315,7 +315,7 @@ public class StandardMoLangParser
                     context.skipWhitespace();
                     return new TernaryConditionalExpression(left, trueValue, parse(context));
                 } else {
-                    return new BinaryConditionalExpression(left, trueValue);
+                    return new InfixConditionalExpression(left, trueValue);
                 }
             }
         }

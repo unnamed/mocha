@@ -12,7 +12,7 @@ import team.unnamed.molang.context.EvalContext;
  * Molang#%3F%3F%20Null%20Coalescing%20Operator
  */
 public class NullCoalescingExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public NullCoalescingExpression(
             Expression leftHand,

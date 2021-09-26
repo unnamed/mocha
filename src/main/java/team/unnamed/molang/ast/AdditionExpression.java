@@ -3,11 +3,11 @@ package team.unnamed.molang.ast;
 import team.unnamed.molang.context.EvalContext;
 
 /**
- * {@link BinaryExpression} implementation for
+ * {@link InfixExpression} implementation for
  * addition of two numerical expressions
  */
 public class AdditionExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public AdditionExpression(
             Expression leftHand,

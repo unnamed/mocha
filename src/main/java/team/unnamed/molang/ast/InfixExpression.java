@@ -6,13 +6,13 @@ package team.unnamed.molang.ast;
  * are the left-hand expression and the
  * right-hand expression, respectively
  */
-public abstract class BinaryExpression
+public abstract class InfixExpression
         implements Expression {
 
     protected final Expression leftHand;
     protected final Expression rightHand;
 
-    public BinaryExpression(
+    public InfixExpression(
             Expression leftHand,
             Expression rightHand
     ) {

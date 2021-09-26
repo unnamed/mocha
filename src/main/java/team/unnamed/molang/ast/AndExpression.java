@@ -8,7 +8,7 @@ import team.unnamed.molang.context.EvalContext;
  * to get the final result
  */
 public class AndExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public AndExpression(Expression leftHand, Expression rightHand) {
         super(leftHand, rightHand);

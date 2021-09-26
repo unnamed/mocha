@@ -11,7 +11,7 @@ import team.unnamed.molang.context.EvalContext;
  * than the 'rightHand' expression
  */
 public class LessThanExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public LessThanExpression(
             Expression leftHand,

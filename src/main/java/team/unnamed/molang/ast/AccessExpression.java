@@ -3,11 +3,11 @@ package team.unnamed.molang.ast;
 import team.unnamed.molang.context.EvalContext;
 
 /**
- * {@link BinaryExpression} implementation for
+ * {@link InfixExpression} implementation for
  * representing field accessing
  */
 public class AccessExpression
-        extends BinaryExpression {
+        extends InfixExpression {
 
     public AccessExpression(
             Expression leftHand,

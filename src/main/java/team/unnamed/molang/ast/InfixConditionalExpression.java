@@ -12,10 +12,10 @@ import team.unnamed.molang.context.EvalContext;
  * expression is considered true, it evaluates the
  * {@code predicate} expression.</p>
  */
-public class BinaryConditionalExpression
-        extends BinaryExpression {
+public class InfixConditionalExpression
+        extends InfixExpression {
 
-    public BinaryConditionalExpression(
+    public InfixConditionalExpression(
             Expression conditional,
             Expression predicate
     ) {
