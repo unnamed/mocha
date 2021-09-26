@@ -8,9 +8,9 @@ import team.unnamed.molang.ast.binary.BinaryExpression;
  * Implementation of the binary conditional expression,
  * it's similar to an "if {...} " expression.
  *
- * If the evaluated value of the {@code conditional}
+ * <p>If the evaluated value of the {@code conditional}
  * expression is considered true, it evaluates the
- * {@code predicate} expression.
+ * {@code predicate} expression.</p>
  */
 public class BinaryConditionalExpression
         extends BinaryExpression {
