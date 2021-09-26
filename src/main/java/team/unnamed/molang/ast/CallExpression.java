@@ -6,7 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Function call expression implementation
+ * Expression implementation for MoLang 1.17 function
+ * call expression
  */
 public class CallExpression
         implements Expression {
@@ -19,10 +20,18 @@ public class CallExpression
         this.arguments = arguments;
     }
 
+    /**
+     * Returns the expression evaluated to the
+     * invoked function
+     */
     public Expression getFunction() {
         return function;
     }
 
+    /**
+     * Returns the expressions evaluated to the
+     * function arguments
+     */
     public List<Expression> getArguments() {
         return arguments;
     }
@@ -33,7 +42,7 @@ public class CallExpression
     }
 
     @Override
-    public String toString() {
+    public String toSource() {
         StringBuilder builder = new StringBuilder()
                 .append(function)
                 .append('(');
@@ -50,6 +59,11 @@ public class CallExpression
         }
 
         return builder.append(')').toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Call(" + function + ", " + arguments + ")";
     }
 
 }

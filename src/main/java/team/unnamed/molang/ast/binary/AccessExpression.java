@@ -23,7 +23,13 @@ public class AccessExpression
     }
 
     @Override
-    public String toString() {
-        return leftHand + "." + rightHand;
+    public String toSource() {
+        return leftHand.toSource() + '.' + rightHand.toSource();
     }
+
+    @Override
+    public String toString() {
+        return "Access(" + leftHand + ", " + rightHand + ")";
+    }
+
 }

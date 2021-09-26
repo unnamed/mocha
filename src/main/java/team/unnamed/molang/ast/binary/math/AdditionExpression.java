@@ -31,8 +31,13 @@ public class AdditionExpression
     }
 
     @Override
+    public String toSource() {
+        return leftHand.toSource() + " + " + rightHand.toSource();
+    }
+
+    @Override
     public String toString() {
-        return leftHand + " + " + rightHand;
+        return "Add(" + leftHand + ", " + rightHand + ")";
     }
 
 }

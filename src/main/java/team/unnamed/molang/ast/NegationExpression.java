@@ -2,6 +2,11 @@ package team.unnamed.molang.ast;
 
 import team.unnamed.molang.context.EvalContext;
 
+/**
+ * Expression implementation for the MoLang 1.17
+ * negation expression, it may negate numbers or
+ * boolean expressions
+ */
 public class NegationExpression
         implements Expression {
 
@@ -11,6 +16,15 @@ public class NegationExpression
     public NegationExpression(Expression expression, char token) {
         this.expression = expression;
         this.token = token;
+    }
+
+    /**
+     * Returns the negated expression
+     * @return The negated expression,
+     * never null
+     */
+    public Expression getExpression() {
+        return expression;
     }
 
     @Override
@@ -29,7 +43,13 @@ public class NegationExpression
     }
 
     @Override
-    public String toString() {
-        return (token + "") + expression;
+    public String toSource() {
+        return token + expression.toSource();
     }
+
+    @Override
+    public String toString() {
+        return "Negate(" + expression + ")";
+    }
+
 }

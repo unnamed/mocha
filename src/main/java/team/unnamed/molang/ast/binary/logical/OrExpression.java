@@ -22,7 +22,7 @@ public class OrExpression
     }
 
     @Override
-    public String toString() {
-        return leftHand + " || " + rightHand;
+    public String toSource() {
+        return leftHand.toSource() + " || " + rightHand.toSource();
     }
 }

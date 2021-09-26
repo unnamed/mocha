@@ -27,8 +27,8 @@ public class LessThanOrEqualExpression
     }
 
     @Override
-    public String toString() {
-        return leftHand + " <= " + rightHand;
+    public String toSource() {
+        return leftHand.toSource() + " <= " + rightHand.toSource();
     }
 
 }

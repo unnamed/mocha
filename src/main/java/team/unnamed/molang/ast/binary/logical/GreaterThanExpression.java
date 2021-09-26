@@ -34,8 +34,13 @@ public class GreaterThanExpression
     }
 
     @Override
+    public String toSource() {
+        return leftHand.toSource() + " > " + rightHand.toSource();
+    }
+
+    @Override
     public String toString() {
-        return leftHand + " > " + rightHand;
+        return "GreaterThan(" + leftHand + ", " + rightHand + ")";
     }
 
 }

@@ -9,7 +9,8 @@ import team.unnamed.molang.ast.Expression;
  * is considered invalid, then it returns the 'rightHand'
  * result.
  *
- * See https://bedrock.dev/docs/stable/MoLang#%3F%3F%20Null%20Coalescing%20Operator
+ * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/
+ * Molang#%3F%3F%20Null%20Coalescing%20Operator
  */
 public class NullCoalescingExpression
         extends BinaryExpression {
@@ -29,8 +30,14 @@ public class NullCoalescingExpression
     }
 
     @Override
+    public String toSource() {
+        return leftHand.toSource() + " ?? "
+                + rightHand.toSource();
+    }
+
+    @Override
     public String toString() {
-        return leftHand + " ?? " + rightHand;
+        return "NullCoalescing(" + leftHand + ", " + rightHand + ")";
     }
 
 }
