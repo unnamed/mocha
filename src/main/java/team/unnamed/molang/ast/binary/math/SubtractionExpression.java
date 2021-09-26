@@ -1,17 +1,17 @@
-package team.unnamed.molang.expression.binary.math;
+package team.unnamed.molang.ast.binary.math;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.expression.Expression;
-import team.unnamed.molang.expression.binary.BinaryExpression;
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
  * {@link BinaryExpression} implementation for
- * multiplication of two numerical expressions
+ * subtraction of two numerical expressions
  */
-public class MultiplicationExpression
+public class SubtractionExpression
         extends BinaryExpression {
 
-    public MultiplicationExpression(
+    public SubtractionExpression(
             Expression leftHand,
             Expression rightHand
     ) {
@@ -22,7 +22,7 @@ public class MultiplicationExpression
     public float evalAsFloat(EvalContext context) {
         // override to avoid unboxing
         return leftHand.evalAsFloat(context)
-                * rightHand.evalAsFloat(context);
+                - rightHand.evalAsFloat(context);
     }
 
     @Override
@@ -32,6 +32,6 @@ public class MultiplicationExpression
 
     @Override
     public String toString() {
-        return leftHand + " * " + rightHand;
+        return leftHand + " - " + rightHand;
     }
 }

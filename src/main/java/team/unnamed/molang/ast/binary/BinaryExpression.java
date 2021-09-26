@@ -1,6 +1,6 @@
-package team.unnamed.molang.expression.binary;
+package team.unnamed.molang.ast.binary;
 
-import team.unnamed.molang.expression.Expression;
+import team.unnamed.molang.ast.Expression;
 
 /**
  * Abstraction for all {@link Expression}

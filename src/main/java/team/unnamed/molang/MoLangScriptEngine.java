@@ -2,7 +2,7 @@ package team.unnamed.molang;
 
 import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.expression.Expression;
+import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.parser.MoLangParser;
 
 import javax.script.AbstractScriptEngine;

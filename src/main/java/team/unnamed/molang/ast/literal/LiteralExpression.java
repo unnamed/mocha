@@ -1,8 +1,8 @@
-package team.unnamed.molang.expression.literal;
+package team.unnamed.molang.ast.literal;
 
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.context.ParseContext;
-import team.unnamed.molang.expression.Expression;
+import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.Tokens;
 

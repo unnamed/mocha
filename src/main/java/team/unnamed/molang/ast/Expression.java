@@ -1,4 +1,4 @@
-package team.unnamed.molang.expression;
+package team.unnamed.molang.ast;
 
 import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.context.EvalContext;

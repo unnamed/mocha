@@ -1,6 +1,6 @@
 package team.unnamed.molang.parser;
 
-import team.unnamed.molang.expression.Expression;
+import team.unnamed.molang.ast.Expression;
 
 import java.io.Reader;
 import java.util.List;

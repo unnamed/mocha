@@ -1,8 +1,8 @@
-package team.unnamed.molang.expression.binary.logical;
+package team.unnamed.molang.ast.binary.logical;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.expression.Expression;
-import team.unnamed.molang.expression.binary.BinaryExpression;
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
  * A logical "AND" expression, with a left-hand

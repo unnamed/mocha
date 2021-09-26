@@ -1,8 +1,8 @@
-package team.unnamed.molang.expression.conditional;
+package team.unnamed.molang.ast.conditional;
 
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.expression.Expression;
-import team.unnamed.molang.expression.binary.BinaryExpression;
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.ast.binary.BinaryExpression;
 
 /**
  * Implementation of the binary conditional expression,
