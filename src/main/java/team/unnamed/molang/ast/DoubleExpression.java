@@ -3,7 +3,6 @@ package team.unnamed.molang.ast;
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.parser.ParseException;
-import team.unnamed.molang.parser.Tokens;
 
 import java.util.Objects;
 

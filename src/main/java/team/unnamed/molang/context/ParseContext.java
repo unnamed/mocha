@@ -1,7 +1,7 @@
 package team.unnamed.molang.context;
 
 import team.unnamed.molang.parser.ParseException;
-import team.unnamed.molang.parser.Tokens;
+import team.unnamed.molang.ast.Tokens;
 
 import java.io.IOException;
 import java.io.Reader;
