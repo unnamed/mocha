@@ -11,7 +11,8 @@ import team.unnamed.molang.context.EvalContext;
  * or equal to the 'rightHand' expression value
  */
 public class LessThanOrEqualExpression
-        extends LessThanExpression {
+        extends LessThanExpression
+        implements BooleanExpression {
 
     public LessThanOrEqualExpression(
             Expression leftHand,

@@ -11,7 +11,8 @@ import team.unnamed.molang.context.EvalContext;
  * 'rightHand' value.
  */
 public class GreaterThanExpression
-        extends InfixExpression {
+        extends InfixExpression
+        implements BooleanExpression {
 
     public GreaterThanExpression(
             Expression leftHand,
@@ -24,11 +25,6 @@ public class GreaterThanExpression
     public boolean evalAsBoolean(EvalContext context) {
         return leftHand.evalAsFloat(context)
                 > rightHand.evalAsFloat(context);
-    }
-
-    @Override
-    public Object eval(EvalContext context) {
-        return evalAsBoolean(context);
     }
 
     @Override

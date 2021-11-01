@@ -11,7 +11,8 @@ import team.unnamed.molang.context.EvalContext;
  * than the 'rightHand' expression
  */
 public class LessThanExpression
-        extends InfixExpression {
+        extends InfixExpression
+        implements BooleanExpression {
 
     public LessThanExpression(
             Expression leftHand,
@@ -23,11 +24,6 @@ public class LessThanExpression
     @Override
     public boolean evalAsBoolean(EvalContext context) {
         return leftHand.evalAsFloat(context) < rightHand.evalAsFloat(context);
-    }
-
-    @Override
-    public Object eval(EvalContext context) {
-        return evalAsBoolean(context);
     }
 
     @Override

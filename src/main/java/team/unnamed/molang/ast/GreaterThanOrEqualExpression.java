@@ -11,7 +11,8 @@ import team.unnamed.molang.context.EvalContext;
  * equal to 'rightHand' value.
  */
 public class GreaterThanOrEqualExpression
-        extends GreaterThanExpression {
+        extends GreaterThanExpression
+        implements BooleanExpression {
 
     public GreaterThanOrEqualExpression(
             Expression leftHand,

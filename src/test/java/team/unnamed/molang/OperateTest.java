@@ -13,6 +13,7 @@ public class OperateTest {
         assertEquals(10, "true ? 10");
         assertEquals(10, "false ? 5 : 10");
         assertEquals(0, "3 >= 4");
+        assertEquals(1, "5 <= 10");
     }
 
 }

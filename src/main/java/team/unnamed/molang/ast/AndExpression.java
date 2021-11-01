@@ -8,14 +8,15 @@ import team.unnamed.molang.context.EvalContext;
  * to get the final result
  */
 public class AndExpression
-        extends InfixExpression {
+        extends InfixExpression
+        implements BooleanExpression {
 
     public AndExpression(Expression leftHand, Expression rightHand) {
         super(leftHand, rightHand);
     }
 
     @Override
-    public Object eval(EvalContext context) {
+    public boolean evalAsBoolean(EvalContext context) {
         return leftHand.evalAsBoolean(context)
                 && rightHand.evalAsBoolean(context);
     }
