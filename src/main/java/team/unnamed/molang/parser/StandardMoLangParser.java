@@ -1,6 +1,8 @@
 package team.unnamed.molang.parser;
 
 import team.unnamed.molang.ast.*;
+import team.unnamed.molang.ast.logical.AndExpression;
+import team.unnamed.molang.ast.logical.OrExpression;
 import team.unnamed.molang.context.ParseContext;
 
 import java.io.Reader;

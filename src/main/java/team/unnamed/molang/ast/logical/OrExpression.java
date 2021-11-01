@@ -1,5 +1,8 @@
-package team.unnamed.molang.ast;
+package team.unnamed.molang.ast.logical;
 
+import team.unnamed.molang.ast.BooleanExpression;
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.ast.InfixExpression;
 import team.unnamed.molang.context.EvalContext;
 
 /**
