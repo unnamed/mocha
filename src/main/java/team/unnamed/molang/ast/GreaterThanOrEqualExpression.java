@@ -32,4 +32,9 @@ public class GreaterThanOrEqualExpression
         return leftHand.toSource() + " >= " + rightHand.toSource();
     }
 
+    @Override
+    public String toString() {
+        return "GreaterThanOrEqual(" + leftHand + ", " + rightHand + ")";
+    }
+
 }

@@ -31,4 +31,9 @@ public class LessThanOrEqualExpression
         return leftHand.toSource() + " <= " + rightHand.toSource();
     }
 
+    @Override
+    public String toString() {
+        return "LessThanOrEqual(" + leftHand + ", " + rightHand + ")";
+    }
+
 }
