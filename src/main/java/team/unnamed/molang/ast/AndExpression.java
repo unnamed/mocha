@@ -15,11 +15,6 @@ public class AndExpression
     }
 
     @Override
-    public Class<?> getType() {
-        return Object.class;
-    }
-
-    @Override
     public Object eval(EvalContext context) {
         return leftHand.evalAsBoolean(context)
                 && rightHand.evalAsBoolean(context);

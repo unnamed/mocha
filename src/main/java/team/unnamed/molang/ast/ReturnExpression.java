@@ -24,15 +24,6 @@ public class ReturnExpression implements Expression {
     }
 
     @Override
-    public boolean hasReturnValue() {
-        // return statements do not
-        // have values when calling
-        // eval(EvalContext), we should
-        // use statements instead :/
-        return false;
-    }
-
-    @Override
     public Object eval(EvalContext context) {
         Object value = this.value.eval(context);
         // set the scope return value
