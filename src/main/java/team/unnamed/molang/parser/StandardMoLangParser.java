@@ -257,7 +257,7 @@ public class StandardMoLangParser
             return new LessThanExpression(left, parse(context));
         } else if (current == '>') {
             if (context.next() == '=') {
-                context.skipWhitespace();
+                context.nextNoWhitespace();
                 return new GreaterThanOrEqualExpression(left, parse(context));
             }
 
