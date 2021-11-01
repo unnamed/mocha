@@ -48,7 +48,6 @@ public class MoLangScriptEngine
             Object lastResult = 0;
 
             for (Expression expression : expressions) {
-                System.out.println(expression);
                 lastResult = expression.eval(evalContext);
             }
 
