@@ -249,7 +249,7 @@ public class StandardMoLangParser
             return new OrExpression(left, parse(context));
         } else if (current == '<') {
             if (context.next() == '=') {
-                context.skipWhitespace();
+                context.nextNoWhitespace();
                 return new LessThanOrEqualExpression(left, parse(context));
             }
 
