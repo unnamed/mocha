@@ -9,26 +9,7 @@ import java.util.List;
  * A fundamental interface representing every
  * possible expression in the MoLang language
  */
-public interface Expression extends Node {
-
-    /**
-     * Determines if this expression returns
-     * a value when calling {@link Expression#eval}
-     * TODO: We should create statement types
-     * @return True if this is an expression
-     * with value
-     */
-    default boolean hasReturnValue() {
-        return true;
-    }
-
-    /**
-     * Returns the expected return type
-     * when evaluating this expression
-     */
-    default Class<?> getType() {
-        return Object.class;
-    }
+public interface Expression {
 
     /**
      * Evaluates the expression using
