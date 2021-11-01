@@ -24,4 +24,10 @@ public class OrExpression
     public String toSource() {
         return leftHand.toSource() + " || " + rightHand.toSource();
     }
+
+    @Override
+    public String toString() {
+        return "Or(" + leftHand + ", " + rightHand  + ")";
+    }
+
 }

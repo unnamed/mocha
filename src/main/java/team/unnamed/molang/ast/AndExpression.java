@@ -26,4 +26,9 @@ public class AndExpression
         return leftHand.toSource() + " && " + rightHand.toSource();
     }
 
+    @Override
+    public String toString() {
+        return "And(" + leftHand + ", " + rightHand + ")";
+    }
+
 }
