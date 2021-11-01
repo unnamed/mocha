@@ -291,7 +291,7 @@ public class StandardMoLangParser
                 if (context.getCurrent() == ':') {
                     // then it's a ternary expression, since there is
                     // a ':', indicating the next expression
-                    context.skipWhitespace();
+                    context.nextNoWhitespace();
                     return new TernaryConditionalExpression(left, trueValue, parse(context));
                 } else {
                     return new InfixConditionalExpression(left, trueValue);
