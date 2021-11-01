@@ -16,4 +16,12 @@ public class OperateTest {
         assertEquals(1, "5 <= 10");
     }
 
+    @Test
+    public void test_logical() {
+        assertEquals(1, "true && true");
+        assertEquals(1, "true || false");
+        assertEquals(0, "false && true");
+        assertEquals(0, "false || false");
+    }
+
 }
