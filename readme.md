@@ -35,22 +35,16 @@ implementation("team.unnamed:molang:0.1.0")
 ```
 
 ## Usage
-It implements interfaces in `javax.script` so
-you can use MoLang as any other registered `ScriptEngine`
+MoLang is pretty easy to use, you can eval strings or `java.io.Reader`
 
 ### Basic Usage:
 ```java
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import team.unnamed.molang.MoLangEngine;
 
 class MyProgram {
 
     public void run() throws ScriptException {
-        ScriptEngineManager scriptEngineManager
-                = new ScriptEngineManager();
-        ScriptEngine engine
-                = scriptEngineManager.getEngineByName("molang");
+        MoLangEngine engine = new MoLangEngine();
         
         System.out.println(engine.eval("math.cos(90) * 16"));
     }
