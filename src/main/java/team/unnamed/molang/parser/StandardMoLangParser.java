@@ -295,7 +295,7 @@ public class StandardMoLangParser
                         context.getCursor()
                 );
             }
-            return new AccessExpression(left, readWord(context));
+            return new AccessExpression(left, readWord(context).toLowerCase());
         }
         //#endregion
 
