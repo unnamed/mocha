@@ -26,8 +26,7 @@ public class AccessExpression implements Expression {
     @Override
     public Object eval(EvalContext context) {
         if (!(property instanceof IdentifierExpression)) {
-            // TODO: This is invalid, should we throw an error?
-            return null;
+            return 0;
         }
         Object binding = object.eval(context);
         if (binding instanceof ObjectBinding) {
