@@ -44,7 +44,7 @@ import team.unnamed.molang.MoLangEngine;
 class MyProgram {
 
     public void run() throws ScriptException {
-        MoLangEngine engine = new MoLangEngine();
+        MoLangEngine engine = MoLangEngine.createDefault();
         
         System.out.println(engine.eval("math.cos(90) * 16"));
     }
