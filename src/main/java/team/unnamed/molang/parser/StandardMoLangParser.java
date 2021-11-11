@@ -1,8 +1,15 @@
 package team.unnamed.molang.parser;
 
 import team.unnamed.molang.ast.*;
-import team.unnamed.molang.ast.logical.AndExpression;
-import team.unnamed.molang.ast.logical.OrExpression;
+import team.unnamed.molang.ast.binary.AccessExpression;
+import team.unnamed.molang.ast.binary.ConditionalExpression;
+import team.unnamed.molang.ast.binary.InfixExpression;
+import team.unnamed.molang.ast.binary.NullCoalescingExpression;
+import team.unnamed.molang.ast.composite.CallExpression;
+import team.unnamed.molang.ast.composite.ExecutionScopeExpression;
+import team.unnamed.molang.ast.simple.DoubleExpression;
+import team.unnamed.molang.ast.simple.IdentifierExpression;
+import team.unnamed.molang.ast.simple.StringExpression;
 import team.unnamed.molang.context.ParseContext;
 
 import java.io.Reader;
@@ -166,11 +173,11 @@ public class StandardMoLangParser
         if (current == '*') {
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
-            return new MultiplicationExpression(left, right);
+            return new InfixExpression(InfixExpression.MULTIPLY, left, right);
         } else if (current == '/') {
             context.nextNoWhitespace();
             Expression right = parseSingle(context);
-            return new DivisionExpression(left, right);
+            return new InfixExpression(InfixExpression.DIVIDE, left, right);
         }
         return left;
     }
@@ -181,11 +188,11 @@ public class StandardMoLangParser
         if (current == '+') {
             context.nextNoWhitespace();
             Expression right = parse(context);
-            return new AdditionExpression(left, right);
+            return new InfixExpression(InfixExpression.ADD, left, right);
         } else if (current == '-') {
             context.nextNoWhitespace();
             Expression right = parse(context);
-            return new SubtractionExpression(left, right);
+            return new InfixExpression(InfixExpression.SUBTRACT, left, right);
         }
         // try fallback-ing to multiplication/division
         return parseMultiplication(context, left);
@@ -237,7 +244,7 @@ public class StandardMoLangParser
 
             // skip second ampersand and next spaces
             context.nextNoWhitespace();
-            return new AndExpression(left, parse(context));
+            return new InfixExpression(InfixExpression.AND, left, parse(context));
         } else if (current == Tokens.LINE) {
             current = context.next();
 
@@ -248,23 +255,23 @@ public class StandardMoLangParser
 
             // skip second line and next spaces
             context.nextNoWhitespace();
-            return new OrExpression(left, parse(context));
+            return new InfixExpression(InfixExpression.OR, left, parse(context));
         } else if (current == '<') {
             if (context.next() == '=') {
                 context.nextNoWhitespace();
-                return new LessThanOrEqualExpression(left, parse(context));
+                return new InfixExpression(InfixExpression.LESS_THAN_OR_EQUAL, left, parse(context));
             }
 
             context.skipWhitespace();
-            return new LessThanExpression(left, parse(context));
+            return new InfixExpression(InfixExpression.LESS_THAN, left, parse(context));
         } else if (current == '>') {
             if (context.next() == '=') {
                 context.nextNoWhitespace();
-                return new GreaterThanOrEqualExpression(left, parse(context));
+                return new InfixExpression(InfixExpression.GREATER_THAN_OR_EQUAL, left, parse(context));
             }
 
             context.skipWhitespace();
-            return new GreaterThanExpression(left, parse(context));
+            return new InfixExpression(InfixExpression.GREATER_THAN, left, parse(context));
         }
         //#endregion
 
@@ -296,7 +303,7 @@ public class StandardMoLangParser
                     context.nextNoWhitespace();
                     return new TernaryConditionalExpression(left, trueValue, parse(context));
                 } else {
-                    return new InfixConditionalExpression(left, trueValue);
+                    return new ConditionalExpression(left, trueValue);
                 }
             }
         }

@@ -32,16 +32,6 @@ public class WrappedExpression implements Expression {
     }
 
     @Override
-    public Object evalProperty(EvalContext context, Expression property) {
-        return expression.evalProperty(context, property);
-    }
-
-    @Override
-    public Object call(EvalContext context, List<Expression> arguments) {
-        return expression.call(context, arguments);
-    }
-
-    @Override
     public float evalAsFloat(EvalContext context) {
         return expression.evalAsFloat(context);
     }

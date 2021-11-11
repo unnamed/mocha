@@ -1,5 +1,6 @@
-package team.unnamed.molang.ast;
+package team.unnamed.molang.ast.binary;
 
+import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.context.EvalContext;
 
 /**
@@ -12,20 +13,23 @@ import team.unnamed.molang.context.EvalContext;
  * expression is considered true, it evaluates the
  * {@code predicate} expression.</p>
  */
-public class InfixConditionalExpression
-        extends InfixExpression {
+public class ConditionalExpression implements Expression {
 
-    public InfixConditionalExpression(
-            Expression conditional,
+    private final Expression condition;
+    private final Expression predicate;
+
+    public ConditionalExpression(
+            Expression condition,
             Expression predicate
     ) {
-        super(conditional, predicate);
+        this.condition = condition;
+        this.predicate = predicate;
     }
 
     @Override
     public Object eval(EvalContext context) {
-        if (leftHand.evalAsBoolean(context)) {
-            return rightHand.eval(context);
+        if (condition.evalAsBoolean(context)) {
+            return predicate.eval(context);
         } else {
             return 0;
         }
@@ -33,12 +37,12 @@ public class InfixConditionalExpression
 
     @Override
     public String toSource() {
-        return leftHand.toSource() + " ? " + rightHand.toSource();
+        return condition.toSource() + " ? " + predicate.toSource();
     }
 
     @Override
     public String toString() {
-        return "Condition(" + leftHand + ", " + rightHand + ")";
+        return "Condition(" + condition + ", " + predicate + ")";
     }
 
 }

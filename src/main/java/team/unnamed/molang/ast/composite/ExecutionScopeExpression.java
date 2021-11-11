@@ -1,5 +1,6 @@
-package team.unnamed.molang.ast;
+package team.unnamed.molang.ast.composite;
 
+import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.context.EvalContext;
 
 import java.util.Iterator;
@@ -32,7 +33,6 @@ public class ExecutionScopeExpression implements Expression {
     public Object eval(EvalContext context) {
         for (Expression expression : expressions) {
             // eval expression, ignore result
-            // todo: we should use statements!
             expression.eval(context);
 
             // check for return values

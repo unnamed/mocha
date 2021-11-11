@@ -1,5 +1,7 @@
-package team.unnamed.molang.ast;
+package team.unnamed.molang.ast.composite;
 
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.binding.CallableBinding;
 import team.unnamed.molang.context.EvalContext;
 
 import java.util.Iterator;
@@ -38,7 +40,17 @@ public class CallExpression
 
     @Override
     public Object eval(EvalContext context) {
-        return function.call(context, arguments);
+        Object binding = function.eval(context);
+        if (!(binding instanceof CallableBinding)) {
+            // TODO: This isn't fail-fast, check this in specification
+            return 0;
+        }
+
+        Object[] evaluatedArguments = new Object[arguments.size()];
+        for (int i = 0; i < arguments.size(); i++) {
+            evaluatedArguments[i] = arguments.get(i).eval(context);
+        }
+        return ((CallableBinding) binding).call(evaluatedArguments);
     }
 
     @Override

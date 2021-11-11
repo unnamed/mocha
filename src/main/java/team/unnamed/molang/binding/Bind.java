@@ -27,21 +27,4 @@ public final class Bind {
     private Bind() {
     }
 
-    public static Object callBinding(
-            EvalContext context,
-            Object binding,
-            List<Expression> arguments
-    ) {
-        if (!(binding instanceof CallableBinding)) {
-            // TODO: This isn't fail-fast, check this in specification
-            return 0;
-        }
-
-        Object[] evaluatedArguments = new Object[arguments.size()];
-        for (int i = 0; i < arguments.size(); i++) {
-            evaluatedArguments[i] = arguments.get(i).eval(context);
-        }
-        return ((CallableBinding) binding).call(evaluatedArguments);
-    }
-
 }

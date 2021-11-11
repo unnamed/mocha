@@ -1,5 +1,7 @@
-package team.unnamed.molang.ast;
+package team.unnamed.molang.ast.simple;
 
+import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.ast.Tokens;
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.parser.ParseException;
