@@ -2,7 +2,6 @@ package team.unnamed.molang.ast.binary;
 
 import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.ast.Tokens;
-import team.unnamed.molang.ast.simple.IdentifierExpression;
 import team.unnamed.molang.binding.ObjectBinding;
 import team.unnamed.molang.context.EvalContext;
 
@@ -30,6 +29,14 @@ public class AccessExpression implements Expression {
             return ((ObjectBinding) binding).getProperty(property);
         }
         return null;
+    }
+
+    @Override
+    public void setValue(EvalContext context, Object value) {
+        Object binding = object.eval(context);
+        if (binding instanceof ObjectBinding) {
+            ((ObjectBinding) binding).setProperty(property, value);
+        }
     }
 
     @Override

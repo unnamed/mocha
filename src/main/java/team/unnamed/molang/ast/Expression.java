@@ -1,9 +1,6 @@
 package team.unnamed.molang.ast;
 
-import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.context.EvalContext;
-
-import java.util.List;
 
 /**
  * A fundamental interface representing every
@@ -16,6 +13,9 @@ public interface Expression {
      * the given {@code context}
      */
     Object eval(EvalContext context);
+
+    default void setValue(EvalContext context, Object value) {
+    }
 
     /**
      * Evaluates the expression using

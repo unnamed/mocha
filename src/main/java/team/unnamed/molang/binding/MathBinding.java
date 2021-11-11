@@ -11,6 +11,8 @@ import java.util.Random;
 public class MathBinding
         implements ObjectBinding {
 
+    private static final double RADIAN = Math.toRadians(1);
+
     private static final Random RANDOM = new Random();
     private static final int DECIMAL_PART = 4;
 
@@ -19,10 +21,10 @@ public class MathBinding
     public MathBinding() {
 
         bindCallable("abs", args -> Math.abs(toDouble(args[0])));
-        bindCallable("acos", args -> Math.acos(toDouble(args[0])));
-        bindCallable("asin", args -> Math.asin(toDouble(args[0])));
-        bindCallable("atan", args -> Math.atan(toDouble(args[0])));
-        bindCallable("atan2", args -> Math.atan2(toDouble(args[0]), toDouble(args[1])));
+        bindCallable("acos", args -> Math.acos(toDouble(args[0])) / RADIAN);
+        bindCallable("asin", args -> Math.asin(toDouble(args[0])) / RADIAN);
+        bindCallable("atan", args -> Math.atan(toDouble(args[0])) / RADIAN);
+        bindCallable("atan2", args -> Math.atan2(toDouble(args[0]), toDouble(args[1])) / RADIAN);
         bindCallable("ceil", args -> Math.ceil(toDouble(args[0])));
         bindCallable("clamp", args -> Math.max(Math.min(toDouble(args[0]), toDouble(args[2])), toDouble(args[1])));
         bindCallable("cos", args -> Math.cos(toRadians(args[0])));
@@ -40,6 +42,25 @@ public class MathBinding
 
         bindCallable("exp", args -> Math.exp(toDouble(args[0])));
         bindCallable("floor", args -> Math.floor(toDouble(args[0])));
+        bindCallable("lerprotate", args -> {
+            double start = radify(toDouble(args[0]));
+            double end = radify(toDouble(args[1]));
+            double lerp = toDouble(args[2]);
+
+            if (start > end) {
+                // swap
+                double tmp = start;
+                start = end;
+                end = tmp;
+            }
+
+            double diff = end - start;
+            if (diff > 180F) {
+                return radify(end + lerp * (360F - diff));
+            } else {
+                return start + lerp * diff;
+            }
+        });
         // TODO: hermite_blend, lerp, lerprotate
         bindCallable("ln", args -> Math.log(toDouble(args[0])));
         bindCallable("max", args -> Math.max(toDouble(args[0]), toDouble(args[1])));
@@ -65,6 +86,10 @@ public class MathBinding
 
     @Override
     public void setProperty(String name, Object value) {
+    }
+
+    private static double radify(double n) {
+        return (((n + 180) % 360) + 180) % 360;
     }
 
     private static double toDouble(Object object) {

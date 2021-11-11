@@ -4,6 +4,7 @@ import team.unnamed.molang.ast.*;
 import team.unnamed.molang.ast.binary.AccessExpression;
 import team.unnamed.molang.ast.binary.ConditionalExpression;
 import team.unnamed.molang.ast.binary.InfixExpression;
+import team.unnamed.molang.ast.binary.ModifyExpression;
 import team.unnamed.molang.ast.binary.NullCoalescingExpression;
 import team.unnamed.molang.ast.composite.CallExpression;
 import team.unnamed.molang.ast.composite.ExecutionScopeExpression;
@@ -62,7 +63,7 @@ public class StandardMoLangParser
         int current = context.getCurrent();
         do {
             builder.append((char) current);
-        } while (Tokens.isValidForIdentifier(current = context.next()));
+        } while (Tokens.isValidIdentifierContinuation(current = context.next()));
         // skip whitespace
         context.skipWhitespace();
         return builder.toString();
@@ -123,6 +124,8 @@ public class StandardMoLangParser
                     return new DoubleExpression(1D);
                 case "false":
                     return new DoubleExpression(0F);
+                case "return":
+                    return new ReturnExpression(parse(context));
                 default:
                     return new IdentifierExpression(identifier);
             }
@@ -319,6 +322,13 @@ public class StandardMoLangParser
                     return new ConditionalExpression(left, trueValue);
                 }
             }
+        }
+        //#endregion
+
+        //#region Assignation Operators
+        if (current == Tokens.EQUAL) {
+            context.nextNoWhitespace();
+            return new ModifyExpression(left, parse(context));
         }
         //#endregion
 

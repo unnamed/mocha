@@ -18,6 +18,7 @@ public final class Tokens {
     public static final char DOT = '.';
     public static final char AMPERSAND = '&';
     public static final char EXCLAMATION = '!';
+    public static final char EQUAL = '=';
 
     // I don't know the name of this character, it's just a line
     public static final char LINE = '|';
@@ -36,8 +37,16 @@ public final class Tokens {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
     }
 
+    public static boolean isDigit(int c) {
+        return Character.isDigit(c);
+    }
+
     public static boolean isValidForIdentifier(int c) {
         return isLetter(c) || c == UNDERSCORE;
+    }
+
+    public static boolean isValidIdentifierContinuation(int c) {
+        return isValidForIdentifier(c) || isDigit(c);
     }
 
 }

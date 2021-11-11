@@ -1,10 +1,5 @@
 package team.unnamed.molang.binding;
 
-import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
-
-import java.util.List;
-
 /**
  * Class holding some default bindings and
  * static utility methods for ease working
