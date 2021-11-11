@@ -52,6 +52,22 @@ public class StandardMoLangParser
         }
     }
 
+    /**
+     * Reads a 'word' or 'identifier' without any other
+     * checks, assumes that current token is valid for
+     * a word
+     */
+    private String readWord(ParseContext context) throws ParseException {
+        StringBuilder builder = new StringBuilder();
+        int current = context.getCurrent();
+        do {
+            builder.append((char) current);
+        } while (Tokens.isValidForIdentifier(current = context.next()));
+        // skip whitespace
+        context.skipWhitespace();
+        return builder.toString();
+    }
+
     private Expression parseSingle(ParseContext context) throws ParseException {
         int current = context.getCurrent();
 
@@ -100,14 +116,7 @@ public class StandardMoLangParser
 
         //#region Identifier expression and keywords
         if (Tokens.isValidForIdentifier(current)) {
-            StringBuilder identifierBuilder = new StringBuilder();
-            do {
-                identifierBuilder.append((char) current);
-            } while (Tokens.isValidForIdentifier(current = context.next()));
-            // skip whitespace
-            context.skipWhitespace();
-
-            String identifier = identifierBuilder.toString();
+            String identifier = readWord(context);
 
             switch (identifier) {
                 case "true":
@@ -277,9 +286,13 @@ public class StandardMoLangParser
 
         //#region Dot access expression
         if (current == Tokens.DOT) {
-            context.nextNoWhitespace();
-            Expression right = parseSingle(context);
-            return new AccessExpression(left, right);
+            if (!Tokens.isValidForIdentifier(context.nextNoWhitespace())) {
+                throw new ParseException(
+                        "Unexpected token; expected a valid field token",
+                        context.getCursor()
+                );
+            }
+            return new AccessExpression(left, readWord(context));
         }
         //#endregion
 

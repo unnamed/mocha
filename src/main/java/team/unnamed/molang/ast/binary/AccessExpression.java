@@ -13,11 +13,11 @@ import team.unnamed.molang.context.EvalContext;
 public class AccessExpression implements Expression {
 
     private final Expression object;
-    private final Expression property;
+    private final String property;
 
     public AccessExpression(
             Expression object,
-            Expression property
+            String property
     ) {
         this.object = object;
         this.property = property;
@@ -25,20 +25,16 @@ public class AccessExpression implements Expression {
 
     @Override
     public Object eval(EvalContext context) {
-        if (!(property instanceof IdentifierExpression)) {
-            return 0;
-        }
         Object binding = object.eval(context);
         if (binding instanceof ObjectBinding) {
-            String propertyName = ((IdentifierExpression) property).getIdentifier();
-            return ((ObjectBinding) binding).getProperty(propertyName);
+            return ((ObjectBinding) binding).getProperty(property);
         }
         return null;
     }
 
     @Override
     public String toSource() {
-        return object.toSource() + Tokens.DOT + property.toSource();
+        return object.toSource() + Tokens.DOT + property;
     }
 
     @Override
