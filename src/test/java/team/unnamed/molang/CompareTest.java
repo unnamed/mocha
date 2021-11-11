@@ -3,7 +3,6 @@ package team.unnamed.molang;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +15,7 @@ import java.io.InputStreamReader;
  */
 public class CompareTest {
 
-    private static final ScriptEngine ENGINE = new MoLangScriptEngineFactory().getScriptEngine();
+    private static final MoLangEngine ENGINE = new MoLangEngine();
 
     /**
      * Compares this library results with MolangJS

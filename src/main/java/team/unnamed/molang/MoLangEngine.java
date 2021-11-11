@@ -4,11 +4,9 @@ import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.parser.MoLangParser;
+import team.unnamed.molang.parser.StandardMoLangParser;
 
-import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
@@ -17,27 +15,17 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
-public class MoLangScriptEngine
-        extends AbstractScriptEngine
-        implements ScriptEngine {
+public class MoLangEngine {
 
-    private final ScriptEngineFactory factory;
-    private final MoLangParser parser;
+    private final MoLangParser parser = new StandardMoLangParser();
 
-    public MoLangScriptEngine(ScriptEngineFactory factory, MoLangParser parser) {
-        this.factory = factory;
-        this.parser = parser;
+    public Object eval(String script) throws ScriptException {
+        return eval(new StringReader(script));
     }
 
-    @Override
-    public Object eval(String script, ScriptContext context) throws ScriptException {
-        return eval(new StringReader(script), context);
-    }
-
-    @Override
-    public Object eval(Reader reader, ScriptContext context) throws ScriptException {
+    public Object eval(Reader reader) throws ScriptException {
         try {
-            Bindings bindings = createBindings();
+            Bindings bindings = new SimpleBindings();
             bindings.put("query", Bind.QUERY_BINDING);
             bindings.put("math", Bind.MATH_BINDING);
 
@@ -56,16 +44,6 @@ public class MoLangScriptEngine
         } catch (IOException e) {
             throw new ScriptException(e);
         }
-    }
-
-    @Override
-    public Bindings createBindings() {
-        return new SimpleBindings();
-    }
-
-    @Override
-    public ScriptEngineFactory getFactory() {
-        return factory;
     }
 
 }
