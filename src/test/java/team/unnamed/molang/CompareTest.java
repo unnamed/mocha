@@ -24,7 +24,7 @@ public class CompareTest {
      * https://github.com/JannisX11/MolangJS
      */
     @Test
-    public void compare_with_molangjs() throws IOException, ScriptException {
+    public void compare_with_molangjs() throws IOException {
         compare("expectations.txt", "tests.txt");
     }
 
@@ -52,7 +52,7 @@ public class CompareTest {
         return value;
     }
 
-    private static void compare(String expectationsName, String sourceName) throws IOException, ScriptException {
+    private static void compare(String expectationsName, String sourceName) throws IOException {
         try (BufferedReader source = createResourceReader(sourceName)) {
             try (BufferedReader expectations = createResourceReader(expectationsName)) {
                 while (true) {
@@ -67,9 +67,13 @@ public class CompareTest {
                     float expectedValue = Float.parseFloat(expected);
 
                     // eval expression
-                    Object result = ENGINE.eval(expression);
-                    Assertions.assertTrue(result instanceof Number, "Result is a number");
-                    Assertions.assertEquals(expectedValue, ((Number) result).floatValue());
+                    try {
+                        Object result = ENGINE.eval(expression);
+                        Assertions.assertTrue(result instanceof Number, "Result is a number");
+                        Assertions.assertEquals(expectedValue, ((Number) result).floatValue());
+                    } catch (ScriptException e) {
+                        Assertions.fail("Failed to eval expression '" + expression + "'", e);
+                    }
                 }
             }
         }

@@ -1,3 +1,13 @@
+# Please do not modify this file, this is
+# a generated file to compare results across
+# different MoLang libraries
 2
-5
-30
+3
+10
+10
+0
+66
+4
+9
+20
+207

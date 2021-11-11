@@ -1,4 +1,29 @@
+# basic
 1 + 1
-2 + 3
 
-5 * 6
+# order or operation
+1 + 1 * 2
+
+# binary
+true ? 10
+
+# ternary
+false ? 5 : 10
+
+# greater or equal
+3 >= 4
+
+# multiline
+temp.test = 33; return temp.test * 2;
+
+# return
+temp.test = 4; return temp.test; return 5;
+
+# math
+math.pow(math.clamp(500, 0, 3), 2)
+
+# lerp rotate
+math.lerprotate(10, 380, 0.5) + math.lerprotate(50, -10, 0.25)
+
+# inverse trigonometry
+math.round(math.acos(-1) + math.atan2(2, 4))

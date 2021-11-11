@@ -20,6 +20,13 @@ const output = fs.createWriteStream(`${basePath}/expectations.txt`);
 // read input, parse and write
 const reader = readline.createInterface({ input });
 
+// write warning
+output.write(
+        '# Please do not modify this file, this is\n'
+         + '# a generated file to compare results across\n'
+         + '# different MoLang libraries\n'
+);
+
 reader.on('line', expression => {
     if (expression.length !== 0 && expression.trim().charAt(0) !== '#') {
         const result = parser.parse(expression);
