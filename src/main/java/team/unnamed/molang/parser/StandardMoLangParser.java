@@ -4,7 +4,7 @@ import team.unnamed.molang.ast.*;
 import team.unnamed.molang.ast.binary.AccessExpression;
 import team.unnamed.molang.ast.binary.ConditionalExpression;
 import team.unnamed.molang.ast.binary.InfixExpression;
-import team.unnamed.molang.ast.binary.ModifyExpression;
+import team.unnamed.molang.ast.binary.AssignExpression;
 import team.unnamed.molang.ast.binary.NullCoalescingExpression;
 import team.unnamed.molang.ast.composite.CallExpression;
 import team.unnamed.molang.ast.composite.ExecutionScopeExpression;
@@ -328,7 +328,7 @@ public class StandardMoLangParser
         //#region Assignation Operators
         if (current == Tokens.EQUAL) {
             context.nextNoWhitespace();
-            return new ModifyExpression(left, parse(context));
+            return new AssignExpression(left, parse(context));
         }
         //#endregion
 

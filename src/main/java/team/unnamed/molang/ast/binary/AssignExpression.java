@@ -3,12 +3,12 @@ package team.unnamed.molang.ast.binary;
 import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.context.EvalContext;
 
-public class ModifyExpression implements Expression {
+public class AssignExpression implements Expression {
 
     private final Expression variable;
     private final Expression value;
 
-    public ModifyExpression(
+    public AssignExpression(
             Expression variable,
             Expression value
     ) {
