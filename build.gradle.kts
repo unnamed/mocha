@@ -12,8 +12,14 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
+tasks {
+    create<Exec>("generateExpectations") {
+        commandLine = listOf("node", "scripts/generate_expectations.js")
+    }
+    test {
+        useJUnitPlatform()
+        dependsOn("generateExpectations")
+    }
 }
 
 java {
