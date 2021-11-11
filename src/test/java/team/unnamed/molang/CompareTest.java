@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
  */
 public class CompareTest {
 
-    private static final MoLangEngine ENGINE = new MoLangEngine();
+    private static final MoLangEngine ENGINE = MoLangEngine.createDefault();
 
     /**
      * Compares this library results with MolangJS

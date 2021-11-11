@@ -13,12 +13,20 @@ import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MoLangEngine {
 
     private final MoLangParser parser = new StandardMoLangParser();
     private final StorageBinding variable = new StorageBinding();
+
+    private final Map<String, Object> globalBindings;
+
+    private MoLangEngine(Builder builder) {
+        this.globalBindings = builder.bindings;
+    }
 
     public Object eval(String script) throws ScriptException {
         return eval(new StringReader(script));
@@ -27,8 +35,6 @@ public class MoLangEngine {
     public Object eval(Reader reader) throws ScriptException {
         try {
             Bindings bindings = new SimpleBindings();
-            bindings.put("query", Bind.QUERY_BINDING);
-            bindings.put("math", Bind.MATH_BINDING);
             bindings.put("variable", variable);
 
             // temporal storage
@@ -55,6 +61,37 @@ public class MoLangEngine {
         } catch (IOException e) {
             throw new ScriptException(e);
         }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static MoLangEngine createDefault() {
+        return new Builder()
+                .withDefaultBindings()
+                .build();
+    }
+
+    public static MoLangEngine createEmpty() {
+        return new Builder().build();
+    }
+
+    public static class Builder {
+
+        private final Map<String, Object> bindings = new HashMap<>();
+
+        public Builder withDefaultBindings() {
+            bindings.put("query", Bind.QUERY_BINDING);
+            bindings.put("math", Bind.MATH_BINDING);
+            bindings.put("variable", new StorageBinding());
+            return this;
+        }
+
+        public MoLangEngine build() {
+            return new MoLangEngine(this);
+        }
+
     }
 
 }
