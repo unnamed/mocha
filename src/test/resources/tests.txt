@@ -30,3 +30,6 @@ math.lerprotate(10, 380, 0.5) + math.lerprotate(50, -10, 0.25)
 
 # inverse trigonometry
 math.round(math.acos(-1) + math.atan2(2, 4))
+
+# pixel case
+temp.level = 10; 10 * temp.level + (temp.level * temp.level * 4)
