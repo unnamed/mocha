@@ -25,41 +25,46 @@ final class MoLangEngineImpl implements MoLangEngine {
         this.bindings = builder.bindings;
     }
 
+    private Bindings createBindings() {
+        Bindings bindings = new SimpleBindings();
+        bindings.putAll(this.bindings);
+
+        // temporal storage
+        StorageBinding temp = new StorageBinding();
+        bindings.put("temp", temp);
+        return bindings;
+    }
+
     @Override
-    public List<Expression> parse(Reader reader) throws ParseException {
-        return parser.parse(reader);
+    public Object eval(List<Expression> expressions) {
+        Bindings bindings = createBindings();
+        EvalContext context = new EvalContext(bindings);
+        Object lastResult = 0;
+
+        for (Expression expression : expressions) {
+            lastResult = expression.eval(context);
+            Object returnValue = context.popReturnValue();
+            if (returnValue != null) {
+                lastResult = returnValue;
+                break;
+            }
+        }
+
+        return lastResult;
     }
 
     @Override
     public Object eval(Reader reader) throws ScriptException {
         try {
-            Bindings bindings = new SimpleBindings();
-            bindings.putAll(this.bindings);
-
-            // temporal storage
-            StorageBinding temp = new StorageBinding();
-            bindings.put("temp", temp);
-
-            // temporal
-            List<Expression> expressions = parser.parse(reader);
-
-            EvalContext context = new EvalContext(bindings);
-            Object lastResult = 0;
-
-            for (Expression expression : expressions) {
-                lastResult = expression.eval(context);
-                Object returnValue = context.popReturnValue();
-                if (returnValue != null) {
-                    lastResult = returnValue;
-                    break;
-                }
-            }
-            temp.clear();
-
-            return lastResult;
+            return eval(parser.parse(reader));
         } catch (IOException e) {
             throw new ScriptException(e);
         }
+    }
+
+    @Override
+    public List<Expression> parse(Reader reader) throws ParseException {
+        return parser.parse(reader);
     }
 
 }

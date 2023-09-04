@@ -1,5 +1,6 @@
 package team.unnamed.molang;
 
+import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.binding.StorageBinding;
 import team.unnamed.molang.parser.MoLangParser;
@@ -9,9 +10,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface MoLangEngine extends MoLangParser {
+
+    Object eval(List<Expression> expressions) throws ScriptException;
 
     Object eval(Reader reader) throws ScriptException;
 
