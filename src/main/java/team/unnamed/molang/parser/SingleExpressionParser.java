@@ -98,7 +98,9 @@ final class SingleExpressionParser {
                         left,
                         StandardMoLangParser.readWord(context).toLowerCase()
                 );
+                current = context.getCurrent();
             }
+
             //#endregion
             return left;
         }

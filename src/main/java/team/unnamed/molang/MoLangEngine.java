@@ -44,11 +44,26 @@ public interface MoLangEngine extends MoLangParser {
     class Builder {
 
         final Map<String, Object> bindings = new HashMap<>();
+        StorageBinding variables;
+
+        public Builder bindVariable(String key, Object binding) {
+            ensureBoundVariables();
+            variables.setProperty(key, binding);
+            return this;
+        }
+
+        private void ensureBoundVariables() {
+            if (variables == null) {
+                variables = new StorageBinding();
+                bindings.put("variable", variables);
+                bindings.put("v", variables); // <-- alias
+            }
+        }
 
         public Builder withDefaultBindings() {
             bindings.put("query", Bind.QUERY_BINDING);
             bindings.put("math", Bind.MATH_BINDING);
-            bindings.put("variable", new StorageBinding());
+            ensureBoundVariables();
             return this;
         }
 
