@@ -4,6 +4,7 @@ import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.binding.StorageBinding;
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.parser.MoLangParser;
+import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.StandardMoLangParser;
 
 import javax.script.Bindings;
@@ -24,6 +25,12 @@ final class MoLangEngineImpl implements MoLangEngine {
         this.bindings = builder.bindings;
     }
 
+    @Override
+    public List<Expression> parse(Reader reader) throws ParseException {
+        return parser.parse(reader);
+    }
+
+    @Override
     public Object eval(Reader reader) throws ScriptException {
         try {
             Bindings bindings = new SimpleBindings();

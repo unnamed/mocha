@@ -2,6 +2,7 @@ package team.unnamed.molang;
 
 import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.binding.StorageBinding;
+import team.unnamed.molang.parser.MoLangParser;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface MoLangEngine {
+public interface MoLangEngine extends MoLangParser {
 
     Object eval(Reader reader) throws ScriptException;
 
