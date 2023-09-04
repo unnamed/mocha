@@ -7,10 +7,6 @@ import team.unnamed.molang.ast.binary.InfixExpression;
 import team.unnamed.molang.ast.binary.AssignExpression;
 import team.unnamed.molang.ast.binary.NullCoalescingExpression;
 import team.unnamed.molang.ast.composite.CallExpression;
-import team.unnamed.molang.ast.composite.ExecutionScopeExpression;
-import team.unnamed.molang.ast.simple.DoubleExpression;
-import team.unnamed.molang.ast.simple.IdentifierExpression;
-import team.unnamed.molang.ast.simple.StringExpression;
 import team.unnamed.molang.context.ParseContext;
 
 import java.io.Reader;
@@ -34,10 +30,9 @@ import java.util.List;
  * @see Tokens
  * @see Expression
  */
-public class StandardMoLangParser
-        implements MoLangParser {
+public class StandardMoLangParser implements MoLangParser {
 
-    private void failUnexpectedToken(ParseContext context, char current, char expected)
+    static void failUnexpectedToken(ParseContext context, char current, char expected)
             throws ParseException {
         throw new ParseException(
                 "Unexpected token: '" + current + "'. Expected: '" + expected + '\'',
@@ -45,7 +40,7 @@ public class StandardMoLangParser
         );
     }
 
-    private void assertToken(ParseContext context, char expected) throws ParseException {
+    static void assertToken(ParseContext context, char expected) throws ParseException {
         int current;
         if ((current = context.getCurrent()) != expected) {
             // must be closed
@@ -58,7 +53,7 @@ public class StandardMoLangParser
      * checks, assumes that current token is valid for
      * a word
      */
-    private String readWord(ParseContext context) throws ParseException {
+    static String readWord(ParseContext context) throws ParseException {
         StringBuilder builder = new StringBuilder();
         int current = context.getCurrent();
         do {
@@ -69,132 +64,22 @@ public class StandardMoLangParser
         return builder.toString();
     }
 
-    private Expression parseSingle(ParseContext context) throws ParseException {
-        int current = context.getCurrent();
-
-        //#region Expression inside parenthesis
-        if (current == '(') {
-            context.nextNoWhitespace();
-            // wrapped expression: (expression)
-            Expression expression = parse(context);
-            assertToken(context, ')');
-            // skip the closing parenthesis and
-            // following spaces
-            context.nextNoWhitespace();
-            return new WrappedExpression(expression);
-        }
-        //#endregion
-
-        //#region Execution scope
-        if (current == '{') {
-            context.nextNoWhitespace();
-
-            List<Expression> expressions = new ArrayList<>();
-            while (true) {
-                expressions.add(parse(context));
-                current = context.getCurrent();
-                if (current == '}') {
-                    // skip last '}' and next whitespace
-                    context.nextNoWhitespace();
-                    break;
-                } else if (current == -1) {
-                    // end reached but not closed yet huh?
-                    throw new ParseException(
-                            "Found the end before the execution scope closing token",
-                            context.getCursor()
-                    );
-                } else {
-                    assertToken(context, ';');
-                    // skip current semicolon and
-                    // following whitespace
-                    context.nextNoWhitespace();
-                }
-            }
-
-            return new ExecutionScopeExpression(expressions);
-        }
-        //#endregion
-
-        //#region Identifier expression and keywords
-        if (Tokens.isValidForIdentifier(current)) {
-            String identifier = readWord(context);
-
-            switch (identifier) {
-                case "true":
-                    return new DoubleExpression(1D);
-                case "false":
-                    return new DoubleExpression(0F);
-                case "return":
-                    return new ReturnExpression(parse(context));
-                default:
-                    return new IdentifierExpression(identifier);
-            }
-        }
-        //#endregion
-
-        //#region String literal expression
-        if (current == Tokens.QUOTE) {
-            StringBuilder builder = new StringBuilder();
-            while ((current = context.next()) != Tokens.QUOTE && current != -1) {
-                builder.append((char) current);
-            }
-
-            // it must be closed with 'QUOTE'
-            if (current == -1) {
-                throw new ParseException(
-                        "Found the end before the closing quote",
-                        context.getCursor()
-                );
-            }
-
-            // skip the last quote and following whitespaces
-            context.nextNoWhitespace();
-            return new StringExpression(builder.toString());
-        }
-        //#endregion
-
-        //#region Float literal expression
-        if (Character.isDigit(current)) {
-            return DoubleExpression.parse(context, 1);
-        }
-        //#endregion
-
-        //#region Negation
-        if (current == Tokens.HYPHEN) {
-            current = context.nextNoWhitespace();
-            if (Character.isDigit(current)) {
-                // if negated expression is numeral, make it
-                // negative instead of creating a negation expression
-                return DoubleExpression.parse(context, -1);
-            } else {
-                Expression expression = parseSingle(context);
-                return new NegationExpression(expression, Tokens.HYPHEN);
-            }
-        } else if (current == Tokens.EXCLAMATION) {
-            context.nextNoWhitespace();
-            return new NegationExpression(parseSingle(context), Tokens.EXCLAMATION);
-        }
-        //#endregion
-
-        return new DoubleExpression(0F);
-    }
-
-    private Expression parseMultiplication(ParseContext context, Expression left)
+    static Expression parseMultiplication(ParseContext context, Expression left)
         throws ParseException {
         int current = context.getCurrent();
         if (current == '*') {
             context.nextNoWhitespace();
-            Expression right = parse(context);
+            Expression right = SingleExpressionParser.parseSingle(context);
             return new InfixExpression(InfixExpression.MULTIPLY, left, right);
         } else if (current == '/') {
             context.nextNoWhitespace();
-            Expression right = parse(context);
+            Expression right = SingleExpressionParser.parseSingle(context);
             return new InfixExpression(InfixExpression.DIVIDE, left, right);
         }
         return left;
     }
 
-    private Expression parseAddition(ParseContext context, Expression left)
+    static Expression parseAddition(ParseContext context, Expression left)
         throws ParseException {
         int current = context.getCurrent();
         if (current == '+') {
@@ -210,7 +95,7 @@ public class StandardMoLangParser
         return parseMultiplication(context, left);
     }
 
-    private Expression parse(ParseContext context, Expression left) throws ParseException {
+    static Expression parse(ParseContext context, Expression left) throws ParseException {
         int current = context.getCurrent();
 
         //#region Function call expression
@@ -287,18 +172,6 @@ public class StandardMoLangParser
         }
         //#endregion
 
-        //#region Dot access expression
-        if (current == Tokens.DOT) {
-            if (!Tokens.isValidForIdentifier(context.nextNoWhitespace())) {
-                throw new ParseException(
-                        "Unexpected token; expected a valid field token",
-                        context.getCursor()
-                );
-            }
-            return new AccessExpression(left, readWord(context).toLowerCase());
-        }
-        //#endregion
-
         //#region Null Coalescing, Binary Conditional and Ternary Conditional expressions
         if (current == '?') {
             current = context.next();
@@ -335,8 +208,8 @@ public class StandardMoLangParser
         return parseAddition(context, left);
     }
 
-    private Expression parse(ParseContext context) throws ParseException {
-        Expression expression = parseSingle(context);
+    static Expression parse(ParseContext context) throws ParseException {
+        Expression expression = SingleExpressionParser.parseSingle(context);
         while (true) {
             Expression compositeExpr = parse(context, expression);
             if (compositeExpr == expression) {
