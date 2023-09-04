@@ -184,11 +184,11 @@ public class StandardMoLangParser
         int current = context.getCurrent();
         if (current == '*') {
             context.nextNoWhitespace();
-            Expression right = parseSingle(context);
+            Expression right = parse(context);
             return new InfixExpression(InfixExpression.MULTIPLY, left, right);
         } else if (current == '/') {
             context.nextNoWhitespace();
-            Expression right = parseSingle(context);
+            Expression right = parse(context);
             return new InfixExpression(InfixExpression.DIVIDE, left, right);
         }
         return left;
