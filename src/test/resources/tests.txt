@@ -16,6 +16,9 @@ false ? 5 : 10
 # multiline
 temp.test = 33; return temp.test * 2;
 
+# backwards
+temp.test = 33; return 10 * temp.test;
+
 # return
 temp.test = 4; return temp.test; return 5;
 
