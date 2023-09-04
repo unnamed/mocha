@@ -2,12 +2,15 @@ package team.unnamed.molang;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import team.unnamed.molang.ast.Expression;
 
 import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Compares the results of this library with the
@@ -67,9 +70,16 @@ public class CompareTest {
 
                     // eval expression
                     try {
-                        Object result = ENGINE.eval(expression);
+                        List<Expression> expressions = ENGINE.parse(expression);
+                        Object result = ENGINE.eval(expressions);
                         Assertions.assertTrue(result instanceof Number, "Result is a number");
-                        Assertions.assertEquals(expectedValue, ((Number) result).floatValue());
+                        Assertions.assertEquals(
+                                expectedValue,
+                                ((Number) result).floatValue(),
+                                () -> "Incorrect result. Parsed expressions:\n" + expressions.stream()
+                                        .map(Expression::toString)
+                                        .collect(Collectors.joining(";\n")) + ";\n"
+                        );
                     } catch (ScriptException e) {
                         Assertions.fail("Failed to eval expression '" + expression + "'", e);
                     }
