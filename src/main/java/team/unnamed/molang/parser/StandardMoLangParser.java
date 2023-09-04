@@ -29,7 +29,10 @@ import java.util.List;
  *
  * @see Tokens
  * @see Expression
+ * @deprecated Use {@link MoLangParser#parser()} to get a parser instance, access
+ * to this class will be removed in future versions
  */
+@Deprecated
 public class StandardMoLangParser implements MoLangParser {
 
     static void failUnexpectedToken(ParseContext context, char current, char expected)

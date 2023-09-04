@@ -43,4 +43,13 @@ public interface MoLangParser {
         }
     }
 
+    /**
+     * Returns a {@link MoLangParser} instance
+     *
+     * @return The MoLang parser instance
+     */
+    static MoLangParser parser() {
+        return new StandardMoLangParser();
+    }
+
 }
