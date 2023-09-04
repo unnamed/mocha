@@ -20,7 +20,6 @@ import java.util.Map;
 public class MoLangEngine {
 
     private final MoLangParser parser = new StandardMoLangParser();
-    private final StorageBinding variable = new StorageBinding();
 
     private final Map<String, Object> globalBindings;
 
@@ -35,7 +34,7 @@ public class MoLangEngine {
     public Object eval(Reader reader) throws ScriptException {
         try {
             Bindings bindings = new SimpleBindings();
-            bindings.put("variable", variable);
+            bindings.putAll(globalBindings);
 
             // temporal storage
             StorageBinding temp = new StorageBinding();
