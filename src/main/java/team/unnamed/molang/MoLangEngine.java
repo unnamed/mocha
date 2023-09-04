@@ -2,83 +2,43 @@ package team.unnamed.molang;
 
 import team.unnamed.molang.binding.Bind;
 import team.unnamed.molang.binding.StorageBinding;
-import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.parser.MoLangParser;
-import team.unnamed.molang.parser.StandardMoLangParser;
 
-import javax.script.Bindings;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class MoLangEngine {
+public interface MoLangEngine {
 
-    private final MoLangParser parser = new StandardMoLangParser();
+    Object eval(Reader reader) throws ScriptException;
 
-    private final Map<String, Object> globalBindings;
-
-    private MoLangEngine(Builder builder) {
-        this.globalBindings = builder.bindings;
-    }
-
-    public Object eval(String script) throws ScriptException {
-        return eval(new StringReader(script));
-    }
-
-    public Object eval(Reader reader) throws ScriptException {
-        try {
-            Bindings bindings = new SimpleBindings();
-            bindings.putAll(globalBindings);
-
-            // temporal storage
-            StorageBinding temp = new StorageBinding();
-            bindings.put("temp", temp);
-
-            // temporal
-            List<Expression> expressions = parser.parse(reader);
-
-            EvalContext context = new EvalContext(bindings);
-            Object lastResult = 0;
-
-            for (Expression expression : expressions) {
-                lastResult = expression.eval(context);
-                Object returnValue = context.popReturnValue();
-                if (returnValue != null) {
-                    lastResult = returnValue;
-                    break;
-                }
-            }
-            temp.clear();
-
-            return lastResult;
+    default Object eval(String script) throws ScriptException {
+        try (Reader reader = new StringReader(script)) {
+            return eval(reader);
         } catch (IOException e) {
             throw new ScriptException(e);
         }
     }
 
-    public static Builder builder() {
+    static Builder builder() {
         return new Builder();
     }
 
-    public static MoLangEngine createDefault() {
+    static MoLangEngine createDefault() {
         return new Builder()
                 .withDefaultBindings()
                 .build();
     }
 
-    public static MoLangEngine createEmpty() {
+    static MoLangEngine createEmpty() {
         return new Builder().build();
     }
 
-    public static class Builder {
+    class Builder {
 
-        private final Map<String, Object> bindings = new HashMap<>();
+        final Map<String, Object> bindings = new HashMap<>();
 
         public Builder withDefaultBindings() {
             bindings.put("query", Bind.QUERY_BINDING);
@@ -88,7 +48,7 @@ public class MoLangEngine {
         }
 
         public MoLangEngine build() {
-            return new MoLangEngine(this);
+            return new MoLangEngineImpl(this);
         }
 
     }
