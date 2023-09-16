@@ -1,53 +1,21 @@
-# MoLang Engine
-A MoLang scripting engine for Java 8+<br>
-See the MoLang specification [here](https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang)
+# molang
+[![Build Status](https://img.shields.io/github/actions/workflow/status/unnamed/molang/build.yml?branch=main)](https://github.com/unnamed/molang/actions/workflows/build.yml)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](license.txt)
+[![Discord](https://img.shields.io/discord/683899335405994062)](https://discord.gg/xbba2fy)
 
-## Install
-Add the repository and to your pom.xml or build.gradle(.kts):
-**Maven:**
-```xml
-<repository>
-    <id>unnamed-public</id>
-    <url>https://repo.unnamed.team/repository/unnamed-public/</url>
-</repository>
-```
-```xml
-<dependency>
-    <groupId>team.unnamed</groupId>
-    <artifactId>molang</artifactId>
-    <version>0.1.0</version>
-</dependency>
-```
+A lightweight, fast and efficient Molang parser and interpreter for Java 8+. Molang is a
+simple **expression-based** language designed for fast and **data-driven** calculation of
+values at run-time.
 
-**Gradle:** (Groovy DSL)
-```groovy
-repository { url 'https://repo.unnamed.team/repository/unnamed-public/' }
-```
-```groovy
-implementation 'team.unnamed:molang:0.1.0'
-```
-**Gradle:** (Kotlin DSL)
-```kotlin
-maven("https://repo.unnamed.team/repository/unnamed-public")
-```
-```kotlin
-implementation("team.unnamed:molang:0.1.0")
-```
+Its focus is to enable low-level systems like animation to support flexible data-driven
+behavior, while staying highly performant.
 
-## Usage
-MoLang is pretty easy to use, you can eval strings or `java.io.Reader`
+Pretty much everything in this language evaluates to a number; if something doesn't evaluate
+to a number, you can use an operator to make it into one. You can basically just think of
+Molang as one big math equation.
 
-### Basic Usage:
-```java
-import team.unnamed.molang.MoLangEngine;
+This library lets programmers easily evaluate Molang expressions and bind objects
+or functions so that they can be called from the evaluated expressions.
 
-class MyProgram {
-
-    public void run() throws ScriptException {
-        MoLangEngine engine = MoLangEngine.createDefault();
-        
-        System.out.println(engine.eval("math.cos(90) * 16"));
-    }
-
-}
-```
+Check the [documentation](https://unnamed.team/docs/molang) for installation, usage and
+some more information for this project
