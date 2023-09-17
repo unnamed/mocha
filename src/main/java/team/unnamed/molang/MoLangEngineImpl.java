@@ -5,7 +5,6 @@ import team.unnamed.molang.binding.StorageBinding;
 import team.unnamed.molang.context.EvalContext;
 import team.unnamed.molang.parser.MoLangParser;
 import team.unnamed.molang.parser.ParseException;
-import team.unnamed.molang.parser.StandardMoLangParser;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
@@ -17,7 +16,7 @@ import java.util.Map;
 
 final class MoLangEngineImpl implements MoLangEngine {
 
-    private final MoLangParser parser = new StandardMoLangParser();
+    private final MoLangParser parser = MoLangParser.parser();
 
     private final Map<String, Object> bindings;
 

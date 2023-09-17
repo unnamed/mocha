@@ -1,7 +1,7 @@
 package team.unnamed.molang.parser;
 
 import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.context.ScriptCursor;
+import team.unnamed.molang.lexer.Cursor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -39,7 +39,7 @@ public interface MoLangParser {
         try (Reader reader = new StringReader(string)) {
             return parse(reader);
         } catch (IOException e) {
-            throw new ParseException("Failed to close string reader", e, new ScriptCursor(0, 0));
+            throw new ParseException("Failed to close string reader", e, new Cursor(0, 0));
         }
     }
 

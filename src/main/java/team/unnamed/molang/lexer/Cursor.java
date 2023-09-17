@@ -1,41 +1,44 @@
-package team.unnamed.molang.context;
+package team.unnamed.molang.lexer;
 
 import java.util.Objects;
 
 /**
- * Mutable class for tracking the script
- * cursor, it's currently used for indicating
- * error locations
+ * Mutable class that tracks the position of characters
+ * when performing lexical analysis
+ *
+ * <p>Can be used to show the position of lexical errors
+ * in a very human-readable way</p>
+ *
+ * @since 1.0.0
  */
-public final class ScriptCursor
-        implements Cloneable {
+public final class Cursor implements Cloneable {
 
-    private int line;
-    private int column;
+    private int index = 0;
+    private int line = 0;
+    private int column = 0;
 
-    public ScriptCursor(int line, int column) {
+    public Cursor(int line, int column) {
         this.line = line;
         this.column = column;
     }
 
-    public ScriptCursor() {
-        this.line = 1;
-        this.column = 1;
+    public Cursor() {
     }
 
-    public int getLine() {
+    public int index() {
+        return index;
+    }
+
+    public int line() {
         return line;
     }
 
-    public int getColumn() {
+    public int column() {
         return column;
     }
 
-    public void incrementColumn() {
-        column++;
-    }
-
-    public void add(int character) {
+    public void push(int character) {
+        index++;
         if (character == '\n') {
             // if it's a line break,
             // reset the column
@@ -47,8 +50,8 @@ public final class ScriptCursor
     }
 
     @Override
-    public ScriptCursor clone() {
-        return new ScriptCursor(line, column);
+    public Cursor clone() {
+        return new Cursor(line, column);
     }
 
     @Override
@@ -60,7 +63,7 @@ public final class ScriptCursor
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ScriptCursor that = (ScriptCursor) o;
+        Cursor that = (Cursor) o;
         return line == that.line
                 && column == that.column;
     }

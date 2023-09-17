@@ -3,7 +3,6 @@ package team.unnamed.molang.ast.simple;
 import team.unnamed.molang.ast.Expression;
 import team.unnamed.molang.ast.Tokens;
 import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.context.ParseContext;
 import team.unnamed.molang.parser.ParseException;
 
 import java.util.Objects;
@@ -57,55 +56,52 @@ public class DoubleExpression implements Expression {
         return Objects.hash(value);
     }
 
-    /**
-     * Parses a double value from the given {@code context}
-     * and wraps it into a {@link DoubleExpression} expression
-     *
-     * @param context The context to read from
-     * @param divideByInitial The initial divisor, the value
-     *                        is read as an integer and then
-     *                        divided by this value plus the
-     *                        found digit count after the
-     *                        floating point
-     * @return The parsed double expression, never null
-     * @throws ParseException If stream returns multiple floating
-     * points
-     */
-    public static DoubleExpression parse(
-            ParseContext context,
-            float divideByInitial
-    ) throws ParseException {
-
-        int current = context.getCurrent();
-        boolean readingDecimalPart = false;
-        float value = 0;
-        float divideBy = divideByInitial;
-
-        while (true) {
-            if (Character.isDigit(current)) {
-                value *= 10;
-                value += Character.getNumericValue(current);
-                if (readingDecimalPart) {
-                    divideBy *= 10;
-                }
-                current = context.next();
-            } else if (current == Tokens.DOT) {
-                if (readingDecimalPart) {
-                    throw new ParseException(
-                            "Numbers can't have multiple floating points!",
-                            context.getCursor()
-                    );
-                }
-                readingDecimalPart = true;
-                current = context.next();
-            } else {
-                // skip whitespace
-                context.skipWhitespace();
-                break;
-            }
-        }
-
-        return new DoubleExpression(value / divideBy);
-    }
+//    /**
+//     * Parses a double value from the given {@code context}
+//     * and wraps it into a {@link DoubleExpression} expression
+//     *
+//     * @param context The context to read from
+//     * @param divideByInitial The initial divisor, the value
+//     *                        is read as an integer and then
+//     *                        divided by this value plus the
+//     *                        found digit count after the
+//     *                        floating point
+//     * @return The parsed double expression, never null
+//     * @throws ParseException If stream returns multiple floating
+//     * points
+//     */
+//    public static DoubleExpression parse(
+//            float divideByInitial
+//    ) throws ParseException {
+//
+//        int current = context.getCurrent();
+//        boolean readingDecimalPart = false;
+//        float value = 0;
+//        float divideBy = divideByInitial;
+//
+//        while (true) {
+//            if (Character.isDigit(current)) {
+//                value *= 10;
+//                value += Character.getNumericValue(current);
+//                if (readingDecimalPart) {
+//                    divideBy *= 10;
+//                }
+//                current = context.next();
+//            } else if (current == Tokens.DOT) {
+//                if (readingDecimalPart) {
+//                    throw new ParseException(
+//                            "Numbers can't have multiple floating points!",
+//                            context.getCursor()
+//                    );
+//                }
+//                readingDecimalPart = true;
+//                current = context.next();
+//            } else {
+//                break;
+//            }
+//        }
+//
+//        return new DoubleExpression(value / divideBy);
+//    }
 
 }
