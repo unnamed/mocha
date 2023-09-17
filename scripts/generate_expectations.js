@@ -22,14 +22,22 @@ const reader = readline.createInterface({ input });
 
 // write warning
 output.write(
-        '# Please do not modify this file, this is\n'
-         + '# a generated file to compare results across\n'
-         + '# different MoLang libraries\n'
+        '#\n' +
+        '# AUTO-GENERATED FILE, DO NOT MODIFY\n' +
+        '# This is an automatically generated file to compare\n' +
+        '# results across different Molang libraries, to update\n' +
+        '# this file, run the "generateExpectations" gradle task\n' +
+        '# by executing "./gradlew generateExpectations"\n' +
+        '#\n'
 );
 
 reader.on('line', expression => {
     if (expression.length !== 0 && expression.trim().charAt(0) !== '#') {
         const result = parser.parse(expression);
-        output.write(result.toString() + '\n');
+        output.write(
+                '\n' +
+                '# ' + expression + ' \n' +
+                result.toString() + '\n'
+        );
     }
 });

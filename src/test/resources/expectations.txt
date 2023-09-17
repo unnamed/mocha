@@ -1,15 +1,49 @@
-# Please do not modify this file, this is
-# a generated file to compare results across
-# different MoLang libraries
+#
+# AUTO-GENERATED FILE, DO NOT MODIFY
+# This is an automatically generated file to compare
+# results across different Molang libraries, to update
+# this file, run the "generateExpectations" gradle task
+# by executing "./gradlew generateExpectations"
+#
+
+# 1 + 1 
 2
+
+# 1 + 1 * 2 
 3
+
+# 18 - 2 * -0.5 
+19
+
+# 12 / 2 / 2 
+3
+
+# true ? 10 
 10
+
+# false ? 5 : 10 
 10
+
+# 3 >= 4 
 0
+
+# temp.test = 33; return temp.test * 2; 
 66
+
+# temp.test = 33; return 10 * temp.test; 
 330
+
+# temp.test = 4; return temp.test; return 5; 
 4
+
+# math.pow(math.clamp(500, 0, 3), 2) 
 9
+
+# math.lerprotate(10, 380, 0.5) + math.lerprotate(50, -10, 0.25) 
 20
+
+# math.round(math.acos(-1) + math.atan2(2, 4)) 
 207
+
+# temp.level = 10; 10 * temp.level + (temp.level * temp.level * 4) 
 500

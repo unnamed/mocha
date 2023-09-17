@@ -1,8 +1,14 @@
 # basic
 1 + 1
 
-# order or operation
+# order of operation
 1 + 1 * 2
+
+# order of operation 2
+18 - 2 * -0.5
+
+# order of division
+12 / 2 / 2
 
 # binary
 true ? 10
