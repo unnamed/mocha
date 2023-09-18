@@ -1,7 +1,5 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 /**
  * Expression implementation of a simple expression
  * wrapped inside parenthesis to delimit the expression,
@@ -20,18 +18,13 @@ public class WrappedExpression implements Expression {
      * @return The wrapped expression,
      * never null
      */
-    public Expression getExpression() {
+    public Expression expression() {
         return expression;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        return expression.eval(context);
-    }
-
-    @Override
-    public float evalAsFloat(EvalContext context) {
-        return expression.evalAsFloat(context);
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitWrapped(this);
     }
 
     @Override

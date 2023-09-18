@@ -2,6 +2,7 @@ package team.unnamed.molang;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
 
 import javax.script.ScriptException;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class CompareTest {
 
-    private static final MoLangEngine ENGINE = MoLangEngine.createDefault();
+    private static final MolangEngine ENGINE = MolangEngine.createDefault();
 
     /**
      * Compares this library results with MolangJS
@@ -80,6 +81,8 @@ public class CompareTest {
                                         .map(Expression::toString)
                                         .collect(Collectors.joining(";\n")) + ";\n"
                         );
+                    } catch (ParseException e) {
+                        Assertions.fail("Failed to parse expression: " + expression, e);
                     } catch (ScriptException e) {
                         Assertions.fail("Failed to eval expression '" + expression + "'", e);
                     }

@@ -19,16 +19,13 @@ public class ReturnExpression implements Expression {
      * the return value of this {@code return}
      * statement
      */
-    public Expression getValue() {
+    public Expression value() {
         return value;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        Object value = this.value.eval(context);
-        // set the scope return value
-        context.setReturnValue(value);
-        return 0;
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitReturn(this);
     }
 
     @Override

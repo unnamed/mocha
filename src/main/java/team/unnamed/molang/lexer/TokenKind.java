@@ -11,7 +11,7 @@ public enum TokenKind {
     EOF,
 
     /** Error token, means that there was an error there */
-    ERROR,
+    ERROR(Tag.HAS_VALUE),
 
     /** Identifier token, has a string value of the identifier name */
     IDENTIFIER(Tag.HAS_VALUE),

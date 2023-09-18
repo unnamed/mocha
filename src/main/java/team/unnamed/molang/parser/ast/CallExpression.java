@@ -1,8 +1,4 @@
-package team.unnamed.molang.parser.ast.composite;
-
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.runtime.binding.CallableBinding;
-import team.unnamed.molang.runtime.EvalContext;
+package team.unnamed.molang.parser.ast;
 
 import java.util.Iterator;
 import java.util.List;
@@ -11,8 +7,7 @@ import java.util.List;
  * Expression implementation for MoLang 1.17 function
  * call expression
  */
-public class CallExpression
-        implements Expression {
+public final class CallExpression implements Expression {
 
     private final Expression function;
     private final List<Expression> arguments;
@@ -26,7 +21,7 @@ public class CallExpression
      * Returns the expression evaluated to the
      * invoked function
      */
-    public Expression getFunction() {
+    public Expression function() {
         return function;
     }
 
@@ -34,23 +29,13 @@ public class CallExpression
      * Returns the expressions evaluated to the
      * function arguments
      */
-    public List<Expression> getArguments() {
+    public List<Expression> arguments() {
         return arguments;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        Object binding = function.eval(context);
-        if (!(binding instanceof CallableBinding)) {
-            // TODO: This isn't fail-fast, check this in specification
-            return 0;
-        }
-
-        Object[] evaluatedArguments = new Object[arguments.size()];
-        for (int i = 0; i < arguments.size(); i++) {
-            evaluatedArguments[i] = arguments.get(i).eval(context);
-        }
-        return ((CallableBinding) binding).call(evaluatedArguments);
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitCall(this);
     }
 
     @Override

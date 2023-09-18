@@ -1,7 +1,4 @@
-package team.unnamed.molang.parser.ast.composite;
-
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.runtime.EvalContext;
+package team.unnamed.molang.parser.ast;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,23 +22,13 @@ public class ExecutionScopeExpression implements Expression {
      * Returns the expressions inside this
      * execution scope, never null
      */
-    public List<Expression> getExpressions() {
+    public List<Expression> expressions() {
         return expressions;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        for (Expression expression : expressions) {
-            // eval expression, ignore result
-            expression.eval(context);
-
-            // check for return values
-            Object returnValue = context.popReturnValue();
-            if (returnValue != null) {
-                return returnValue;
-            }
-        }
-        return 0;
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitExecutionScope(this);
     }
 
     @Override

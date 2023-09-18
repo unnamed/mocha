@@ -13,7 +13,7 @@ import java.util.List;
  * from simple char streams to evaluable
  * {@link Expression} instances
  */
-public interface MoLangParser {
+public interface MolangParser {
 
     /**
      * Parses the data from the given {@code reader}
@@ -38,18 +38,20 @@ public interface MoLangParser {
     default List<Expression> parse(String string) throws ParseException {
         try (Reader reader = new StringReader(string)) {
             return parse(reader);
+        } catch (ParseException e) {
+            throw e;
         } catch (IOException e) {
             throw new ParseException("Failed to close string reader", e, new Cursor(0, 0));
         }
     }
 
     /**
-     * Returns a {@link MoLangParser} instance
+     * Returns a {@link MolangParser} instance
      *
      * @return The MoLang parser instance
      */
-    static MoLangParser parser() {
-        return new StandardMoLangParser();
+    static MolangParser parser() {
+        return new MolangParserImpl();
     }
 
 }

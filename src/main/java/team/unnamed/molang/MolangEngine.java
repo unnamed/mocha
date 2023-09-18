@@ -3,7 +3,7 @@ package team.unnamed.molang;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.binding.Bind;
 import team.unnamed.molang.runtime.binding.StorageBinding;
-import team.unnamed.molang.parser.MoLangParser;
+import team.unnamed.molang.parser.MolangParser;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface MoLangEngine extends MoLangParser {
+public interface MolangEngine extends MolangParser {
 
     Object eval(List<Expression> expressions) throws ScriptException;
 
@@ -31,13 +31,13 @@ public interface MoLangEngine extends MoLangParser {
         return new Builder();
     }
 
-    static MoLangEngine createDefault() {
+    static MolangEngine createDefault() {
         return new Builder()
                 .withDefaultBindings()
                 .build();
     }
 
-    static MoLangEngine createEmpty() {
+    static MolangEngine createEmpty() {
         return new Builder().build();
     }
 
@@ -67,8 +67,8 @@ public interface MoLangEngine extends MoLangParser {
             return this;
         }
 
-        public MoLangEngine build() {
-            return new MoLangEngineImpl(this);
+        public MolangEngine build() {
+            return new MolangEngineImpl(this);
         }
 
     }

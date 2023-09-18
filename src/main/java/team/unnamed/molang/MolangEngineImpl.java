@@ -1,9 +1,10 @@
 package team.unnamed.molang;
 
 import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.ExpressionEvaluator;
 import team.unnamed.molang.runtime.binding.StorageBinding;
 import team.unnamed.molang.runtime.EvalContext;
-import team.unnamed.molang.parser.MoLangParser;
+import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ParseException;
 
 import javax.script.Bindings;
@@ -14,13 +15,13 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
-final class MoLangEngineImpl implements MoLangEngine {
+final class MolangEngineImpl implements MolangEngine {
 
-    private final MoLangParser parser = MoLangParser.parser();
+    private final MolangParser parser = MolangParser.parser();
 
     private final Map<String, Object> bindings;
 
-    MoLangEngineImpl(MoLangEngine.Builder builder) {
+    MolangEngineImpl(MolangEngine.Builder builder) {
         this.bindings = builder.bindings;
     }
 
@@ -38,10 +39,11 @@ final class MoLangEngineImpl implements MoLangEngine {
     public Object eval(List<Expression> expressions) {
         Bindings bindings = createBindings();
         EvalContext context = new EvalContext(bindings);
+        ExpressionEvaluator interpreter = new ExpressionEvaluator(context);
         Object lastResult = 0;
 
         for (Expression expression : expressions) {
-            lastResult = expression.eval(context);
+            lastResult = expression.visit(interpreter);
             Object returnValue = context.popReturnValue();
             if (returnValue != null) {
                 lastResult = returnValue;

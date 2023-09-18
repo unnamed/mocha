@@ -4,11 +4,11 @@ import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.parser.ast.NegationExpression;
 import team.unnamed.molang.parser.ast.ReturnExpression;
 import team.unnamed.molang.parser.ast.WrappedExpression;
-import team.unnamed.molang.parser.ast.binary.AccessExpression;
-import team.unnamed.molang.parser.ast.composite.ExecutionScopeExpression;
-import team.unnamed.molang.parser.ast.simple.DoubleExpression;
-import team.unnamed.molang.parser.ast.simple.IdentifierExpression;
-import team.unnamed.molang.parser.ast.simple.StringExpression;
+import team.unnamed.molang.parser.ast.AccessExpression;
+import team.unnamed.molang.parser.ast.ExecutionScopeExpression;
+import team.unnamed.molang.parser.ast.DoubleExpression;
+import team.unnamed.molang.parser.ast.IdentifierExpression;
+import team.unnamed.molang.parser.ast.StringExpression;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;
@@ -48,7 +48,7 @@ final class SingleExpressionParser {
             case LPAREN: {
                 lexer.next();
                 // wrapped expression: (expression)
-                Expression expression = StandardMoLangParser.parse(lexer);
+                Expression expression = MolangParserImpl.parse(lexer);
                 token = lexer.current();
                 if (token.kind() != TokenKind.RPAREN) {
                     throw new ParseException("Non closed expression", null);
@@ -59,7 +59,7 @@ final class SingleExpressionParser {
             case LBRACE: {
                 List<Expression> expressions = new ArrayList<>();
                 while (true) {
-                    expressions.add(StandardMoLangParser.parse(lexer));
+                    expressions.add(MolangParserImpl.parse(lexer));
                     token = lexer.current();
                     if (token.kind() == TokenKind.RBRACE) {
                         lexer.next();
@@ -110,7 +110,7 @@ final class SingleExpressionParser {
             }
             case RETURN: {
                 lexer.next();
-                return new ReturnExpression(StandardMoLangParser.parse(lexer));
+                return new ReturnExpression(MolangParserImpl.parse(lexer));
             }
         }
 

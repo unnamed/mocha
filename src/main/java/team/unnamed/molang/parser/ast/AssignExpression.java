@@ -1,7 +1,4 @@
-package team.unnamed.molang.parser.ast.binary;
-
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.runtime.EvalContext;
+package team.unnamed.molang.parser.ast;
 
 public class AssignExpression implements Expression {
 
@@ -16,11 +13,17 @@ public class AssignExpression implements Expression {
         this.value = value;
     }
 
+    public Expression variable() {
+        return variable;
+    }
+
+    public Expression value() {
+        return value;
+    }
+
     @Override
-    public Object eval(EvalContext context) {
-        Object val = value.eval(context);
-        variable.setValue(context, val);
-        return val;
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitAssign(this);
     }
 
     @Override

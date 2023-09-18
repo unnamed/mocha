@@ -1,6 +1,5 @@
-package team.unnamed.molang.parser.ast.simple;
+package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.EvalContext;
 
 /**
@@ -17,21 +16,13 @@ public class IdentifierExpression implements Expression {
         this.identifier = identifier.toLowerCase();
     }
 
-    public String getIdentifier() {
+    public String name() {
         return identifier;
     }
 
-    /**
-     * Finds the value from the given {@code context}
-     * environment
-     * @param context The environment to check the
-     *                identifier from
-     * @return The identifier value, or null if not
-     * found
-     */
     @Override
-    public Object eval(EvalContext context) {
-        return context.getBinding(identifier);
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitIdentifier(this);
     }
 
     @Override

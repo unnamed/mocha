@@ -1,14 +1,11 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 /**
  * Expression implementation for the MoLang 1.17
  * negation expression, it may negate numbers or
  * boolean expressions
  */
-public class NegationExpression
-        implements Expression {
+public class NegationExpression implements Expression {
 
     private final Expression expression;
     private final char token;
@@ -23,23 +20,13 @@ public class NegationExpression
      * @return The negated expression,
      * never null
      */
-    public Expression getExpression() {
+    public Expression expression() {
         return expression;
     }
 
     @Override
-    public float evalAsFloat(EvalContext context) {
-        return -expression.evalAsFloat(context);
-    }
-
-    @Override
-    public boolean evalAsBoolean(EvalContext context) {
-        return !expression.evalAsBoolean(context);
-    }
-
-    @Override
-    public Object eval(EvalContext context) {
-        return evalAsFloat(context);
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitNegation(this);
     }
 
     @Override

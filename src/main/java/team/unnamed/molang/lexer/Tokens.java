@@ -1,4 +1,4 @@
-package team.unnamed.molang.parser.ast;
+package team.unnamed.molang.lexer;
 
 /**
  * Utility class holding utility static

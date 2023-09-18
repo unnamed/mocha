@@ -1,7 +1,5 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 import java.util.Objects;
 
 /**
@@ -32,9 +30,9 @@ public class TernaryConditionalExpression implements Expression {
     /**
      * Returns the condition of this ternary conditional expression, if this
      * condition is evaluated to {@code true}, the {@code trueExpression} is
-     * evaluated and returned as value when calling {@link Expression#eval}
+     * evaluated and returned as value when evaluated
      */
-    public Expression getConditional() {
+    public Expression condition() {
         return conditional;
     }
 
@@ -42,7 +40,7 @@ public class TernaryConditionalExpression implements Expression {
      * Returns the expression evaluated when the {@code conditional} expression
      * is evaluated to {@code true}
      */
-    public Expression getTrueExpression() {
+    public Expression trueExpression() {
         return trueExpression;
     }
 
@@ -50,15 +48,13 @@ public class TernaryConditionalExpression implements Expression {
      * Returns the expression evaluated when the {@code conditional} expression
      * is evaluated to {@code false}
      */
-    public Expression getFalseExpression() {
+    public Expression falseExpression() {
         return falseExpression;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        return conditional.evalAsBoolean(context)
-                ? trueExpression.eval(context)
-                : falseExpression.eval(context);
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitTernaryConditional(this);
     }
 
     @Override

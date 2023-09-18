@@ -1,4 +1,4 @@
-package team.unnamed.molang.parser.ast.binary;
+package team.unnamed.molang.parser.ast;
 
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.EvalContext;
@@ -18,21 +18,22 @@ public class ConditionalExpression implements Expression {
     private final Expression condition;
     private final Expression predicate;
 
-    public ConditionalExpression(
-            Expression condition,
-            Expression predicate
-    ) {
+    public ConditionalExpression(Expression condition, Expression predicate) {
         this.condition = condition;
         this.predicate = predicate;
     }
 
+    public Expression condition() {
+        return condition;
+    }
+
+    public Expression predicate() {
+        return predicate;
+    }
+
     @Override
-    public Object eval(EvalContext context) {
-        if (condition.evalAsBoolean(context)) {
-            return predicate.eval(context);
-        } else {
-            return 0;
-        }
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitConditional(this);
     }
 
     @Override

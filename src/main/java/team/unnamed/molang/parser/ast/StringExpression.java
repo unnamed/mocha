@@ -1,20 +1,13 @@
-package team.unnamed.molang.parser.ast.simple;
+package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.parser.ast.Tokens;
-import team.unnamed.molang.runtime.EvalContext;
+import team.unnamed.molang.lexer.Tokens;
 
 /**
  * Literal expression implementation for MoLang 1.17
  * strings
- * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang#Strings
  */
-public class StringExpression implements Expression {
+public final class StringExpression implements Expression {
 
-    /**
-     * The value of this string literal
-     * expression instance
-     */
     private final String value;
 
     public StringExpression(String value) {
@@ -25,13 +18,13 @@ public class StringExpression implements Expression {
      * Returns the value for this string
      * expression, never null
      */
-    public String getValue() {
+    public String value() {
         return value;
     }
 
     @Override
-    public Object eval(EvalContext context) {
-        return value;
+    public <R> R visit(ExpressionVisitor<R> visitor) {
+        return visitor.visitString(this);
     }
 
     @Override
