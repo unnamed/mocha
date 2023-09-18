@@ -1,12 +1,12 @@
 package team.unnamed.molang.parser;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.TernaryConditionalExpression;
-import team.unnamed.molang.ast.binary.AssignExpression;
-import team.unnamed.molang.ast.binary.ConditionalExpression;
-import team.unnamed.molang.ast.binary.InfixExpression;
-import team.unnamed.molang.ast.binary.NullCoalescingExpression;
-import team.unnamed.molang.ast.composite.CallExpression;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.parser.ast.TernaryConditionalExpression;
+import team.unnamed.molang.parser.ast.binary.AssignExpression;
+import team.unnamed.molang.parser.ast.binary.ConditionalExpression;
+import team.unnamed.molang.parser.ast.binary.InfixExpression;
+import team.unnamed.molang.parser.ast.binary.NullCoalescingExpression;
+import team.unnamed.molang.parser.ast.composite.CallExpression;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;

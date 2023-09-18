@@ -2,7 +2,7 @@ package team.unnamed.molang;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.parser.ast.Expression;
 
 import javax.script.ScriptException;
 import java.io.BufferedReader;

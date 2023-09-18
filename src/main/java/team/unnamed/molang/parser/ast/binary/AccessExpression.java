@@ -1,9 +1,9 @@
-package team.unnamed.molang.ast.binary;
+package team.unnamed.molang.parser.ast.binary;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.Tokens;
-import team.unnamed.molang.binding.ObjectBinding;
-import team.unnamed.molang.context.EvalContext;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.parser.ast.Tokens;
+import team.unnamed.molang.runtime.binding.ObjectBinding;
+import team.unnamed.molang.runtime.EvalContext;
 
 /**
  * {@link Expression} implementation for

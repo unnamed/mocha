@@ -1,14 +1,14 @@
 package team.unnamed.molang.parser;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.NegationExpression;
-import team.unnamed.molang.ast.ReturnExpression;
-import team.unnamed.molang.ast.WrappedExpression;
-import team.unnamed.molang.ast.binary.AccessExpression;
-import team.unnamed.molang.ast.composite.ExecutionScopeExpression;
-import team.unnamed.molang.ast.simple.DoubleExpression;
-import team.unnamed.molang.ast.simple.IdentifierExpression;
-import team.unnamed.molang.ast.simple.StringExpression;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.parser.ast.NegationExpression;
+import team.unnamed.molang.parser.ast.ReturnExpression;
+import team.unnamed.molang.parser.ast.WrappedExpression;
+import team.unnamed.molang.parser.ast.binary.AccessExpression;
+import team.unnamed.molang.parser.ast.composite.ExecutionScopeExpression;
+import team.unnamed.molang.parser.ast.simple.DoubleExpression;
+import team.unnamed.molang.parser.ast.simple.IdentifierExpression;
+import team.unnamed.molang.parser.ast.simple.StringExpression;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;

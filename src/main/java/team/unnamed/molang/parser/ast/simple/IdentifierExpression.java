@@ -1,7 +1,7 @@
-package team.unnamed.molang.ast.simple;
+package team.unnamed.molang.parser.ast.simple;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.context.EvalContext;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.EvalContext;
 
 /**
  * Expression implementation for MoLang 1.17

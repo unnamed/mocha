@@ -1,8 +1,8 @@
 package team.unnamed.molang;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.binding.StorageBinding;
-import team.unnamed.molang.context.EvalContext;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.binding.StorageBinding;
+import team.unnamed.molang.runtime.EvalContext;
 import team.unnamed.molang.parser.MoLangParser;
 import team.unnamed.molang.parser.ParseException;
 

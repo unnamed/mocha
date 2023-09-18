@@ -1,6 +1,6 @@
 package team.unnamed.molang.lexer;
 
-import team.unnamed.molang.ast.Tokens;
+import team.unnamed.molang.parser.ast.Tokens;
 
 import java.io.Closeable;
 import java.io.IOException;

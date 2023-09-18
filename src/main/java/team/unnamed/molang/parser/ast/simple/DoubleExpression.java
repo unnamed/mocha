@@ -1,9 +1,7 @@
-package team.unnamed.molang.ast.simple;
+package team.unnamed.molang.parser.ast.simple;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.ast.Tokens;
-import team.unnamed.molang.context.EvalContext;
-import team.unnamed.molang.parser.ParseException;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.EvalContext;
 
 import java.util.Objects;
 

@@ -1,8 +1,8 @@
 package team.unnamed.molang;
 
-import team.unnamed.molang.ast.Expression;
-import team.unnamed.molang.binding.Bind;
-import team.unnamed.molang.binding.StorageBinding;
+import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.binding.Bind;
+import team.unnamed.molang.runtime.binding.StorageBinding;
 import team.unnamed.molang.parser.MoLangParser;
 
 import javax.script.ScriptException;

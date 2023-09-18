@@ -1,4 +1,4 @@
-package team.unnamed.molang.binding;
+package team.unnamed.molang.runtime.binding;
 
 import java.util.HashMap;
 import java.util.Map;

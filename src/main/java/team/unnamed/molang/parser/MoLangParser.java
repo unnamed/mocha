@@ -1,6 +1,6 @@
 package team.unnamed.molang.parser;
 
-import team.unnamed.molang.ast.Expression;
+import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.lexer.Cursor;
 
 import java.io.IOException;
