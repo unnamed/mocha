@@ -4,6 +4,7 @@ import team.unnamed.molang.parser.ast.*;
 import team.unnamed.molang.runtime.binding.CallableBinding;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 
+import javax.script.Bindings;
 import java.util.List;
 
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
@@ -28,10 +29,11 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             })
     };
 
-    private final EvalContext context;
+    private final Bindings bindings;
+    private Object returnValue;
 
-    public ExpressionEvaluator(EvalContext context) {
-        this.context = context;
+    public ExpressionEvaluator(Bindings bindings) {
+        this.bindings = bindings;
     }
 
     @Override
@@ -41,6 +43,12 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             return ((ObjectBinding) binding).getProperty(expression.property());
         }
         return null;
+    }
+
+    public Object popReturnValue() {
+        Object val = this.returnValue;
+        this.returnValue = null;
+        return val;
     }
 
     @Override
@@ -97,7 +105,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             expression.visit(this);
 
             // check for return values
-            Object returnValue = context.popReturnValue();
+            Object returnValue = popReturnValue();
             if (returnValue != null) {
                 return returnValue;
             }
@@ -107,7 +115,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     @Override
     public Object visitIdentifier(IdentifierExpression expression) {
-        return context.getBinding(expression.name());
+        return bindings.get(expression.name());
     }
 
     @Override
@@ -148,9 +156,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     @Override
     public Object visitReturn(ReturnExpression expression) {
-        Object value = expression.value().visit(this);
-        // set the scope return value
-        context.setReturnValue(value);
+        this.returnValue = expression.value().visit(this);
         return 0;
     }
 

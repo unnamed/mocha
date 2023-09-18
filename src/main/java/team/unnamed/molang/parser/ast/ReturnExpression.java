@@ -1,7 +1,5 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 /**
  * Expression implementation of MoLang 1.17
  * return statements

@@ -1,7 +1,5 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 /**
  * The null coalescing expression implementation,
  * if the result of evaluating the 'leftHand' expression

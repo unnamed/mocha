@@ -1,7 +1,5 @@
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.runtime.EvalContext;
-
 /**
  * Expression implementation for MoLang 1.17
  * identifiers, they are <b>case-insensitive</b>

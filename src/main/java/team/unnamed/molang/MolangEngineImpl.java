@@ -3,7 +3,6 @@ package team.unnamed.molang;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
 import team.unnamed.molang.runtime.binding.StorageBinding;
-import team.unnamed.molang.runtime.EvalContext;
 import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ParseException;
 
@@ -38,13 +37,12 @@ final class MolangEngineImpl implements MolangEngine {
     @Override
     public Object eval(List<Expression> expressions) {
         Bindings bindings = createBindings();
-        EvalContext context = new EvalContext(bindings);
-        ExpressionEvaluator interpreter = new ExpressionEvaluator(context);
+        ExpressionEvaluator evaluator = new ExpressionEvaluator(bindings);
         Object lastResult = 0;
 
         for (Expression expression : expressions) {
-            lastResult = expression.visit(interpreter);
-            Object returnValue = context.popReturnValue();
+            lastResult = expression.visit(evaluator);
+            Object returnValue = evaluator.popReturnValue();
             if (returnValue != null) {
                 lastResult = returnValue;
                 break;
