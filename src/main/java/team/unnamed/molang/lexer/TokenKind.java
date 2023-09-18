@@ -26,28 +26,28 @@ public enum TokenKind {
     FLOAT(Tag.HAS_VALUE),
 
     /** 'True' literal boolean token */
-    TRUE(Tag.KEYWORD),
+    TRUE,
 
     /** 'False' literal boolean token */
-    FALSE(Tag.KEYWORD),
+    FALSE,
 
     /** The "loop" keyword */
-    LOOP("loop", Tag.KEYWORD),
+    LOOP("loop"),
 
     /** The "for_each" keyword */
-    FOR_EACH("for_each", Tag.KEYWORD),
+    FOR_EACH("for_each"),
 
     /** The "break" keyword */
-    BREAK("break", Tag.KEYWORD),
+    BREAK("break"),
 
     /** The "continue" keyword */
-    CONTINUE("continue", Tag.KEYWORD),
+    CONTINUE("continue"),
 
     /** The "this" keyword */
-    THIS("this", Tag.KEYWORD),
+    THIS("this"),
 
     /** The "return" keyword */
-    RETURN("return", Tag.KEYWORD),
+    RETURN("return"),
 
     /** The dot symbol (.) */
     DOT("."),
@@ -148,7 +148,6 @@ public enum TokenKind {
     }
 
     public enum Tag {
-        KEYWORD,
         HAS_VALUE
     }
 
