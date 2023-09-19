@@ -1,5 +1,7 @@
 package team.unnamed.molang;
 
+import team.unnamed.molang.lexer.Cursor;
+import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.binding.Bind;
 import team.unnamed.molang.runtime.binding.StorageBinding;
@@ -13,7 +15,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface MolangEngine extends MolangParser {
+public interface MolangEngine {
+
+    /**
+     * Parses the data from the given {@code reader}
+     * to a {@link List} of {@link Expression}
+     *
+     * <strong>Note that this method won't close
+     * the given {@code reader}</strong>
+     *
+     * @throws ParseException If read failed or there
+     * are syntax errors in the script
+     */
+    List<Expression> parse(Reader reader) throws IOException;
+
+    /**
+     * Parses the given {@code string} to a list of
+     * {@link Expression}
+     *
+     * @param string The MoLang string
+     * @return The list of parsed expressions
+     * @throws ParseException If parsing fails
+     */
+    default List<Expression> parse(String string) throws ParseException {
+        try (Reader reader = new StringReader(string)) {
+            return parse(reader);
+        } catch (ParseException e) {
+            throw e;
+        } catch (IOException e) {
+            throw new ParseException("Failed to close string reader", e, new Cursor(0, 0));
+        }
+    }
 
     Object eval(List<Expression> expressions) throws ScriptException;
 

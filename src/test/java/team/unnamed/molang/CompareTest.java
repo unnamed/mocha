@@ -77,9 +77,10 @@ public class CompareTest {
                         Assertions.assertEquals(
                                 expectedValue,
                                 ((Number) result).floatValue(),
-                                () -> "Incorrect result. Parsed expressions:\n" + expressions.stream()
+                                () -> "Incorrect result. Parsed syntax tree:\n\t" + expressions.stream()
                                         .map(Expression::toString)
-                                        .collect(Collectors.joining(";\n")) + ";\n"
+                                        .collect(Collectors.joining(";\n\t")) + ";\n"
+                                        + "For expression: " + expression
                         );
                     } catch (ParseException e) {
                         Assertions.fail("Failed to parse expression: " + expression, e);

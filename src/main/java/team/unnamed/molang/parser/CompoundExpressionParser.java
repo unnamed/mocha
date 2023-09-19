@@ -31,7 +31,7 @@ final class CompoundExpressionParser {
 
                 // start reading the arguments
                 while (true) {
-                    arguments.add(MolangParserImpl.parse(lexer));
+                    arguments.add(MolangParserImpl.parseCompoundExpression(lexer));
                     // update current character
                     current = lexer.current();
                     if (current.kind() == TokenKind.EOF) {
@@ -51,55 +51,55 @@ final class CompoundExpressionParser {
             }
             case AMPAMP: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.AND, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.AND, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case BARBAR: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.OR, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.OR, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case LT: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.LESS_THAN, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.LESS_THAN, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case LTE: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.LESS_THAN_OR_EQUAL, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.LESS_THAN_OR_EQUAL, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case GT: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.GREATER_THAN, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.GREATER_THAN, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case GTE: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.GREATER_THAN_OR_EQUAL, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.GREATER_THAN_OR_EQUAL, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case QUESQUES: {
                 lexer.next();
-                return new NullCoalescingExpression(left, MolangParserImpl.parse(lexer));
+                return new NullCoalescingExpression(left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case QUES: {
                 lexer.next();
-                Expression trueValue = MolangParserImpl.parse(lexer);
+                Expression trueValue = MolangParserImpl.parseCompoundExpression(lexer);
 
                 if (lexer.current().kind() == TokenKind.COLON) {
                     // then it's a ternary expression, since there is a ':', indicating the next expression
                     lexer.next();
-                    return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parse(lexer));
+                    return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parseCompoundExpression(lexer));
                 } else {
                     return new ConditionalExpression(left, trueValue);
                 }
             }
             case EQ: {
                 lexer.next();
-                return new AssignExpression(left, MolangParserImpl.parse(lexer));
+                return new AssignExpression(left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case PLUS: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.ADD, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.ADD, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case SUB: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.SUBTRACT, left, MolangParserImpl.parse(lexer));
+                return new InfixExpression(InfixExpression.SUBTRACT, left, MolangParserImpl.parseCompoundExpression(lexer));
             }
             case STAR: {
                 lexer.next();

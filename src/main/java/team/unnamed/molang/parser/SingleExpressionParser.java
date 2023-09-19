@@ -48,7 +48,7 @@ final class SingleExpressionParser {
             case LPAREN: {
                 lexer.next();
                 // wrapped expression: (expression)
-                Expression expression = MolangParserImpl.parse(lexer);
+                Expression expression = MolangParserImpl.parseCompoundExpression(lexer);
                 token = lexer.current();
                 if (token.kind() != TokenKind.RPAREN) {
                     throw new ParseException("Non closed expression", null);
@@ -59,7 +59,7 @@ final class SingleExpressionParser {
             case LBRACE: {
                 List<Expression> expressions = new ArrayList<>();
                 while (true) {
-                    expressions.add(MolangParserImpl.parse(lexer));
+                    expressions.add(MolangParserImpl.parseCompoundExpression(lexer));
                     token = lexer.current();
                     if (token.kind() == TokenKind.RBRACE) {
                         lexer.next();
@@ -110,7 +110,7 @@ final class SingleExpressionParser {
             }
             case RETURN: {
                 lexer.next();
-                return new ReturnExpression(MolangParserImpl.parse(lexer));
+                return new ReturnExpression(MolangParserImpl.parseCompoundExpression(lexer));
             }
         }
 

@@ -7,9 +7,8 @@ import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.lexer.Tokens;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Standard implementation of {@link MolangParser},
@@ -21,7 +20,60 @@ import java.util.List;
  */
 final class MolangParserImpl implements MolangParser {
 
-    static Expression parse(MolangLexer lexer) throws IOException {
+    private final MolangLexer lexer;
+
+    // the last parsed expression, returned by next()
+    private Expression current;
+
+    MolangParserImpl(MolangLexer lexer) {
+        this.lexer = requireNonNull(lexer, "lexer");
+    }
+
+    @Override
+    public MolangLexer lexer() {
+        return lexer;
+    }
+
+    @Override
+    public Expression current() {
+        if (current == null) {
+            throw new IllegalStateException("No current parsed expression, call next() at least once!");
+        }
+        return current;
+    }
+
+    @Override
+    public Expression next() throws IOException {
+        return current = next0();
+    }
+
+    private Expression next0() throws IOException {
+        Token token = lexer.next();
+
+        if (token.kind() == TokenKind.EOF) {
+            // reached end-of-file!
+            return null;
+        }
+
+        if (token.kind() == TokenKind.ERROR) {
+            // tokenization error!
+            throw new ParseException("Found an invalid token (error): " + token.value(), cursor());
+        }
+
+        // parse a single expression
+        Expression expression = parseCompoundExpression(lexer);
+
+        // update current token
+        token = lexer.current();
+
+        if (token.kind() != TokenKind.EOF && token.kind() != TokenKind.SEMICOLON) {
+            throw new ParseException("Expected a semicolon, but was " + token, lexer.cursor());
+        }
+
+        return expression;
+    }
+
+    static Expression parseCompoundExpression(MolangLexer lexer) throws IOException {
         Expression leftHandExpression = SingleExpressionParser.parseSingle(lexer);
         while (true) {
             Expression compositeExpr = CompoundExpressionParser.parseCompound(lexer, leftHandExpression);
@@ -35,36 +87,8 @@ final class MolangParserImpl implements MolangParser {
     }
 
     @Override
-    public List<Expression> parse(Reader reader) throws ParseException {
-
-        List<Expression> expressions = new ArrayList<>();
-
-        try {
-            MolangLexer lexer = MolangLexer.lexer(reader);
-            Token current = lexer.next(); // initial next call
-            while (true) {
-                if (current.kind() == TokenKind.EOF) {
-                    break;
-                }
-                expressions.add(parse(lexer));
-                current = lexer.current();
-
-                if (current.kind() == TokenKind.EOF) {
-                    // end reached, break
-                    break;
-                } else if (current.kind() != TokenKind.SEMICOLON) {
-                    throw new ParseException("Expected a semicolon, but was " + current, lexer.cursor());
-                }
-
-                current = lexer.next();
-            }
-        } catch (ParseException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new ParseException(e, null);
-        }
-
-        return expressions;
+    public void close() throws IOException {
+        this.lexer.close();
     }
 
 }
