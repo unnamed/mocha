@@ -57,6 +57,7 @@ final class SingleExpressionParser {
                 return new WrappedExpression(expression);
             }
             case LBRACE: {
+                lexer.next();
                 List<Expression> expressions = new ArrayList<>();
                 while (true) {
                     expressions.add(MolangParserImpl.parseCompoundExpression(lexer));
@@ -80,7 +81,6 @@ final class SingleExpressionParser {
                 return new ExecutionScopeExpression(expressions);
             }
             // todo: should not be parsed as identifiers
-            case LOOP:
             case FOR_EACH:
             case BREAK:
             case CONTINUE:

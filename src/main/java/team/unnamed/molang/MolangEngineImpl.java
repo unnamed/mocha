@@ -2,39 +2,37 @@ package team.unnamed.molang;
 
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
-import team.unnamed.molang.runtime.binding.StorageBinding;
 import team.unnamed.molang.parser.MolangParser;
+import team.unnamed.molang.runtime.binding.ObjectBinding;
+import team.unnamed.molang.runtime.binding.StandardBindings;
 
-import javax.script.Bindings;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 final class MolangEngineImpl implements MolangEngine {
 
-    private final Map<String, Object> bindings;
+    private final ObjectBinding bindings;
 
     MolangEngineImpl(MolangEngine.Builder builder) {
         this.bindings = builder.bindings;
     }
 
-    private Bindings createBindings() {
-        Bindings bindings = new SimpleBindings();
-        bindings.putAll(this.bindings);
-
-        // temporal storage
-        StorageBinding temp = new StorageBinding();
-        bindings.put("temp", temp);
+    private ObjectBinding createBindings() {
+        ObjectBinding bindings = new ObjectBinding();
+        bindings.setAllFrom(StandardBindings.BUILT_IN);
+        bindings.setAllFrom(this.bindings);
+        ObjectBinding temp = new ObjectBinding();
+        bindings.setProperty("temp", temp);
+        bindings.setProperty("t", temp);
         return bindings;
     }
 
     @Override
     public Object eval(List<Expression> expressions) {
-        Bindings bindings = createBindings();
+        ObjectBinding bindings = createBindings();
         ExpressionEvaluator evaluator = new ExpressionEvaluator(bindings);
         Object lastResult = 0;
 

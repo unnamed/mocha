@@ -31,9 +31,6 @@ public enum TokenKind {
     /** 'False' literal boolean token */
     FALSE,
 
-    /** The "loop" keyword */
-    LOOP("loop"),
-
     /** The "for_each" keyword */
     FOR_EACH("for_each"),
 

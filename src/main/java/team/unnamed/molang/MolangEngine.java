@@ -3,9 +3,8 @@ package team.unnamed.molang;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.runtime.binding.Bind;
-import team.unnamed.molang.runtime.binding.StorageBinding;
-import team.unnamed.molang.parser.MolangParser;
+import team.unnamed.molang.runtime.binding.StandardBindings;
+import team.unnamed.molang.runtime.binding.ObjectBinding;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -75,8 +74,9 @@ public interface MolangEngine {
 
     class Builder {
 
-        final Map<String, Object> bindings = new HashMap<>();
-        StorageBinding variables;
+        // @VisibleForTesting
+        final ObjectBinding bindings = new ObjectBinding();
+        ObjectBinding variables;
 
         public Builder bindVariable(String key, Object binding) {
             ensureBoundVariables();
@@ -86,15 +86,15 @@ public interface MolangEngine {
 
         private void ensureBoundVariables() {
             if (variables == null) {
-                variables = new StorageBinding();
-                bindings.put("variable", variables);
-                bindings.put("v", variables); // <-- alias
+                variables = new ObjectBinding();
+                bindings.setProperty("variable", variables);
+                bindings.setProperty("v", variables); // <-- alias
             }
         }
 
         public Builder withDefaultBindings() {
-            bindings.put("query", Bind.QUERY_BINDING);
-            bindings.put("math", Bind.MATH_BINDING);
+            bindings.setProperty("query", StandardBindings.QUERY_BINDING);
+            bindings.setProperty("math", StandardBindings.MATH_BINDING);
             ensureBoundVariables();
             return this;
         }

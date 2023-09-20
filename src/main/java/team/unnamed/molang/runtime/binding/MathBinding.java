@@ -8,8 +8,7 @@ import java.util.Random;
  * Math function bindings inside an object
  * binding, commonly named 'math'
  */
-public class MathBinding
-        implements ObjectBinding {
+public class MathBinding extends ObjectBinding {
 
     private static final double RADIAN = Math.toRadians(1);
 

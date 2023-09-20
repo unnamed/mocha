@@ -59,6 +59,12 @@ final class MolangLexerImpl implements MolangLexer {
             c = read();
         }
 
+        // additional spaces, lines, etc. at the end?
+        if (c == -1) {
+            // EOF reached
+            return new Token(TokenKind.EOF, null, cursor.index(), cursor.index() + 1);
+        }
+
         int start = cursor.index();
         if (Tokens.isDigit(c)) {
             StringBuilder builder = new StringBuilder(8);
@@ -86,7 +92,6 @@ final class MolangLexerImpl implements MolangLexer {
             String word = builder.toString();
             TokenKind kind;
             switch (word.toLowerCase()) {
-                case "loop": kind = TokenKind.LOOP; break;
                 case "for_each": kind = TokenKind.FOR_EACH; break;
                 case "break": kind = TokenKind.BREAK; break;
                 case "continue": kind = TokenKind.CONTINUE; break;

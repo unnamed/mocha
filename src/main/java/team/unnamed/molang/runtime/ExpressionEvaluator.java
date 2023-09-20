@@ -3,8 +3,8 @@ package team.unnamed.molang.runtime;
 import team.unnamed.molang.parser.ast.*;
 import team.unnamed.molang.runtime.binding.CallableBinding;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
+import team.unnamed.molang.runtime.binding.ValueConversions;
 
-import javax.script.Bindings;
 import java.util.List;
 
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
@@ -29,11 +29,17 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             })
     };
 
-    private final Bindings bindings;
+    private final ObjectBinding bindings;
     private Object returnValue;
 
-    public ExpressionEvaluator(Bindings bindings) {
+    public ExpressionEvaluator(ObjectBinding bindings) {
         this.bindings = bindings;
+    }
+
+    private ExpressionEvaluator createChild() {
+        // Note that it will have its own returnValue, but same bindings
+        // (Should we create new bindings?)
+        return new ExpressionEvaluator(this.bindings);
     }
 
     @Override
@@ -85,7 +91,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     @Override
     public Object visitConditional(ConditionalExpression expression) {
         Object condition = expression.condition().visit(this);
-        if (asBoolean(condition)) {
+        if (ValueConversions.asBoolean(condition)) {
             return expression.predicate().visit(this);
         } else {
             return 0;
@@ -100,22 +106,25 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     @Override
     public Object visitExecutionScope(ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
-        for (Expression expression : expressions) {
-            // eval expression, ignore result
-            expression.visit(this);
+        ExpressionEvaluator evaluatorForThisScope = createChild();
+        return (CallableBinding) arguments -> {
+            for (Expression expression : expressions) {
+                // eval expression, ignore result
+                expression.visit(evaluatorForThisScope);
 
-            // check for return values
-            Object returnValue = popReturnValue();
-            if (returnValue != null) {
-                return returnValue;
+                // check for return values
+                Object returnValue = evaluatorForThisScope.popReturnValue();
+                if (returnValue != null) {
+                    return returnValue;
+                }
             }
-        }
-        return 0;
+            return 0;
+        };
     }
 
     @Override
     public Object visitIdentifier(IdentifierExpression expression) {
-        return bindings.get(expression.name());
+        return bindings.getProperty(expression.name());
     }
 
     @Override
@@ -167,7 +176,8 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     @Override
     public Object visitTernaryConditional(TernaryConditionalExpression expression) {
-        return asBoolean(expression.condition().visit(this))
+        Object obj = expression.condition().visit(this);
+        return ValueConversions.asBoolean(obj)
                 ? expression.trueExpression().visit(this)
                 : expression.falseExpression().visit(this);
     }
@@ -182,28 +192,6 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }
 
-    private static boolean asBoolean(Object obj) {
-        if (obj instanceof Boolean) {
-            return (Boolean) obj;
-        } else if (obj instanceof Number) {
-            // '0' is considered false here, anything else
-            // is considered true.
-            return ((Number) obj).floatValue() != 0;
-        } else {
-            return true;
-        }
-    }
-
-    private static float asFloat(Object obj) {
-        if (obj instanceof Boolean) {
-            return ((Boolean) obj) ? 1 : 0;
-        } else if (!(obj instanceof Number)) {
-            return 0;
-        } else {
-            return ((Number) obj).floatValue();
-        }
-    }
-
     private interface Evaluator {
         Object eval(LazyEvaluableObject a, LazyEvaluableObject b);
         interface LazyEvaluableObject {
@@ -213,22 +201,40 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     private static Evaluator bool(BooleanOperator op) {
         return (a, b) -> op.operate(
-                () -> asBoolean(a.eval()),
-                () -> asBoolean(b.eval())
+                () -> {
+                    Object obj = a.eval();
+                    return ValueConversions.asBoolean(obj);
+                },
+                () -> {
+                    Object obj = b.eval();
+                    return ValueConversions.asBoolean(obj);
+                }
         ) ? 1F : 0F;
     }
 
     private static Evaluator compare(Comparator comp) {
         return (a, b) -> comp.compare(
-                () -> asFloat(a.eval()),
-                () -> asFloat(b.eval())
+                () -> {
+                    Object obj = a.eval();
+                    return ValueConversions.asFloat(obj);
+                },
+                () -> {
+                    Object obj = b.eval();
+                    return ValueConversions.asFloat(obj);
+                }
         ) ? 1F : 0F;
     }
 
     private static Evaluator arithmetic(ArithmeticOperator op) {
         return (a, b) -> op.operate(
-                () -> asFloat(a.eval()),
-                () -> asFloat(b.eval())
+                () -> {
+                    Object obj = a.eval();
+                    return ValueConversions.asFloat(obj);
+                },
+                () -> {
+                    Object obj = b.eval();
+                    return ValueConversions.asFloat(obj);
+                }
         );
     }
 
