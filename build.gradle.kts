@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("org.cadixdev.licenser") version "0.6.1"
 }
 
 repositories {
@@ -21,6 +22,12 @@ tasks {
         useJUnitPlatform()
         dependsOn("generateExpectations")
     }
+}
+
+license {
+    header.set(rootProject.resources.text.fromFile("header.txt"))
+    include("**/*.java")
+    newLine = true
 }
 
 java {
