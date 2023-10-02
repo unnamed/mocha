@@ -36,7 +36,22 @@ public class NegationExpression implements Expression {
 
     @Override
     public String toString() {
-        return "Negate(" + expression + ")";
+        return "Negation(" + expression + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NegationExpression that = (NegationExpression) o;
+        if (token != that.token) return false;
+        return expression.equals(that.expression);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = expression.hashCode();
+        result = 31 * result + (int) token;
+        return result;
+    }
 }

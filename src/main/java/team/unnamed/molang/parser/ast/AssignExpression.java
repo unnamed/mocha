@@ -36,4 +36,20 @@ public class AssignExpression implements Expression {
         return "Assign(" + variable + ", " + value + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssignExpression that = (AssignExpression) o;
+        if (!variable.equals(that.variable)) return false;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = variable.hashCode();
+        result = 31 * result + value.hashCode();
+        return result;
+    }
+
 }
