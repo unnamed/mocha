@@ -32,106 +32,98 @@ public enum TokenKind {
     FALSE,
 
     /** The "break" keyword */
-    BREAK("break"),
+    BREAK,
 
     /** The "continue" keyword */
-    CONTINUE("continue"),
-
+    CONTINUE,
 
     /** The "return" keyword */
-    RETURN("return"),
+    RETURN,
 
     /** The dot symbol (.) */
-    DOT("."),
+    DOT,
 
     /** The bang or exclamation symbol (!) */
-    BANG("!"),
+    BANG,
 
     /** Double ampersand token (&&) */
-    AMPAMP("&&"),
+    AMPAMP,
 
     /** Double bar token (||) */
-    BARBAR("||"),
+    BARBAR,
 
     /** Less-than token (<) */
-    LT("<"),
+    LT,
 
     /** Less-than-or-equal token (<=) */
-    LTE("<="),
+    LTE,
 
     /** Greater-than token (>) */
-    GT(">"),
+    GT,
 
     /** Greater-than-or-equal token (>=) */
-    GTE(">="),
+    GTE,
 
     /** Equal symbol (=) */
-    EQ("="),
+    EQ,
 
     /** Equal-equal token (==) */
-    EQEQ("=="),
+    EQEQ,
 
     /** Bang-eq token (!=) */
-    BANGEQ("!="),
+    BANGEQ,
 
     /** Star symbol (*) */
-    STAR("*"),
+    STAR,
 
     /** Slash symbol (/) */
-    SLASH("/"),
+    SLASH,
 
     /** Plus symbol (+) */
-    PLUS("+"),
+    PLUS,
 
     /** Hyphen/sub symbol (-) */
-    SUB("-"),
+    SUB,
 
     /** Left-parenthesis symbol "(" */
-    LPAREN("("),
+    LPAREN,
 
     /** Right-parenthesis symbol ")" */
-    RPAREN(")"),
+    RPAREN,
 
     /** Left-brace symbol "{" */
-    LBRACE("{"),
+    LBRACE,
 
     /** Right-brace symbol "}" */
-    RBRACE("}"),
+    RBRACE,
 
     /** Question-question token (??) */
-    QUESQUES("??"),
+    QUESQUES,
 
     /** Question symbol (?) */
-    QUES("?"),
+    QUES,
 
     /** Colon symbol (:) */
-    COLON(":"),
+    COLON,
 
     /** Arrow token (->) */
-    ARROW("->"),
+    ARROW,
 
     /** Left-bracket token "[" */
-    LBRACKET("["),
+    LBRACKET,
 
     /** Right-bracket "] */
-    RBRACKET("]"),
+    RBRACKET,
 
     /** Comma symbol (,) */
-    COMMA(","),
+    COMMA,
 
     /** Semicolon symbol (;) */
-    SEMICOLON(";");
+    SEMICOLON;
 
-    private final String name;
     private final Set<Tag> tags;
 
-    TokenKind(String name, Tag... tags) {
-        this.name = name;
-        this.tags = enumSetOf(tags);
-    }
-
     TokenKind(Tag... tags) {
-        this.name = null;
         this.tags = enumSetOf(tags);
     }
 
