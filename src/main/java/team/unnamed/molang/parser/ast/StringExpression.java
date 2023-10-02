@@ -24,7 +24,7 @@
 
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.lexer.Tokens;
+import team.unnamed.molang.lexer.Characters;
 
 /**
  * Literal expression implementation for MoLang 1.17
@@ -53,7 +53,7 @@ public final class StringExpression implements Expression {
 
     @Override
     public String toSource() {
-        return Tokens.QUOTE + escapeQuotes(value) + Tokens.QUOTE;
+        return Characters.QUOTE + escapeQuotes(value) + Characters.QUOTE;
     }
 
     @Override
@@ -75,8 +75,8 @@ public final class StringExpression implements Expression {
     }
 
     /**
-     * Escapes quotes ({@link Tokens#QUOTE}) in the given
-     * {@code value} using {@link Tokens#ESCAPE}
+     * Escapes quotes ({@link Characters#QUOTE}) in the given
+     * {@code value} using {@link Characters#ESCAPE}
      *
      * <strong>Currently not required, but done, 1.17.30.4
      * specification declares that escape characters aren't
@@ -90,8 +90,8 @@ public final class StringExpression implements Expression {
         StringBuilder builder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             char c = value.charAt(i);
-            if (c == Tokens.QUOTE) {
-                builder.append(Tokens.ESCAPE);
+            if (c == Characters.QUOTE) {
+                builder.append(Characters.ESCAPE);
             }
             builder.append(c);
         }

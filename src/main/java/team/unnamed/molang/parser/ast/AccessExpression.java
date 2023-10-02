@@ -24,7 +24,7 @@
 
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.lexer.Tokens;
+import team.unnamed.molang.lexer.Characters;
 
 /**
  * {@link Expression} implementation for
@@ -58,7 +58,7 @@ public class AccessExpression implements Expression {
 
     @Override
     public String toSource() {
-        return object.toSource() + Tokens.DOT + property;
+        return object.toSource() + Characters.DOT + property;
     }
 
     @Override

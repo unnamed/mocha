@@ -32,7 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
  * tokens
  */
 @ApiStatus.Internal
-public final class Tokens {
+public final class Characters {
 
     /**
      * Character used to escape other characters
@@ -42,27 +42,21 @@ public final class Tokens {
     public static final char ESCAPE = '\\';
     public static final char UNDERSCORE = '_';
     public static final char DOT = '.';
-
-    // MoLang currently only supports single quotes for string
     public static final char QUOTE = '\'';
 
-    private Tokens() {
-    }
-
-    public static boolean isLetter(final int c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    private Characters() {
     }
 
     public static boolean isDigit(final int c) {
         return Character.isDigit(c);
     }
 
-    public static boolean isValidForWord(final int c) {
-        return isLetter(c) || c == UNDERSCORE;
+    public static boolean isValidForWordStart(final int c) {
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == UNDERSCORE;
     }
 
     public static boolean isValidForWordContinuation(final int c) {
-        return isValidForWord(c) || isDigit(c);
+        return isValidForWordStart(c) || isDigit(c);
     }
 
 }
