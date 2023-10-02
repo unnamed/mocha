@@ -134,7 +134,7 @@ final class CompoundExpressionParser {
             }
         }
 
-        if (attachmentPower > precedence) {
+        if (attachmentPower >= precedence) {
             return left;
         }
 
