@@ -78,7 +78,6 @@ final class MolangParserImpl implements MolangParser {
     }
 
     static Expression parseCompoundExpression(MolangLexer lexer, int attachmentPower) throws IOException {
-        boolean o = attachmentPower == 0;
         Expression expr = SingleExpressionParser.parseSingle(lexer);
         while (true) {
             Expression compositeExpr = CompoundExpressionParser.parseCompound(lexer, expr, attachmentPower);
