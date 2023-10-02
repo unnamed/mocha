@@ -1,14 +1,6 @@
 package team.unnamed.molang.parser;
 
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.parser.ast.NegationExpression;
-import team.unnamed.molang.parser.ast.ReturnExpression;
-import team.unnamed.molang.parser.ast.WrappedExpression;
-import team.unnamed.molang.parser.ast.AccessExpression;
-import team.unnamed.molang.parser.ast.ExecutionScopeExpression;
-import team.unnamed.molang.parser.ast.DoubleExpression;
-import team.unnamed.molang.parser.ast.IdentifierExpression;
-import team.unnamed.molang.parser.ast.StringExpression;
+import team.unnamed.molang.parser.ast.*;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;
@@ -80,11 +72,14 @@ final class SingleExpressionParser {
                 }
                 return new ExecutionScopeExpression(expressions);
             }
-            // todo: should not be parsed as identifiers
-            case FOR_EACH:
-            case BREAK:
-            case CONTINUE:
-            case THIS:
+            case BREAK: {
+                lexer.next();
+                return new BreakExpression();
+            }
+            case CONTINUE: {
+                lexer.next();
+                return new ContinueExpression();
+            }
             case IDENTIFIER: {
                 Expression expr = new IdentifierExpression(token.value());
                 token = lexer.next();

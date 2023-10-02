@@ -92,10 +92,8 @@ final class MolangLexerImpl implements MolangLexer {
             String word = builder.toString();
             TokenKind kind;
             switch (word.toLowerCase()) {
-                case "for_each": kind = TokenKind.FOR_EACH; break;
                 case "break": kind = TokenKind.BREAK; break;
                 case "continue": kind = TokenKind.CONTINUE; break;
-                case "this": kind = TokenKind.THIS; break;
                 case "return": kind = TokenKind.RETURN; break;
                 case "true": kind = TokenKind.TRUE; break;
                 case "false": kind = TokenKind.FALSE; break;

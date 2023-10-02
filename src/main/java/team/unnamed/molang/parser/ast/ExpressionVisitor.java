@@ -58,6 +58,14 @@ public interface ExpressionVisitor<R> {
         return visit(expression);
     }
 
+    default R visitBreak(BreakExpression expression) {
+        return visit(expression);
+    }
+
+    default R visitContinue(ContinueExpression expression) {
+        return visit(expression);
+    }
+
     R visit(Expression expression);
 
 }

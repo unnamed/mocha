@@ -21,10 +21,10 @@ public class LexerTest {
         assertTokenization("1 -> 2", FLOAT, ARROW, FLOAT, EOF);
         assertTokenization("(hello) * (world)", LPAREN, IDENTIFIER, RPAREN, STAR, LPAREN, IDENTIFIER, RPAREN, EOF);
         assertTokenization("error & here", IDENTIFIER, ERROR, IDENTIFIER, EOF);
-        assertTokenization("this * is * 'string literal'", THIS, STAR, IDENTIFIER, STAR, STRING, EOF);
+        assertTokenization("this * is * 'string literal'", IDENTIFIER, STAR, IDENTIFIER, STAR, STRING, EOF);
         assertTokenization("(whats true and false)", LPAREN, IDENTIFIER, TRUE, IDENTIFIER, FALSE, RPAREN, EOF);
         assertTokenization("we_love && we_live || we_lie", IDENTIFIER, AMPAMP, IDENTIFIER, BARBAR, IDENTIFIER, EOF);
-        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, THIS, EOF);
+        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, IDENTIFIER, EOF);
         assertTokenization("q.get_equipped_item_name == 'stick'", IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING, EOF);
         assertTokenization("q.is_sneaking || q.is_jumping", IDENTIFIER, DOT, IDENTIFIER, BARBAR, IDENTIFIER, DOT, IDENTIFIER, EOF);
         assertTokenization("q.is_sneaking ? 5", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, EOF);
@@ -45,7 +45,7 @@ public class LexerTest {
                         "    v.x = v.x + v.pig->query.get_relative_block_state(0, 1, 0, 'flammable');\n" +
                         "});",
                 IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
-                FOR_EACH, LPAREN, IDENTIFIER, DOT, IDENTIFIER, COMMA, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, STRING, RPAREN, COMMA, LBRACE,
+                IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, COMMA, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, STRING, RPAREN, COMMA, LBRACE,
                 IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, ARROW, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, FLOAT, COMMA, FLOAT, COMMA, STRING, RPAREN, SEMICOLON,
                 RBRACE, RPAREN, SEMICOLON, EOF
         );

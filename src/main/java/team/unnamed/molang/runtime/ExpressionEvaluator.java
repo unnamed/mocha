@@ -170,6 +170,18 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
+    public Object visitBreak(BreakExpression expression) {
+        this.returnValue = BreakExpression.BREAK_FLAG;
+        return 0;
+    }
+
+    @Override
+    public Object visitContinue(ContinueExpression expression) {
+        this.returnValue = ContinueExpression.CONTINUE_FLAG;
+        return 0;
+    }
+
+    @Override
     public Object visitString(StringExpression expression) {
         return expression.value();
     }

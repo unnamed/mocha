@@ -31,17 +31,12 @@ public enum TokenKind {
     /** 'False' literal boolean token */
     FALSE,
 
-    /** The "for_each" keyword */
-    FOR_EACH("for_each"),
-
     /** The "break" keyword */
     BREAK("break"),
 
     /** The "continue" keyword */
     CONTINUE("continue"),
 
-    /** The "this" keyword */
-    THIS("this"),
 
     /** The "return" keyword */
     RETURN("return"),
