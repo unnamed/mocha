@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.lexer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -31,9 +33,9 @@ import java.util.Objects;
  * when performing lexical analysis
  *
  * <p>Can be used to show the position of lexical errors
- * in a very human-readable way</p>
+ * in a human-readable way</p>
  *
- * @since 1.0.0
+ * @since 3.0.0
  */
 public final class Cursor implements Cloneable {
 
@@ -41,7 +43,7 @@ public final class Cursor implements Cloneable {
     private int line = 0;
     private int column = 0;
 
-    public Cursor(int line, int column) {
+    public Cursor(final int line, final int column) {
         this.line = line;
         this.column = column;
     }
@@ -61,7 +63,7 @@ public final class Cursor implements Cloneable {
         return column;
     }
 
-    public void push(int character) {
+    public void push(final int character) {
         index++;
         if (character == '\n') {
             // if it's a line break,
@@ -74,7 +76,7 @@ public final class Cursor implements Cloneable {
     }
 
     @Override
-    public Cursor clone() {
+    public @NotNull Cursor clone() {
         return new Cursor(line, column);
     }
 
@@ -84,12 +86,11 @@ public final class Cursor implements Cloneable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cursor that = (Cursor) o;
-        return line == that.line
-                && column == that.column;
+        return line == that.line && column == that.column;
     }
 
     @Override

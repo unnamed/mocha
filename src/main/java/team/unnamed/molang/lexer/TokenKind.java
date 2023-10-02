@@ -24,11 +24,25 @@
 
 package team.unnamed.molang.lexer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
+/**
+ * An enum of token kinds. Represents a single token kind.
+ *
+ * <p>Tokens are, commonly, a sequence of one or more continuous
+ * characters, like "??", "->", "!", "true", "1.0", "2.0", ...</p>
+ *
+ * <p>Tokens do not have an specific behavior, they just group
+ * certain characters that can be used by the parser.</p>
+ *
+ * @since 3.0.0
+ */
 public enum TokenKind {
 
     /** End-of-file token, means that the end was reached */
@@ -147,25 +161,45 @@ public enum TokenKind {
 
     private final Set<Tag> tags;
 
-    TokenKind(Tag... tags) {
-        this.tags = enumSetOf(tags);
+    TokenKind(final Tag @NotNull ... tags) {
+        this.tags = EnumSet.copyOf(Arrays.asList(tags));
     }
 
-    public boolean hasTag(Tag tag) {
+    TokenKind() {
+        this.tags = Collections.emptySet();
+    }
+
+    /**
+     * Determines if this token kind has a certain
+     * tag.
+     *
+     * @param tag The tag to check.
+     * @return True if this token kind is tagged with
+     * the given tag
+     * @since 3.0.0
+     */
+    public boolean hasTag(final @NotNull Tag tag) {
+        Objects.requireNonNull(tag, "tag");
         return tags.contains(tag);
     }
 
+    /**
+     * An enum of tags for token kinds. Tags specify
+     * certain features of token kinds.
+     *
+     * @since 3.0.0
+     */
     public enum Tag {
-        HAS_VALUE
-    }
 
-    @SafeVarargs
-    private static <E extends Enum<E>> Set<E> enumSetOf(E... elements){
-        if (elements.length == 0) {
-            return Collections.emptySet();
-        } else {
-            return EnumSet.copyOf(Arrays.asList(elements));
-        }
+        /**
+         * A token kind with HAS_VALUE tag will have a variable value,
+         * for example, double or string literal tokens have variable
+         * values, but they are still parsed with the same token kind.
+         *
+         * @since 3.0.0
+         */
+        HAS_VALUE
+
     }
 
 }

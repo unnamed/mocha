@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.lexer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 
@@ -43,18 +45,18 @@ final class MolangLexerImpl implements MolangLexer {
     // the current token
     private Token token = null;
 
-    MolangLexerImpl(Reader reader) throws IOException {
+    MolangLexerImpl(final @NotNull Reader reader) throws IOException {
         this.reader = requireNonNull(reader, "reader");
         this.next = reader.read();
     }
 
     @Override
-    public Cursor cursor() {
+    public @NotNull Cursor cursor() {
         return cursor;
     }
 
     @Override
-    public Token current() {
+    public @NotNull Token current() {
         if (token == null) {
             throw new IllegalStateException("No current token, please call next() at least once");
         }
@@ -62,7 +64,7 @@ final class MolangLexerImpl implements MolangLexer {
     }
 
     @Override
-    public Token next() throws IOException {
+    public @NotNull Token next() throws IOException {
         return token = next0();
     }
 
@@ -71,7 +73,7 @@ final class MolangLexerImpl implements MolangLexer {
         this.reader.close();
     }
 
-    private Token next0() throws IOException {
+    private @NotNull Token next0() throws IOException {
         int c = next;
         if (c == -1) {
             // EOF reached

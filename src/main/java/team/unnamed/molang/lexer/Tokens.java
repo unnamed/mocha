@@ -24,11 +24,14 @@
 
 package team.unnamed.molang.lexer;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * Utility class holding utility static
  * methods for working with character
  * tokens
  */
+@ApiStatus.Internal
 public final class Tokens {
 
     /**
@@ -46,19 +49,19 @@ public final class Tokens {
     private Tokens() {
     }
 
-    public static boolean isLetter(int c) {
+    public static boolean isLetter(final int c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
     }
 
-    public static boolean isDigit(int c) {
+    public static boolean isDigit(final int c) {
         return Character.isDigit(c);
     }
 
-    public static boolean isValidForWord(int c) {
+    public static boolean isValidForWord(final int c) {
         return isLetter(c) || c == UNDERSCORE;
     }
 
-    public static boolean isValidForWordContinuation(int c) {
+    public static boolean isValidForWordContinuation(final int c) {
         return isValidForWord(c) || isDigit(c);
     }
 

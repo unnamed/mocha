@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.lexer;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -35,20 +37,84 @@ import java.io.Reader;
  * <p>The lexical analyzer converts character streams
  * to token streams</p>
  *
- * @since 1.0.0
+ * <p>Note that this is a stream-based lexer, this means
+ * that it will not consume the entire reader if it doesn't
+ * continue having next() calls</p>
+ *
+ * <p>See the following example on correctly lexing a string:</p>
+ * <pre>{@code
+ *     MolangLexer lexer = MolangLexer.lexer(new StringReader("1 + 1"));
+ *     List<Token> tokens = new ArrayList<>();
+ *     Token token;
+ *     while ((token = lexer.next()).kind() != TokenKind.EOF) {
+ *         tokens.add(token);
+ *     }
+ *     // tokens: [ Double, Plus, Double ]
+ * }</pre>
+ *
+ * @since 3.0.0
  */
+@ApiStatus.NonExtendable
 public /*sealed*/ interface MolangLexer /* permits MolangLexerImpl */ extends Closeable {
 
-    Cursor cursor();
+    /**
+     * Returns the cursor for this lexer, the cursor maintains
+     * track of the current line and column, it is used for
+     * error reporting.
+     *
+     * @return The lexer cursor
+     * @since 3.0.0
+     */
+    @NotNull Cursor cursor();
 
-    Token current();
+    /**
+     * Returns the last emitted token (the last token value
+     * returned when calling {@link MolangLexer#next()})
+     *
+     * <p>Requires the user to call {@link MolangLexer#next()}
+     * at least once first.</p>
+     *
+     * @return The last emitted token
+     * @throws IllegalStateException If there is no current token
+     * @since 3.0.0
+     */
+    @NotNull Token current();
 
-    Token next() throws IOException;
+    /**
+     * Reads the internal reader until it gets a token and
+     * then returns it.
+     *
+     * <p>The returned token will never be null, but it can
+     * be of kind {@link TokenKind#EOF} or {@link TokenKind#ERROR}.</p>
+     *
+     * <p>We can stop lexing when we find a {@link TokenKind#EOF} token
+     * for the first time, since following tokens will be EOF too.</p>
+     *
+     * @return The emitted token after reading characters from the internal reader
+     * @throws IOException If reading fails
+     * @since 3.0.0
+     */
+    @NotNull Token next() throws IOException;
 
+    /**
+     * Closes this lexer and the internal {@link Reader}.
+     *
+     * @throws IOException If closing fails
+     * @since 3.0.0
+     */
     @Override
     void close() throws IOException;
 
-    static MolangLexer lexer(Reader reader) throws IOException {
+    /**
+     * Creates a new lexer that will read the characters from the
+     * given reader.
+     *
+     * @param reader The reader to use.
+     * @return The created lexer
+     * @throws IOException If lexer initialization fails.
+     * @since 3.0.0
+     */
+    static @NotNull MolangLexer lexer(final @NotNull Reader reader) throws IOException {
         return new MolangLexerImpl(reader);
     }
 
