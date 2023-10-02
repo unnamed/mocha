@@ -55,6 +55,16 @@ public class HierarchyTest {
         assertCreateSameTree("math.sqrt((3 * 3) + (4 * 4))", "math.sqrt(3 * 3 + 4 * 4)");
         assertCreateSameTree("math.sqrt((5 * 5) - (4 * 4))", "math.sqrt(5 * 5 - 4 * 4)");
         assertCreateSameTree("3 + (cool * cool) + 9", "3 + cool * cool + 9");
+        // combined
+        assertCreateSameTree("((!shy) && (!me)) || (5 > ((math.sqrt(9)) * 5))", "!shy && !me || 5 > math.sqrt(9) * 5");
+        assertCreateSameTree("r00 = ((2 * ((q0 * q0) + (q1 * q1))) - 1)", "r00 = 2 * (q0 * q0 + q1 * q1) - 1");
+        assertCreateSameTree("v.x = ((t.sin_x * t.sin_x) + (v.x * v.x))", "v.x = t.sin_x * t.sin_x + v.x * v.x");
+        // left-to-right
+        assertCreateSameTree("((12 / 2) / 2)", "12 / 2 / 2");
+        assertCreateSameTree("((((1 + 2) + 3) + 4) + 5) + 6", "1 + 2 + 3 + 4 + 5 + 6");
+        assertCreateSameTree("((10 - 10) - 10) - 10", "10 - 10 - 10 - 10");
+        assertCreateSameTree("((((10 * 5) / 5) * 6) / 20) * 8", "10 * 5 / 5 * 6 / 20 * 8");
+        assertCreateSameTree("(((10 + (5 * 8)) + 20) - (8 / 4)) + ((9 / 4) * 5)", "10 + 5 * 8 + 20 - 8 / 4 + 9 / 4 * 5");
     }
 
     private static void assertCreateSameTree(String expr1, String expr2) throws Exception {
