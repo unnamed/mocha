@@ -42,4 +42,19 @@ public class AccessExpression implements Expression {
         return "Access(" + object + ", " + property + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AccessExpression that = (AccessExpression) o;
+        if (!object.equals(that.object)) return false;
+        return property.equals(that.property);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = object.hashCode();
+        result = 31 * result + property.hashCode();
+        return result;
+    }
 }

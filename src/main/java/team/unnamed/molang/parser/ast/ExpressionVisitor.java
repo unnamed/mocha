@@ -18,10 +18,6 @@ public interface ExpressionVisitor<R> {
         return visit(expression);
     }
 
-    default R visitWrapped(WrappedExpression expression) {
-        return visit(expression);
-    }
-
     default R visitTernaryConditional(TernaryConditionalExpression expression) {
         return visit(expression);
     }

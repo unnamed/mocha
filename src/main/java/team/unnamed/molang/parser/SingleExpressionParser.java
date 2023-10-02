@@ -46,7 +46,7 @@ final class SingleExpressionParser {
                     throw new ParseException("Non closed expression", null);
                 }
                 lexer.next();
-                return new WrappedExpression(expression);
+                return expression;
             }
             case LBRACE: {
                 lexer.next();

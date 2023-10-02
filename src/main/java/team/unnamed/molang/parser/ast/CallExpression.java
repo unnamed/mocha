@@ -63,4 +63,19 @@ public final class CallExpression implements Expression {
         return "Call(" + function + ", " + arguments + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CallExpression that = (CallExpression) o;
+        if (!function.equals(that.function)) return false;
+        return arguments.equals(that.arguments);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = function.hashCode();
+        result = 31 * result + arguments.hashCode();
+        return result;
+    }
 }

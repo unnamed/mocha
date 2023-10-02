@@ -195,11 +195,6 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitWrapped(WrappedExpression expression) {
-        return expression.expression().visit(this);
-    }
-
-    @Override
     public Object visit(Expression expression) {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }

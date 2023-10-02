@@ -20,7 +20,7 @@ final class CompoundExpressionParser {
     private CompoundExpressionParser() {
     }
 
-    static Expression parseCompound(MolangLexer lexer, Expression left) throws IOException {
+    static Expression parseCompound(MolangLexer lexer, Expression left, int attachmentPower) throws IOException {
         Token current = lexer.current();
 
         //#region Function call expression
@@ -51,27 +51,35 @@ final class CompoundExpressionParser {
             }
             case AMPAMP: {
                 lexer.next();
-                return new InfixExpression(InfixExpression.AND, left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new InfixExpression(InfixExpression.AND, left, MolangParserImpl.parseCompoundExpression(lexer, 300));
             }
             case BARBAR: {
+                if (attachmentPower > 200) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.OR, left, MolangParserImpl.parseCompoundExpression(lexer));
+                Expression right = MolangParserImpl.parseCompoundExpression(lexer, 200);
+                return new InfixExpression(InfixExpression.OR, left, right);
             }
             case LT: {
+                if (attachmentPower > 700) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.LESS_THAN, left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new InfixExpression(InfixExpression.LESS_THAN, left, MolangParserImpl.parseCompoundExpression(lexer, 700));
             }
             case LTE: {
+                if (attachmentPower > 700) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.LESS_THAN_OR_EQUAL, left, MolangParserImpl.parseCompoundExpression(lexer));
+                Expression right = MolangParserImpl.parseCompoundExpression(lexer, 700);
+                return new InfixExpression(InfixExpression.LESS_THAN_OR_EQUAL, left, right);
             }
             case GT: {
+                if (attachmentPower > 700) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.GREATER_THAN, left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new InfixExpression(InfixExpression.GREATER_THAN, left, MolangParserImpl.parseCompoundExpression(lexer, 700));
             }
             case GTE: {
+                if (attachmentPower > 700) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.GREATER_THAN_OR_EQUAL, left, MolangParserImpl.parseCompoundExpression(lexer));
+                Expression right = MolangParserImpl.parseCompoundExpression(lexer, 700);
+                return new InfixExpression(InfixExpression.GREATER_THAN_OR_EQUAL, left, right);
             }
             case QUESQUES: {
                 lexer.next();
@@ -91,23 +99,27 @@ final class CompoundExpressionParser {
             }
             case EQ: {
                 lexer.next();
-                return new AssignExpression(left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new AssignExpression(left, MolangParserImpl.parseCompoundExpression(lexer, 500));
             }
             case PLUS: {
+                if (attachmentPower > 900) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.ADD, left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new InfixExpression(InfixExpression.ADD, left, MolangParserImpl.parseCompoundExpression(lexer, 900));
             }
             case SUB: {
+                if (attachmentPower > 900) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.SUBTRACT, left, MolangParserImpl.parseCompoundExpression(lexer));
+                return new InfixExpression(InfixExpression.SUBTRACT, left, MolangParserImpl.parseCompoundExpression(lexer, 900));
             }
             case STAR: {
+                if (attachmentPower > 1000) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.MULTIPLY, left, SingleExpressionParser.parseSingle(lexer));
+                return new InfixExpression(InfixExpression.MULTIPLY, left, MolangParserImpl.parseCompoundExpression(lexer, 1000));
             }
             case SLASH: {
+                if (attachmentPower > 1000) break;
                 lexer.next();
-                return new InfixExpression(InfixExpression.DIVIDE, left, SingleExpressionParser.parseSingle(lexer));
+                return new InfixExpression(InfixExpression.DIVIDE, left, MolangParserImpl.parseCompoundExpression(lexer, 1000));
             }
         }
 

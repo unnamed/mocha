@@ -61,7 +61,7 @@ final class MolangParserImpl implements MolangParser {
         }
 
         // parse a single expression
-        Expression expression = parseCompoundExpression(lexer);
+        Expression expression = parseCompoundExpression(lexer, 0);
 
         // update current token
         token = lexer.current();
@@ -74,16 +74,26 @@ final class MolangParserImpl implements MolangParser {
     }
 
     static Expression parseCompoundExpression(MolangLexer lexer) throws IOException {
-        Expression leftHandExpression = SingleExpressionParser.parseSingle(lexer);
+        return parseCompoundExpression(lexer, 0);
+    }
+
+    static Expression parseCompoundExpression(MolangLexer lexer, int attachmentPower) throws IOException {
+        boolean o = attachmentPower == 0;
+        Expression expr = SingleExpressionParser.parseSingle(lexer);
         while (true) {
-            Expression compositeExpr = CompoundExpressionParser.parseCompound(lexer, leftHandExpression);
-            if (compositeExpr == leftHandExpression) {
-                break;
-            } else {
-                leftHandExpression = compositeExpr;
+            Expression compositeExpr = CompoundExpressionParser.parseCompound(lexer, expr, attachmentPower);
+
+            // current token
+            Token current = lexer.current();
+            if (current.kind() == TokenKind.EOF || current.kind() == TokenKind.SEMICOLON) {
+                // found eof, stop parsing, return expr
+                return compositeExpr;
+            } else if (compositeExpr == expr) {
+                return expr;
             }
+
+            expr = compositeExpr;
         }
-        return leftHandExpression;
     }
 
     @Override
