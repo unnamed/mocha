@@ -26,6 +26,7 @@ package team.unnamed.molang.lexer;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Objects;
 
@@ -80,7 +81,7 @@ public final class Token {
      * @return The token value
      * @since 3.0.0
      */
-    public @Nullable String value() {
+    public @UnknownNullability String value() {
         return value;
     }
 

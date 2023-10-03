@@ -24,12 +24,16 @@
 
 package team.unnamed.molang.parser;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;
-import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.parser.ast.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,34 +46,43 @@ import static java.util.Objects.requireNonNull;
  */
 final class MolangParserImpl implements MolangParser {
 
+    private static final Object UNSET_FLAG = new Object();
+
     private final MolangLexer lexer;
 
     // the last parsed expression, returned by next()
-    private Expression current;
+    // we have to use Object and a flag since null is a valid value too
+    private @Nullable Object current = UNSET_FLAG;
 
-    MolangParserImpl(MolangLexer lexer) {
+    MolangParserImpl(final @NotNull MolangLexer lexer) {
         this.lexer = requireNonNull(lexer, "lexer");
     }
 
     @Override
-    public MolangLexer lexer() {
+    public @NotNull MolangLexer lexer() {
         return lexer;
     }
 
     @Override
-    public Expression current() {
-        if (current == null) {
+    public @Nullable Expression current() {
+        if (current == UNSET_FLAG) {
             throw new IllegalStateException("No current parsed expression, call next() at least once!");
         }
-        return current;
+        return (Expression) current;
     }
 
     @Override
-    public Expression next() throws IOException {
-        return current = next0();
+    public @Nullable Expression next() throws IOException {
+        final Expression expr = next0();
+        current = expr;
+        return expr;
     }
 
-    private Expression next0() throws IOException {
+    //
+    // Parses an expression until it finds an unexpected token,
+    // a semicolon, or an end-of-file token.
+    //
+    private @Nullable Expression next0() throws IOException {
         Token token = lexer.next();
 
         if (token.kind() == TokenKind.EOF) {
@@ -82,12 +95,10 @@ final class MolangParserImpl implements MolangParser {
             throw new ParseException("Found an invalid token (error): " + token.value(), cursor());
         }
 
-        // parse a single expression
-        Expression expression = parseCompoundExpression(lexer, 0);
+        final Expression expression = parseCompoundExpression(lexer, 0);
 
-        // update current token
+        // check current token, should be a semicolon or an eof
         token = lexer.current();
-
         if (token.kind() != TokenKind.EOF && token.kind() != TokenKind.SEMICOLON) {
             throw new ParseException("Expected a semicolon, but was " + token, lexer.cursor());
         }
@@ -100,26 +111,193 @@ final class MolangParserImpl implements MolangParser {
         this.lexer.close();
     }
 
-    static Expression parseCompoundExpression(MolangLexer lexer) throws IOException {
-        return parseCompoundExpression(lexer, 0);
+    //
+    // Parses a single expression.
+    // Single expressions don't require a left-hand expression
+    // to be parsed, e.g. literals, statements, identifiers,
+    // wrapped expressions and execution scopes
+    //
+    static @NotNull Expression parseSingle(final @NotNull MolangLexer lexer) throws IOException {
+        Token token = lexer.current();
+        switch (token.kind()) {
+            case FLOAT:
+                lexer.next();
+                return new DoubleExpression(Double.parseDouble(token.value()));
+            case STRING:
+                lexer.next();
+                return new StringExpression(token.value());
+            case TRUE:
+                lexer.next();
+                return DoubleExpression.ONE;
+            case FALSE:
+                lexer.next();
+                return DoubleExpression.ZERO;
+            case LPAREN:
+                lexer.next();
+                // wrapped expression: (expression)
+                Expression expression = MolangParserImpl.parseCompoundExpression(lexer, 0);
+                token = lexer.current();
+                if (token.kind() != TokenKind.RPAREN) {
+                    throw new ParseException("Non closed expression", null);
+                }
+                lexer.next();
+                return expression;
+            case LBRACE:
+                lexer.next();
+                List<Expression> expressions = new ArrayList<>();
+                while (true) {
+                    expressions.add(MolangParserImpl.parseCompoundExpression(lexer, 0));
+                    token = lexer.current();
+                    if (token.kind() == TokenKind.RBRACE) {
+                        lexer.next();
+                        break;
+                    } else if (token.kind() == TokenKind.EOF) {
+                        // end reached but not closed yet huh?
+                        throw new ParseException(
+                                "Found the end before the execution scope closing token",
+                                null
+                        );
+                    } else {
+                        if (token.kind() != TokenKind.SEMICOLON) {
+                            throw new ParseException("Missing semicolon", null);
+                        }
+                        lexer.next();
+                    }
+                }
+                return new ExecutionScopeExpression(expressions);
+            case BREAK:
+                lexer.next();
+                return new StatementExpression(StatementExpression.Op.BREAK);
+            case CONTINUE:
+                lexer.next();
+                return new StatementExpression(StatementExpression.Op.CONTINUE);
+            case IDENTIFIER:
+                Expression expr = new IdentifierExpression(token.value());
+                token = lexer.next();
+                while (token.kind() == TokenKind.DOT) {
+                    token = lexer.next();
+
+                    if (token.kind() != TokenKind.IDENTIFIER) {
+                        throw new ParseException("Unexpected token, expected a valid field token", null);
+                    }
+
+                    expr = new AccessExpression(expr, token.value());
+                    token = lexer.next();
+                }
+                return expr;
+            case SUB:
+                lexer.next();
+                return new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, parseSingle(lexer));
+            case BANG:
+                lexer.next();
+                return new UnaryExpression(UnaryExpression.Op.LOGICAL_NEGATION, parseSingle(lexer));
+            case RETURN:
+                lexer.next();
+                return new UnaryExpression(UnaryExpression.Op.RETURN, MolangParserImpl.parseCompoundExpression(lexer, 0));
+        }
+
+        return DoubleExpression.ZERO;
     }
 
-    static Expression parseCompoundExpression(MolangLexer lexer, int attachmentPower) throws IOException {
-        Expression expr = SingleExpressionParser.parseSingle(lexer);
+    static @NotNull Expression parseCompoundExpression(
+            final @NotNull MolangLexer lexer,
+            final int lastPrecedence
+    ) throws IOException {
+        Expression expr = parseSingle(lexer);
         while (true) {
-            Expression compositeExpr = CompoundExpressionParser.parseCompound(lexer, expr, attachmentPower);
+            final Expression compoundExpr = parseCompound(lexer, expr, lastPrecedence);
 
             // current token
-            Token current = lexer.current();
+            final Token current = lexer.current();
             if (current.kind() == TokenKind.EOF || current.kind() == TokenKind.SEMICOLON) {
                 // found eof, stop parsing, return expr
-                return compositeExpr;
-            } else if (compositeExpr == expr) {
+                return compoundExpr;
+            } else if (compoundExpr == expr) {
                 return expr;
             }
 
-            expr = compositeExpr;
+            expr = compoundExpr;
         }
+    }
+
+    static @NotNull Expression parseCompound(
+            final @NotNull MolangLexer lexer,
+            final @NotNull Expression left,
+            final int lastPrecedence
+    ) throws IOException {
+        Token current = lexer.current();
+
+        switch (current.kind()) {
+            case RPAREN:
+            case EOF:
+                return left;
+            case LPAREN: { // CALL EXPRESSION: "left("
+                lexer.next();
+                final List<Expression> arguments = new ArrayList<>();
+
+                // start reading the arguments
+                while (true) {
+                    arguments.add(MolangParserImpl.parseCompoundExpression(lexer, 0));
+                    // update current character
+                    current = lexer.current();
+                    if (current.kind() == TokenKind.EOF) {
+                        throw new ParseException("Found EOF before closing RPAREN", null);
+                    } else if (current.kind() == TokenKind.RPAREN) {
+                        lexer.next();
+                        break;
+                    } else {
+                        if (current.kind() != TokenKind.COMMA) {
+                            throw new ParseException("Expected a comma", null);
+                        }
+                        lexer.next();
+                    }
+                }
+
+                return new CallExpression(left, arguments);
+            }
+            case QUES: {
+                lexer.next();
+                final Expression trueValue = MolangParserImpl.parseCompoundExpression(lexer, 0);
+
+                if (lexer.current().kind() == TokenKind.COLON) {
+                    // then it's a ternary expression, since there is a ':', indicating the next expression
+                    lexer.next();
+                    return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parseCompoundExpression(lexer, 0));
+                } else {
+                    return new InfixExpression(InfixExpression.Op.CONDITIONAL, left, trueValue);
+                }
+            }
+        }
+
+        // check for infix expressions
+        final InfixExpression.Op op;
+
+        // @formatter:off
+        // i wish this was java 17
+        switch (current.kind()) {
+            case AMPAMP: op = InfixExpression.Op.AND; break;
+            case BARBAR: op = InfixExpression.Op.OR; break;
+            case LT: op = InfixExpression.Op.LT; break;
+            case LTE: op = InfixExpression.Op.LTE; break;
+            case GT: op = InfixExpression.Op.GT; break;
+            case GTE: op = InfixExpression.Op.GTE; break;
+            case PLUS: op = InfixExpression.Op.ADD; break;
+            case SUB: op = InfixExpression.Op.SUB; break;
+            case STAR: op = InfixExpression.Op.MUL; break;
+            case SLASH: op = InfixExpression.Op.DIV; break;
+            case QUESQUES: op = InfixExpression.Op.NULL_COALESCE; break;
+            case EQ: op = InfixExpression.Op.ASSIGN; break;
+            default: return left;
+        }
+        // @formatter:on
+
+        final int precedence = op.precedence();
+        if (lastPrecedence >= precedence) {
+            return left;
+        }
+
+        lexer.next();
+        return new InfixExpression(op, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
     }
 
 }

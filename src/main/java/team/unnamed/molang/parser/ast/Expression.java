@@ -46,8 +46,8 @@ public interface Expression {
      * Visits this expression with the given visitor.
      *
      * @param visitor The expression visitor
+     * @param <R>     The visit result return type
      * @return The visit result
-     * @param <R> The visit result return type
      * @since 3.0.0
      */
     <R> R visit(final @NotNull ExpressionVisitor<R> visitor);

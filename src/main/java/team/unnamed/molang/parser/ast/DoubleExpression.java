@@ -38,6 +38,9 @@ import java.util.Objects;
  */
 public final class DoubleExpression implements Expression {
 
+    public static final DoubleExpression ZERO = new DoubleExpression(0.0D);
+    public static final DoubleExpression ONE = new DoubleExpression(1.0D);
+
     private final double value;
 
     public DoubleExpression(final double value) {

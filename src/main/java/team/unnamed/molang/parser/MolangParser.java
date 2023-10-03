@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.parser;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.parser.ast.Expression;
@@ -38,22 +40,30 @@ import java.io.Reader;
  * <p>The parser converts token streams to expression
  * streams</p>
  *
- * <p>This is the next level after lexical analysis
- * done by {@link team.unnamed.molang.lexer.MolangLexer}</p>
- *
- * @since 1.0.0
+ * @since 3.0.0
  */
 public /* sealed */ interface MolangParser /* permits MolangParserImpl */ extends Closeable {
 
-    MolangLexer lexer();
+    @NotNull MolangLexer lexer();
 
-    default Cursor cursor() {
+    default @NotNull Cursor cursor() {
         return lexer().cursor();
     }
 
-    Expression current();
+    @Nullable Expression current();
 
-    Expression next() throws IOException;
+    /**
+     * Parses the next expression.
+     *
+     * <p>This method returns {@code null} if it reaches
+     * the end of file and throws a {@link ParseException}
+     * if there is an error.</p>
+     *
+     * @return The parsed expression
+     * @throws IOException If reading or parsing fails
+     * @since 3.0.0
+     */
+    @Nullable Expression next() throws IOException;
 
     @Override
     void close() throws IOException;
@@ -63,11 +73,11 @@ public /* sealed */ interface MolangParser /* permits MolangParserImpl */ extend
      *
      * @return The MoLang parser instance
      */
-    static MolangParser parser(MolangLexer lexer) throws IOException {
+    static @NotNull MolangParser parser(final @NotNull MolangLexer lexer) throws IOException {
         return new MolangParserImpl(lexer);
     }
 
-    static MolangParser parser(Reader reader) throws IOException {
+    static @NotNull MolangParser parser(final @NotNull Reader reader) throws IOException {
         return parser(MolangLexer.lexer(reader));
     }
 
