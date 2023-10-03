@@ -64,7 +64,7 @@ import java.util.List;
  * @since 3.0.0
  */
 @ApiStatus.NonExtendable
-public /*sealed*/ interface MolangLexer /* permits MolangLexerImpl */ extends Closeable {
+public /* sealed */ interface MolangLexer /* permits MolangLexerImpl */ extends Closeable {
 
     /**
      * Returns the cursor for this lexer, the cursor maintains

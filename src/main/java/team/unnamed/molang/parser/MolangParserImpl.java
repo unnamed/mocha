@@ -37,13 +37,6 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- * Standard implementation of {@link MolangParser},
- * it's Hephaestus-MoLang parser since some MoLang
- * characteristics may change
- *
- * @see Expression
- */
 final class MolangParserImpl implements MolangParser {
 
     private static final Object UNSET_FLAG = new Object();
@@ -152,7 +145,7 @@ final class MolangParserImpl implements MolangParser {
                         lexer.next();
                         break;
                     } else if (token.kind() == TokenKind.EOF) {
-                        // end reached but not closed yet huh?
+                        // end reached but not closed yet, huh?
                         throw new ParseException(
                                 "Found the end before the execution scope closing token",
                                 null
@@ -273,7 +266,7 @@ final class MolangParserImpl implements MolangParser {
         final BinaryExpression.Op op;
 
         // @formatter:off
-        // i wish this was java 17
+        // I wish this was java 17
         switch (current.kind()) {
             case AMPAMP: op = BinaryExpression.Op.AND; break;
             case BARBAR: op = BinaryExpression.Op.OR; break;

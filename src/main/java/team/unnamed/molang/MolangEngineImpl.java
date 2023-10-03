@@ -33,7 +33,6 @@ import team.unnamed.molang.runtime.binding.StandardBindings;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 
 final class MolangEngineImpl implements MolangEngine {
@@ -83,14 +82,7 @@ final class MolangEngineImpl implements MolangEngine {
 
     @Override
     public List<Expression> parse(Reader reader) throws IOException {
-        MolangParser parser = MolangParser.parser(reader);
-        List<Expression> expressions = new ArrayList<>(8);
-        Expression expr;
-        while ((expr = parser.next()) != null) {
-            expressions.add(expr);
-        }
-        ;
-        return expressions;
+        return MolangParser.parser(reader).parseAll();
     }
 
 }

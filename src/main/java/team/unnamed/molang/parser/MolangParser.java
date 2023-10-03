@@ -28,11 +28,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.lexer.MolangLexer;
+import team.unnamed.molang.lexer.TokenKind;
 import team.unnamed.molang.parser.ast.Expression;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parser for the Molang language.
@@ -40,16 +43,46 @@ import java.io.Reader;
  * <p>The parser converts token streams to expression
  * streams</p>
  *
+ * <p>Note that this is a stream-based parser, this means
+ * that it will not consume the entire lexer if it doesn't
+ * continue having next() calls</p>
+ *
  * @since 3.0.0
  */
 public /* sealed */ interface MolangParser /* permits MolangParserImpl */ extends Closeable {
 
+    /**
+     * Returns the internal lexer being used.
+     *
+     * @return The lexer for this parser.
+     * @since 3.0.0
+     */
     @NotNull MolangLexer lexer();
 
+    /**
+     * Returns the cursor for this parser, the cursor maintains
+     * track of the current line and column, it is used for
+     * error reporting.
+     *
+     * @return The cursor.
+     * @since 3.0.0
+     */
     default @NotNull Cursor cursor() {
+        //noinspection resource
         return lexer().cursor();
     }
 
+    /**
+     * Returns the last emitted expression (the last expression value
+     * returned when calling {@link MolangParser#next()})
+     *
+     * <p>Requires the user to call {@link MolangParser#next()}
+     * at least once first.</p>
+     *
+     * @return The last emitted expression
+     * @throws IllegalStateException If there is no current expression
+     * @since 3.0.0
+     */
     @Nullable Expression current();
 
     /**
@@ -65,20 +98,100 @@ public /* sealed */ interface MolangParser /* permits MolangParserImpl */ extend
      */
     @Nullable Expression next() throws IOException;
 
+    /**
+     * Parses all the tokens until it finds a {@link TokenKind#EOF}.
+     *
+     * <p>After this method is called, the parser should be
+     * done and all next expressions will be null</p>
+     *
+     * @return All the read expressions
+     * @throws IOException If reading or parsing fails
+     * @since 3.0.0
+     */
+    default @NotNull List<Expression> parseAll() throws IOException {
+        List<Expression> tokens = new ArrayList<>();
+        Expression expr;
+        while ((expr = next()) != null) {
+            tokens.add(expr);
+        }
+        return tokens;
+    }
+
+    /**
+     * Closes this parser and the internal {@link MolangLexer}.
+     *
+     * @throws IOException If closing fails
+     * @since 3.0.0
+     */
     @Override
     void close() throws IOException;
 
     /**
-     * Returns a {@link MolangParser} instance
+     * Creates a new parser that will read the tokens from
+     * the given lexer.
      *
-     * @return The MoLang parser instance
+     * @param lexer The lexer
+     * @return The created parser
+     * @throws IOException If parser initialization fails.
+     * @since 3.0.0
      */
     static @NotNull MolangParser parser(final @NotNull MolangLexer lexer) throws IOException {
         return new MolangParserImpl(lexer);
     }
 
+    /**
+     * Creates a new parser that will read the tokens from
+     * the given reader.
+     *
+     * @param reader The reader
+     * @return The created parser
+     * @throws IOException If parser initialization fails.
+     * @since 3.0.0
+     */
     static @NotNull MolangParser parser(final @NotNull Reader reader) throws IOException {
         return parser(MolangLexer.lexer(reader));
+    }
+
+
+    /**
+     * Creates a new parser that will read the tokens from
+     * the given string.
+     *
+     * @param string The string
+     * @return The created parser
+     * @throws IOException If parser initialization fails.
+     * @since 3.0.0
+     */
+    static @NotNull MolangParser parser(final @NotNull String string) throws IOException {
+        return parser(MolangLexer.lexer(string));
+    }
+
+    /**
+     * Parses all the expressions from the given reader.
+     *
+     * @param reader The reader.
+     * @return The emitted expressions.
+     * @throws IOException If reading or parsing fails.
+     * @since 3.0.0
+     */
+    static @NotNull List<Expression> parseAll(final @NotNull Reader reader) throws IOException {
+        try (MolangParser parser = parser(reader)) {
+            return parser.parseAll();
+        }
+    }
+
+    /**
+     * Parses the provided string.
+     *
+     * @param string The string.
+     * @return The emitted expressions.
+     * @throws IOException If reading or parsing fails.
+     * @since 3.0.0
+     */
+    static @NotNull List<Expression> parseAll(final @NotNull String string) throws IOException {
+        try (MolangParser parser = parser(string)) {
+            return parser.parseAll();
+        }
     }
 
 }

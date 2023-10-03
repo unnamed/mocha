@@ -31,6 +31,8 @@ import java.io.IOException;
 /**
  * Exception that can be thrown during the
  * parsing phase
+ *
+ * @since 3.0.0
  */
 public class ParseException extends IOException {
 
@@ -55,7 +57,7 @@ public class ParseException extends IOException {
         this.cursor = cursor;
     }
 
-    public Cursor getCursor() {
+    public Cursor cursor() {
         return cursor;
     }
 
