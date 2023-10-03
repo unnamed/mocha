@@ -88,74 +88,24 @@ final class CompoundExpressionParser {
 
         // check for infix expressions
         InfixExpression.Op op;
-        int precedence;
 
         switch (current.kind()) {
-            case AMPAMP: {
-                op = InfixExpression.Op.AND;
-                precedence = OperatorPrecedence.AND;
-                break;
-            }
-            case BARBAR: {
-                op = InfixExpression.Op.OR;
-                precedence = OperatorPrecedence.OR;
-                break;
-            }
-            case LT: {
-                op = InfixExpression.Op.LT;
-                precedence = OperatorPrecedence.COMPARISON;
-                break;
-            }
-            case LTE: {
-                op = InfixExpression.Op.LTE;
-                precedence = OperatorPrecedence.COMPARISON;
-                break;
-            }
-            case GT: {
-                op = InfixExpression.Op.GT;
-                precedence = OperatorPrecedence.COMPARISON;
-                break;
-            }
-            case GTE: {
-                op = InfixExpression.Op.GTE;
-                precedence = OperatorPrecedence.COMPARISON;
-                break;
-            }
-            case PLUS: {
-                op = InfixExpression.Op.ADD;
-                precedence = OperatorPrecedence.ADDITION_AND_SUBTRACTION;
-                break;
-            }
-            case SUB: {
-                op = InfixExpression.Op.SUB;
-                precedence = OperatorPrecedence.ADDITION_AND_SUBTRACTION;
-                break;
-            }
-            case STAR: {
-                op = InfixExpression.Op.MUL;
-                precedence = OperatorPrecedence.MULTIPLICATION_AND_DIVISION;
-                break;
-            }
-            case SLASH: {
-                op = InfixExpression.Op.DIV;
-                precedence = OperatorPrecedence.MULTIPLICATION_AND_DIVISION;
-                break;
-            }
-            case QUESQUES: {
-                op = InfixExpression.Op.NULL_COALESCE;
-                precedence = OperatorPrecedence.NULL_COALESCING;
-                break;
-            }
-            case EQ: {
-                op = InfixExpression.Op.ASSIGN;
-                precedence = OperatorPrecedence.ASSIGN;
-                break;
-            }
-            default: {
-                return left;
-            }
+            case AMPAMP: op = InfixExpression.Op.AND; break;
+            case BARBAR: op = InfixExpression.Op.OR; break;
+            case LT: op = InfixExpression.Op.LT; break;
+            case LTE: op = InfixExpression.Op.LTE; break;
+            case GT: op = InfixExpression.Op.GT; break;
+            case GTE: op = InfixExpression.Op.GTE; break;
+            case PLUS: op = InfixExpression.Op.ADD; break;
+            case SUB: op = InfixExpression.Op.SUB; break;
+            case STAR: op = InfixExpression.Op.MUL; break;
+            case SLASH: op = InfixExpression.Op.DIV; break;
+            case QUESQUES: op = InfixExpression.Op.NULL_COALESCE; break;
+            case EQ: op = InfixExpression.Op.ASSIGN; break;
+            default: return left;
         }
 
+        int precedence = op.precedence();
         if (attachmentPower >= precedence) {
             return left;
         }

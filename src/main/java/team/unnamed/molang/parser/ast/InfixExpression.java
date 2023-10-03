@@ -24,6 +24,7 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import static java.util.Objects.requireNonNull;
@@ -33,22 +34,6 @@ import static java.util.Objects.requireNonNull;
  * expressions, they can be arithmetic or boolean
  */
 public final class InfixExpression implements Expression {
-
-    public enum Op {
-        AND,
-        OR,
-        LT,
-        LTE,
-        GT,
-        GTE,
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        NULL_COALESCE,
-        ASSIGN,
-        CONDITIONAL
-    }
 
     private final Op op;
     private final Expression left;
@@ -102,6 +87,34 @@ public final class InfixExpression implements Expression {
         result = 31 * result + left.hashCode();
         result = 31 * result + right.hashCode();
         return result;
+    }
+
+    public enum Op {
+        AND(300),
+        OR(200),
+        LT(700),
+        LTE(700),
+        GT(700),
+        GTE(700),
+        ADD(900),
+        SUB(900),
+        MUL(1000),
+        DIV(1000),
+        NULL_COALESCE(-500),
+        ASSIGN(-1000),
+        CONDITIONAL(-1000);
+
+        private final int precedence;
+
+        Op(int precedence) {
+            this.precedence = precedence;
+        }
+
+        @ApiStatus.Internal
+        public int precedence() {
+            return precedence;
+        }
+
     }
 
 }
