@@ -106,7 +106,7 @@ public final class InfixExpression implements Expression {
 
         private final int precedence;
 
-        Op(int precedence) {
+        Op(final int precedence) {
             this.precedence = precedence;
         }
 

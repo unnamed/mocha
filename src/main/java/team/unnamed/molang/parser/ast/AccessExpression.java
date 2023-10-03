@@ -26,6 +26,8 @@ package team.unnamed.molang.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * {@link Expression} implementation for
  * representing property accessing
@@ -36,23 +38,23 @@ public class AccessExpression implements Expression {
     private final String property;
 
     public AccessExpression(
-            Expression object,
-            String property
+            final @NotNull Expression object,
+            final @NotNull String property
     ) {
-        this.object = object;
-        this.property = property;
+        this.object = requireNonNull(object, "object");
+        this.property = requireNonNull(property, "property");
     }
 
-    public Expression object() {
+    public @NotNull Expression object() {
         return object;
     }
 
-    public String property() {
+    public @NotNull String property() {
         return property;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitAccess(this);
     }
 
@@ -62,7 +64,7 @@ public class AccessExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AccessExpression that = (AccessExpression) o;
@@ -76,4 +78,5 @@ public class AccessExpression implements Expression {
         result = 31 * result + property.hashCode();
         return result;
     }
+
 }

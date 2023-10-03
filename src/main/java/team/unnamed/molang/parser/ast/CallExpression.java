@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Expression implementation for MoLang 1.17 function
  * call expression
@@ -37,16 +39,19 @@ public final class CallExpression implements Expression {
     private final Expression function;
     private final List<Expression> arguments;
 
-    public CallExpression(Expression function, List<Expression> arguments) {
-        this.function = function;
-        this.arguments = arguments;
+    public CallExpression(
+            final @NotNull Expression function,
+            final @NotNull List<Expression> arguments
+    ) {
+        this.function = requireNonNull(function, "function");
+        this.arguments = requireNonNull(arguments, "arguments");
     }
 
     /**
      * Returns the expression evaluated to the
      * invoked function
      */
-    public Expression function() {
+    public @NotNull Expression function() {
         return function;
     }
 
@@ -54,12 +59,12 @@ public final class CallExpression implements Expression {
      * Returns the expressions evaluated to the
      * function arguments
      */
-    public List<Expression> arguments() {
+    public @NotNull List<Expression> arguments() {
         return arguments;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitCall(this);
     }
 
@@ -69,7 +74,7 @@ public final class CallExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CallExpression that = (CallExpression) o;
@@ -83,4 +88,5 @@ public final class CallExpression implements Expression {
         result = 31 * result + arguments.hashCode();
         return result;
     }
+
 }

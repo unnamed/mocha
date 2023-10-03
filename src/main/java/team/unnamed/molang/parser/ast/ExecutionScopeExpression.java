@@ -39,20 +39,20 @@ public class ExecutionScopeExpression implements Expression {
 
     private final List<Expression> expressions;
 
-    public ExecutionScopeExpression(List<Expression> expressions) {
-        this.expressions = expressions;
+    public ExecutionScopeExpression(final @NotNull List<Expression> expressions) {
+        this.expressions = Objects.requireNonNull(expressions, "expressions");
     }
 
     /**
      * Returns the expressions inside this
      * execution scope, never null
      */
-    public List<Expression> expressions() {
+    public @NotNull List<Expression> expressions() {
         return expressions;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitExecutionScope(this);
     }
 
@@ -62,7 +62,7 @@ public class ExecutionScopeExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExecutionScopeExpression that = (ExecutionScopeExpression) o;

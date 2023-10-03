@@ -8,16 +8,16 @@ public final class StatementExpression implements Expression {
 
     private final Op op;
 
-    public StatementExpression(Op op) {
+    public StatementExpression(final @NotNull Op op) {
         this.op = Objects.requireNonNull(op, "op");
     }
 
-    public Op op() {
+    public @NotNull Op op() {
         return op;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitStatement(this);
     }
 

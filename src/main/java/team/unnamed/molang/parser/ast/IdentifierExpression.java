@@ -45,6 +45,7 @@ public final class IdentifierExpression implements Expression {
 
     public IdentifierExpression(final @NotNull String name) {
         Objects.requireNonNull(name, "name");
+
         this.name = name.toLowerCase(); // case-insensitive
     }
 
@@ -62,6 +63,7 @@ public final class IdentifierExpression implements Expression {
     public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitIdentifier(this);
     }
+
     @Override
     public String toString() {
         return "Identifier(" + name + ")";
