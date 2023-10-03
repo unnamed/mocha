@@ -46,7 +46,11 @@ publishing {
             val snapshot = project.version.toString().endsWith("-SNAPSHOT")
 
             name = repositoryName
-            url = if (snapshot) { uri(snapshotRepository) } else { uri(releaseRepository) }
+            url = if (snapshot) {
+                uri(snapshotRepository)
+            } else {
+                uri(releaseRepository)
+            }
             credentials(PasswordCredentials::class)
         }
     }
