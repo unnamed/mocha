@@ -89,6 +89,8 @@ public class HierarchyTest {
         assertCreateSameTree("((10 - 10) - 10) - 10", "10 - 10 - 10 - 10");
         assertCreateSameTree("((((10 * 5) / 5) * 6) / 20) * 8", "10 * 5 / 5 * 6 / 20 * 8");
         assertCreateSameTree("(((10 + (5 * 8)) + 20) - (8 / 4)) + ((9 / 4) * 5)", "10 + 5 * 8 + 20 - 8 / 4 + 9 / 4 * 5");
+        // eq, neq
+        assertCreateSameTree("(((true) && (false == false)) || (true))", "true && false == false || true");
     }
 
     private static void assertCreateSameTree(String expr1, String expr2) throws Exception {

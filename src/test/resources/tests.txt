@@ -39,3 +39,15 @@ math.round(math.acos(-1) + math.atan2(2, 4))
 
 # pixel case
 temp.level = 10; 10 * temp.level + (temp.level * temp.level * 4)
+
+# eq, neq
+5 == 3
+5 == 5
+5 != 3
+5 != 5
+
+# more complex eq, neq
+math.sqrt(4*4 + 3*3) == 5
+math.sqrt(7*7 + 24*24) == 25
+3*3*3 == 27
+3*3*3 == 3*(2*2+5)

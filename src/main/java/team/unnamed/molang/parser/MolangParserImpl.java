@@ -287,6 +287,8 @@ final class MolangParserImpl implements MolangParser {
             case SLASH: op = InfixExpression.Op.DIV; break;
             case QUESQUES: op = InfixExpression.Op.NULL_COALESCE; break;
             case EQ: op = InfixExpression.Op.ASSIGN; break;
+            case EQEQ: op = InfixExpression.Op.EQ; break;
+            case BANGEQ: op = InfixExpression.Op.NEQ; break;
             default: return left;
         }
         // @formatter:on

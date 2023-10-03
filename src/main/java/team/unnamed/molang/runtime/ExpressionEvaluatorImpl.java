@@ -81,7 +81,9 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
                 } else {
                     return 0;
                 }
-            }
+            },
+            arithmetic((a, b) -> ((a.eval() == b.eval()) ? 1.0F : 0.0F)), // eq
+            arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
     };
 
     private final ObjectBinding bindings;
