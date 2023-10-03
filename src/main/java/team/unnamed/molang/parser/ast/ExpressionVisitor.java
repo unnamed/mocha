@@ -155,17 +155,6 @@ public interface ExpressionVisitor<R> {
     }
 
     /**
-     * Evaluate for conditional expression.
-     *
-     * @param expression The expression.
-     * @return The result.
-     * @since 3.0.0
-     */
-    default R visitConditional(final @NotNull ConditionalExpression expression) {
-        return visit(expression);
-    }
-
-    /**
      * Evaluate for statement expression.
      *
      * @param expression The expression.

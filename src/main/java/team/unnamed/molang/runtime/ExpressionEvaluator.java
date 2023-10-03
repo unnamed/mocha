@@ -60,10 +60,10 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                     return val;
                 }
             },
-            (evaluator, variable, b) -> {
+            (evaluator, a, b) -> { // assignation
                 Object val = b.visit(evaluator);
-                if (variable instanceof AccessExpression) {
-                    AccessExpression access = (AccessExpression) variable;
+                if (a instanceof AccessExpression) {
+                    AccessExpression access = (AccessExpression) a;
                     Object binding = access.object().visit(evaluator);
                     if (binding instanceof ObjectBinding) {
                         ((ObjectBinding) binding).setProperty(access.property(), val);
@@ -71,6 +71,14 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 }
                 // TODO: (else case) This isn't fail-fast, we can only assign to access expressions
                 return val;
+            },
+            (evaluator, a, b) -> { // conditional
+                Object condition = a.visit(evaluator);
+                if (ValueConversions.asBoolean(condition)) {
+                    return b.visit(evaluator);
+                } else {
+                    return 0;
+                }
             }
     };
 
@@ -116,16 +124,6 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             evaluatedArguments[i] = arguments.get(i).visit(this);
         }
         return ((CallableBinding) binding).call(evaluatedArguments);
-    }
-
-    @Override
-    public Object visitConditional(@NotNull ConditionalExpression expression) {
-        Object condition = expression.condition().visit(this);
-        if (ValueConversions.asBoolean(condition)) {
-            return expression.predicate().visit(this);
-        } else {
-            return 0;
-        }
     }
 
     @Override
