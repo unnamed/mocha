@@ -24,23 +24,32 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+
 /**
- * A fundamental interface representing every
- * possible expression in the MoLang language
+ * The expression interface. It's the super-interface for
+ * all the expression types.
+ *
+ * <p>Expressions are evaluable parts of code, expressions
+ * are emitted by the parser.</p>
+ *
+ * <p>In Molang, almost every expression evaluates to a numerical
+ * value</p>
+ *
+ * @since 3.0.0
  */
+@ApiStatus.NonExtendable
 public interface Expression {
 
-    <R> R visit(ExpressionVisitor<R> visitor);
-
     /**
-     * Returns the expression as source string,
+     * Visits this expression with the given visitor.
      *
-     * <p>It represents the source string used to parse
-     * this expression instance, but may not be exact
-     * since spaces and line breaks aren't stored.</p>
-     *
-     * @return The expression as source string
+     * @param visitor The expression visitor
+     * @return The visit result
+     * @param <R> The visit result return type
+     * @since 3.0.0
      */
-    String toSource();
+    <R> R visit(final @NotNull ExpressionVisitor<R> visitor);
 
 }

@@ -98,11 +98,11 @@ final class SingleExpressionParser {
             }
             case BREAK: {
                 lexer.next();
-                return new BreakExpression();
+                return new StatementExpression(StatementExpression.Op.BREAK);
             }
             case CONTINUE: {
                 lexer.next();
-                return new ContinueExpression();
+                return new StatementExpression(StatementExpression.Op.CONTINUE);
             }
             case IDENTIFIER: {
                 Expression expr = new IdentifierExpression(token.value());
@@ -121,15 +121,15 @@ final class SingleExpressionParser {
             }
             case SUB: {
                 lexer.next();
-                return new NegationExpression(parseSingle(lexer), '-');
+                return new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, parseSingle(lexer));
             }
             case BANG: {
                 lexer.next();
-                return new NegationExpression(parseSingle(lexer), '!');
+                return new UnaryExpression(UnaryExpression.Op.LOGICAL_NEGATION, parseSingle(lexer));
             }
             case RETURN: {
                 lexer.next();
-                return new ReturnExpression(MolangParserImpl.parseCompoundExpression(lexer));
+                return new UnaryExpression(UnaryExpression.Op.RETURN, MolangParserImpl.parseCompoundExpression(lexer));
             }
         }
 

@@ -24,7 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
-import java.util.Iterator;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -58,28 +59,8 @@ public final class CallExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitCall(this);
-    }
-
-    @Override
-    public String toSource() {
-        StringBuilder builder = new StringBuilder()
-                .append(function)
-                .append('(');
-
-        Iterator<Expression> argIterator = arguments.iterator();
-
-        while (argIterator.hasNext()) {
-            Expression argument = argIterator.next();
-            builder.append(argument);
-
-            if (argIterator.hasNext()) {
-                builder.append(", ");
-            }
-        }
-
-        return builder.append(')').toString();
     }
 
     @Override

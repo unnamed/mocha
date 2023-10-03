@@ -24,7 +24,7 @@
 
 package team.unnamed.molang.runtime.binding;
 
-import team.unnamed.molang.parser.ast.BreakExpression;
+import team.unnamed.molang.parser.ast.StatementExpression;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -62,12 +62,12 @@ public final class StandardBindings {
                 CallableBinding callable = (CallableBinding) expr;
                 for (int i = 0; i < n; i++) {
                     Object value = callable.call();
-                    if (value == BreakExpression.BREAK_FLAG) {
+                    if (value == StatementExpression.Op.BREAK) {
                         break;
                     }
                     // (not necessary, callable already exits when returnValue
                     //  is set to any non-null value)
-                    // if (value == CONTINUE_FLAG) continue;
+                    // if (value == StatementExpression.Op.CONTINUE) continue;
                 }
             }
             return 0;

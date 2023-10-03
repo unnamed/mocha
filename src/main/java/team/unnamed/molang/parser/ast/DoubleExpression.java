@@ -24,37 +24,38 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
- * Literal expression implementation for MoLang 1.17
- * numerical values
- * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang#Values
+ * Literal double expression implementation for Molang
+ * numerical values.
+ *
+ * <p>Example double expressions: {@code 2.0}, {@code 59}, {@code 20}, {@code 5.002}</p>
+ *
+ * @since 3.0.0
  */
-public class DoubleExpression implements Expression {
+public final class DoubleExpression implements Expression {
 
     private final double value;
 
-    public DoubleExpression(double value) {
+    public DoubleExpression(final double value) {
         this.value = value;
     }
 
     /**
-     * Returns the value of this double
-     * expression
+     * Gets the double expression value.
+     *
+     * @since 3.0.0
      */
     public double value() {
         return value;
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitDouble(this);
-    }
-
-    @Override
-    public String toSource() {
-        return Double.toString(value);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class DoubleExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DoubleExpression that = (DoubleExpression) o;

@@ -24,7 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
-import java.util.Iterator;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -51,22 +52,8 @@ public class ExecutionScopeExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitExecutionScope(this);
-    }
-
-    @Override
-    public String toSource() {
-        StringBuilder builder = new StringBuilder("{");
-        Iterator<Expression> iterator = expressions.iterator();
-        while (iterator.hasNext()) {
-            Expression expression = iterator.next();
-            builder.append(expression.toSource());
-            if (iterator.hasNext()) {
-                builder.append("; ");
-            }
-        }
-        return builder.append('}').toString();
     }
 
     @Override

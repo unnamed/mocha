@@ -26,58 +26,82 @@ package team.unnamed.molang.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
- * Identifier expression implementation for Molang.
+ * Unary expression implementation, performs a single operation
+ * to a single expression, like logical negation, arithmetical
+ * negation, or "return expr;".
  *
- * <p>Note that, identifiers in Molang are always
- * <b>case-insensitive</b></p>
- *
- * <p>Example identifier expressions: {@code math},
- * {@code name}, {@code this}, {@code print}</p>
+ * <p>Example unary expressions: {@code -hello}, {@code !p},
+ * {@code !q}, {@code -(10 * 5)}, {@code return this},
+ * {@code return 5}</p>
  *
  * @since 3.0.0
  */
-public final class IdentifierExpression implements Expression {
+public final class UnaryExpression implements Expression {
 
-    private final String name;
+    private final Op op;
+    private final Expression expression;
 
-    public IdentifierExpression(final @NotNull String name) {
-        Objects.requireNonNull(name, "name");
-        this.name = name.toLowerCase(); // case-insensitive
+    public UnaryExpression(
+            final @NotNull Op op,
+            final @NotNull Expression expression
+    ) {
+        this.op = requireNonNull(op, "op");
+        this.expression = requireNonNull(expression, "expression");
     }
 
     /**
-     * Gets the identifier name.
+     * Gets the unary expression operation.
      *
-     * @return The identifier name.
+     * @return The unary expression operation.
      * @since 3.0.0
      */
-    public @NotNull String name() {
-        return name;
+    public @NotNull Op op() {
+        return op;
+    }
+
+    /**
+     * Gets the operated expression.
+     *
+     * @return The operated expression.
+     * @since 3.0.0
+     */
+    public @NotNull Expression expression() {
+        return expression;
     }
 
     @Override
     public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
-        return visitor.visitIdentifier(this);
+        return visitor.visitUnary(this);
     }
+
     @Override
     public String toString() {
-        return "Identifier(" + name + ")";
+        return "Unary(" + op + ")(" + expression + ")";
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IdentifierExpression that = (IdentifierExpression) o;
-        return name.equals(that.name);
+        UnaryExpression that = (UnaryExpression) o;
+        if (op != that.op) return false;
+        return expression.equals(that.expression);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        int result = op.hashCode();
+        result = 31 * result + expression.hashCode();
+        return result;
+    }
+
+    public enum Op {
+        LOGICAL_NEGATION,
+        ARITHMETICAL_NEGATION,
+        RETURN
     }
 
 }

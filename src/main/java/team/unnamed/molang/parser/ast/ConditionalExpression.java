@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Implementation of MoLang 1.17 binary conditional
  * expression, it's similar to an "if {...} " expression.
@@ -53,13 +55,8 @@ public class ConditionalExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitConditional(this);
-    }
-
-    @Override
-    public String toSource() {
-        return condition.toSource() + " ? " + predicate.toSource();
     }
 
     @Override

@@ -24,7 +24,7 @@
 
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.lexer.Characters;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * {@link Expression} implementation for
@@ -52,13 +52,8 @@ public class AccessExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitAccess(this);
-    }
-
-    @Override
-    public String toSource() {
-        return object.toSource() + Characters.DOT + property;
     }
 
     @Override

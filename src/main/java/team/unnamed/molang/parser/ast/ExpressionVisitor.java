@@ -24,68 +24,178 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * An {@link Expression} visitor. Provides a way to add
+ * functionalities to the expression interface and all
+ * of its implementations.
+ *
+ * <p>See the following example on visiting an expression:</p>
+ * <pre>{@code
+ *      Expression expr = ...;
+ *      String str = expr.visit(new ToStringVisitor());
+ * }</pre>
+ *
+ * <p>Please note that users MUST use {@link Expression#visit(ExpressionVisitor)}
+ * and NOT ExpressionVisitor's {@link ExpressionVisitor#visit(Expression)}, because
+ * it will not work as intended.</p>
+ *
+ * @param <R> The visit result type
+ * @since 3.0.0
+ */
 public interface ExpressionVisitor<R> {
 
-    default R visitDouble(DoubleExpression expression) {
+    /**
+     * Evaluate for the given unknown expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    R visit(final @NotNull Expression expression);
+
+    /**
+     * Evaluate for double expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitDouble(final @NotNull DoubleExpression expression) {
         return visit(expression);
     }
 
-    default R visitString(StringExpression expression) {
+    /**
+     * Evaluate for string expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitString(final @NotNull StringExpression expression) {
         return visit(expression);
     }
 
-    default R visitIdentifier(IdentifierExpression expression) {
+    /**
+     * Evaluate for identifier expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitIdentifier(final @NotNull IdentifierExpression expression) {
         return visit(expression);
     }
 
-    default R visitNullCoalescing(NullCoalescingExpression expression) {
+    /**
+     * Evaluate for null coalescing expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitNullCoalescing(final @NotNull NullCoalescingExpression expression) {
         return visit(expression);
     }
 
-    default R visitTernaryConditional(TernaryConditionalExpression expression) {
+    /**
+     * Evaluate for ternary conditional expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitTernaryConditional(final @NotNull TernaryConditionalExpression expression) {
         return visit(expression);
     }
 
-    default R visitReturn(ReturnExpression expression) {
+    /**
+     * Evaluate for unary expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitUnary(final @NotNull UnaryExpression expression) {
         return visit(expression);
     }
 
-    default R visitNegation(NegationExpression expression) {
+    /**
+     * Evaluate for execution scope expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitExecutionScope(final @NotNull ExecutionScopeExpression expression) {
         return visit(expression);
     }
 
-    default R visitExecutionScope(ExecutionScopeExpression expression) {
+    /**
+     * Evaluate for infix expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitInfix(final @NotNull InfixExpression expression) {
         return visit(expression);
     }
 
-    default R visitInfix(InfixExpression expression) {
+    /**
+     * Evaluate for access expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitAccess(final @NotNull AccessExpression expression) {
         return visit(expression);
     }
 
-    default R visitAccess(AccessExpression expression) {
+    /**
+     * Evaluate for assign expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitAssign(final @NotNull AssignExpression expression) {
         return visit(expression);
     }
 
-    default R visitAssign(AssignExpression expression) {
+    /**
+     * Evaluate for call expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitCall(final @NotNull CallExpression expression) {
         return visit(expression);
     }
 
-    default R visitCall(CallExpression expression) {
+    /**
+     * Evaluate for conditional expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitConditional(final @NotNull ConditionalExpression expression) {
         return visit(expression);
     }
 
-    default R visitConditional(ConditionalExpression expression) {
+    /**
+     * Evaluate for statement expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitStatement(final @NotNull StatementExpression expression) {
         return visit(expression);
     }
-
-    default R visitBreak(BreakExpression expression) {
-        return visit(expression);
-    }
-
-    default R visitContinue(ContinueExpression expression) {
-        return visit(expression);
-    }
-
-    R visit(Expression expression);
 
 }

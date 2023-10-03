@@ -24,6 +24,7 @@
 
 package team.unnamed.molang.runtime;
 
+import org.jetbrains.annotations.NotNull;
 import team.unnamed.molang.parser.ast.*;
 import team.unnamed.molang.runtime.binding.CallableBinding;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
@@ -67,7 +68,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitAccess(AccessExpression expression) {
+    public Object visitAccess(@NotNull AccessExpression expression) {
         Object binding = expression.object().visit(this);
         if (binding instanceof ObjectBinding) {
             return ((ObjectBinding) binding).getProperty(expression.property());
@@ -82,7 +83,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitAssign(AssignExpression expression) {
+    public Object visitAssign(@NotNull AssignExpression expression) {
         Object val = expression.value().visit(this);
         Expression variable = expression.variable();
         if (variable instanceof AccessExpression) {
@@ -97,7 +98,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitCall(CallExpression expression) {
+    public Object visitCall(@NotNull CallExpression expression) {
         Object binding = expression.function().visit(this);
         if (!(binding instanceof CallableBinding)) {
             // TODO: This isn't fail-fast, check this in specification
@@ -113,7 +114,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitConditional(ConditionalExpression expression) {
+    public Object visitConditional(@NotNull ConditionalExpression expression) {
         Object condition = expression.condition().visit(this);
         if (ValueConversions.asBoolean(condition)) {
             return expression.predicate().visit(this);
@@ -123,12 +124,12 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitDouble(DoubleExpression expression) {
+    public Object visitDouble(@NotNull DoubleExpression expression) {
         return expression.value();
     }
 
     @Override
-    public Object visitExecutionScope(ExecutionScopeExpression executionScope) {
+    public Object visitExecutionScope(@NotNull ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
         ExpressionEvaluator evaluatorForThisScope = createChild();
         return (CallableBinding) arguments -> {
@@ -147,12 +148,12 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitIdentifier(IdentifierExpression expression) {
+    public Object visitIdentifier(@NotNull IdentifierExpression expression) {
         return bindings.getProperty(expression.name());
     }
 
     @Override
-    public Object visitInfix(InfixExpression expression) {
+    public Object visitInfix(@NotNull InfixExpression expression) {
         return INFIX_EVALUATORS[expression.code()].eval(
                 () -> expression.left().visit(this),
                 () -> expression.right().visit(this)
@@ -160,25 +161,24 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitNegation(NegationExpression expression) {
+    public Object visitUnary(@NotNull UnaryExpression expression) {
         Object value = expression.expression().visit(this);
-        if (value instanceof Boolean) {
-            return !((boolean) value);
-        } else if (value instanceof Number) {
-            return -((Number) value).doubleValue();
-        } else if (value == null) {
-            // (value == null) = false
-            // and then negate it = true = 0
-            return 1.0D;
-        } else {
-            // non-null = true
-            // and then negate it = false = 0
-            return 0.0D;
+        switch (expression.op()) {
+            case LOGICAL_NEGATION:
+                return !ValueConversions.asBoolean(value);
+            case ARITHMETICAL_NEGATION:
+                return -ValueConversions.asFloat(value);
+            case RETURN: {
+                this.returnValue = value;
+                return 0D;
+            }
+            default:
+                throw new IllegalStateException("Unknown operation");
         }
     }
 
     @Override
-    public Object visitNullCoalescing(NullCoalescingExpression expression) {
+    public Object visitNullCoalescing(@NotNull NullCoalescingExpression expression) {
         Object val = expression.value().visit(this);
         if (val == null) {
             return expression.fallback().visit(this);
@@ -188,30 +188,27 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visitReturn(ReturnExpression expression) {
-        this.returnValue = expression.value().visit(this);
+    public Object visitStatement(@NotNull StatementExpression expression) {
+        switch (expression.op()) {
+            case BREAK: {
+                this.returnValue = StatementExpression.Op.BREAK;
+                break;
+            }
+            case CONTINUE: {
+                this.returnValue = StatementExpression.Op.CONTINUE;
+                break;
+            }
+        }
         return 0;
     }
 
     @Override
-    public Object visitBreak(BreakExpression expression) {
-        this.returnValue = BreakExpression.BREAK_FLAG;
-        return 0;
-    }
-
-    @Override
-    public Object visitContinue(ContinueExpression expression) {
-        this.returnValue = ContinueExpression.CONTINUE_FLAG;
-        return 0;
-    }
-
-    @Override
-    public Object visitString(StringExpression expression) {
+    public Object visitString(@NotNull StringExpression expression) {
         return expression.value();
     }
 
     @Override
-    public Object visitTernaryConditional(TernaryConditionalExpression expression) {
+    public Object visitTernaryConditional(@NotNull TernaryConditionalExpression expression) {
         Object obj = expression.condition().visit(this);
         return ValueConversions.asBoolean(obj)
                 ? expression.trueExpression().visit(this)
@@ -219,7 +216,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     @Override
-    public Object visit(Expression expression) {
+    public Object visit(@NotNull Expression expression) {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }
 

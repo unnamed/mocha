@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The null coalescing expression implementation,
  * if the result of evaluating the 'leftHand' expression
@@ -49,14 +51,8 @@ public final class NullCoalescingExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitNullCoalescing(this);
-    }
-
-    @Override
-    public String toSource() {
-        return value.toSource() + " ?? "
-                + fallback.toSource();
     }
 
     @Override

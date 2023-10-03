@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -77,15 +79,8 @@ public class TernaryConditionalExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitTernaryConditional(this);
-    }
-
-    @Override
-    public String toSource() {
-        return conditional.toSource()
-                + " ? " + trueExpression.toSource()
-                + " : " + falseExpression.toSource();
     }
 
     @Override

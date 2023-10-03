@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents any binary expression that operates two
  * expressions, they can be arithmetic or boolean
@@ -76,15 +78,8 @@ public final class InfixExpression implements Expression {
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitInfix(this);
-    }
-
-    @Override
-    public String toSource() {
-        return left.toSource() + " "
-                + SYMBOLS[code]
-                + " " + right.toSource();
     }
 
     @Override

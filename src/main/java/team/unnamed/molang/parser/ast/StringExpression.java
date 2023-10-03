@@ -24,45 +24,47 @@
 
 package team.unnamed.molang.parser.ast;
 
-import team.unnamed.molang.lexer.Characters;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
- * Literal expression implementation for MoLang 1.17
- * strings
+ * String literal expression implementation for Molang.
+ *
+ * <p>Example string expressions: {@code 'hello world'},
+ * {@code 'hey there'}, {@code 'name'}, {@code 'the game'}</p>
+ *
+ * @since 3.0.0
  */
 public final class StringExpression implements Expression {
 
     private final String value;
 
-    public StringExpression(String value) {
-        this.value = value;
+    public StringExpression(final @NotNull String value) {
+        this.value = Objects.requireNonNull(value, "value");
     }
 
     /**
-     * Returns the value for this string
-     * expression, never null
+     * Gets the string value for this expression.
+     *
+     * @return The string value.
+     * @since 3.0.0
      */
-    public String value() {
+    public @NotNull String value() {
         return value;
     }
 
     @Override
-    public <R> R visit(ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitString(this);
     }
-
-    @Override
-    public String toSource() {
-        return Characters.QUOTE + escapeQuotes(value) + Characters.QUOTE;
-    }
-
     @Override
     public String toString() {
-        return "String('" + escapeQuotes(value) + "')";
+        return "String('" + value + "')";
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StringExpression that = (StringExpression) o;
@@ -72,30 +74,6 @@ public final class StringExpression implements Expression {
     @Override
     public int hashCode() {
         return value.hashCode();
-    }
-
-    /**
-     * Escapes quotes ({@link Characters#QUOTE}) in the given
-     * {@code value} using {@link Characters#ESCAPE}
-     *
-     * <strong>Currently not required, but done, 1.17.30.4
-     * specification declares that escape characters aren't
-     * supported</strong>
-     *
-     * @param value The string value to process
-     * @return The processed string
-     */
-    public static String escapeQuotes(String value) {
-        int length = value.length();
-        StringBuilder builder = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            char c = value.charAt(i);
-            if (c == Characters.QUOTE) {
-                builder.append(Characters.ESCAPE);
-            }
-            builder.append(c);
-        }
-        return builder.toString();
     }
 
 }
