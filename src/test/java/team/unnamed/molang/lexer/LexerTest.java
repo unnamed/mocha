@@ -28,12 +28,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static team.unnamed.molang.lexer.TokenKind.*;
 
 public class LexerTest {
@@ -41,27 +39,27 @@ public class LexerTest {
     @Test
     @DisplayName("Test lexing Molang")
     public void test() throws IOException {
-        assertTokenization("unexpected $ \\ .", IDENTIFIER, ERROR, ERROR, DOT, EOF);
-        assertTokenization("1 -> 2", FLOAT, ARROW, FLOAT, EOF);
-        assertTokenization("(hello) * (world)", LPAREN, IDENTIFIER, RPAREN, STAR, LPAREN, IDENTIFIER, RPAREN, EOF);
-        assertTokenization("error & here", IDENTIFIER, ERROR, IDENTIFIER, EOF);
-        assertTokenization("this * is * 'string literal'", IDENTIFIER, STAR, IDENTIFIER, STAR, STRING, EOF);
-        assertTokenization("(whats true and false)", LPAREN, IDENTIFIER, TRUE, IDENTIFIER, FALSE, RPAREN, EOF);
-        assertTokenization("we_love && we_live || we_lie", IDENTIFIER, AMPAMP, IDENTIFIER, BARBAR, IDENTIFIER, EOF);
-        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, IDENTIFIER, EOF);
-        assertTokenization("q.get_equipped_item_name == 'stick'", IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING, EOF);
-        assertTokenization("q.is_sneaking || q.is_jumping", IDENTIFIER, DOT, IDENTIFIER, BARBAR, IDENTIFIER, DOT, IDENTIFIER, EOF);
-        assertTokenization("q.is_sneaking ? 5", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, EOF);
-        assertTokenization("q.is_sneaking ? 10 : 3", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, COLON, FLOAT, EOF);
+        assertTokenization("unexpected $ \\ .", IDENTIFIER, ERROR, ERROR, DOT);
+        assertTokenization("1 -> 2", FLOAT, ARROW, FLOAT);
+        assertTokenization("(hello) * (world)", LPAREN, IDENTIFIER, RPAREN, STAR, LPAREN, IDENTIFIER, RPAREN);
+        assertTokenization("error & here", IDENTIFIER, ERROR, IDENTIFIER);
+        assertTokenization("this * is * 'string literal'", IDENTIFIER, STAR, IDENTIFIER, STAR, STRING);
+        assertTokenization("(whats true and false)", LPAREN, IDENTIFIER, TRUE, IDENTIFIER, FALSE, RPAREN);
+        assertTokenization("we_love && we_live || we_lie", IDENTIFIER, AMPAMP, IDENTIFIER, BARBAR, IDENTIFIER);
+        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, IDENTIFIER);
+        assertTokenization("q.get_equipped_item_name == 'stick'", IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING);
+        assertTokenization("q.is_sneaking || q.is_jumping", IDENTIFIER, DOT, IDENTIFIER, BARBAR, IDENTIFIER, DOT, IDENTIFIER);
+        assertTokenization("q.is_sneaking ? 5", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT);
+        assertTokenization("q.is_sneaking ? 10 : 3", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, COLON, FLOAT);
         assertTokenization(
                 "q.is_sneaking && (q.get_equipped_item_name == 'stick' || q.get_equipped_item_name == 'diamond')",
                 IDENTIFIER, DOT, IDENTIFIER, AMPAMP, LPAREN, IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING, BARBAR, IDENTIFIER,
-                DOT, IDENTIFIER, EQEQ, STRING, RPAREN, EOF
+                DOT, IDENTIFIER, EQEQ, STRING, RPAREN
         );
         assertTokenization(
                 "math.cos(query.anim_time * 38) * variable.rotation_scale + variable.x * variable.x * query.life_time;",
                 IDENTIFIER, DOT, IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, STAR, FLOAT, RPAREN, STAR, IDENTIFIER, DOT, IDENTIFIER,
-                PLUS, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON, EOF
+                PLUS, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON
         );
         assertTokenization(
                 "v.x = 0;\n" +
@@ -71,7 +69,7 @@ public class LexerTest {
                 IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
                 IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, COMMA, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, STRING, RPAREN, COMMA, LBRACE,
                 IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, ARROW, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, FLOAT, COMMA, FLOAT, COMMA, STRING, RPAREN, SEMICOLON,
-                RBRACE, RPAREN, SEMICOLON, EOF
+                RBRACE, RPAREN, SEMICOLON
         );
         assertTokenization(
                 "v.x = 1;\n" +
@@ -87,29 +85,16 @@ public class LexerTest {
                 IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
                 IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
                 IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
-                RBRACE, RPAREN, SEMICOLON, EOF
+                RBRACE, RPAREN, SEMICOLON
         );
         assertTokenization(
                 "variable.x = (variable.x ?? 1.2) + 0.3;",
-                IDENTIFIER, DOT, IDENTIFIER, EQ, LPAREN, IDENTIFIER, DOT, IDENTIFIER, QUESQUES, FLOAT, RPAREN, PLUS, FLOAT, SEMICOLON, EOF
+                IDENTIFIER, DOT, IDENTIFIER, EQ, LPAREN, IDENTIFIER, DOT, IDENTIFIER, QUESQUES, FLOAT, RPAREN, PLUS, FLOAT, SEMICOLON
         );
     }
 
-    private static List<Token> tokenize(String expr) throws IOException {
-        try (Reader reader = new StringReader(expr)) {
-            MolangLexer lexer = MolangLexer.lexer(reader);
-            List<Token> tokens = new ArrayList<>();
-            // add our tokens, token list should always end with an EOF token
-            Token token;
-            do {
-                tokens.add(token = lexer.next());
-            } while (token.kind() != TokenKind.EOF);
-            return tokens;
-        }
-    }
-
     private static void assertTokenization(String expr, TokenKind... tokenKinds) throws IOException {
-        List<Token> tokens = tokenize(expr);
+        List<Token> tokens = MolangLexer.tokenizeAll(expr);
         assertEquals(
                 tokenKinds.length,
                 tokens.size(),
