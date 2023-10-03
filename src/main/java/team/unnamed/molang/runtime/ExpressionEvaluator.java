@@ -51,7 +51,15 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 float divisor = b.eval();
                 if (divisor == 0) return 0;
                 else return dividend / divisor;
-            })
+            }),
+            (a, b) -> { // null coalesce
+                Object val = a.eval();
+                if (val == null) {
+                    return b.eval();
+                } else {
+                    return val;
+                }
+            }
     };
 
     private final ObjectBinding bindings;
@@ -174,16 +182,6 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             }
             default:
                 throw new IllegalStateException("Unknown operation");
-        }
-    }
-
-    @Override
-    public Object visitNullCoalescing(@NotNull NullCoalescingExpression expression) {
-        Object val = expression.value().visit(this);
-        if (val == null) {
-            return expression.fallback().visit(this);
-        } else {
-            return val;
         }
     }
 

@@ -29,7 +29,6 @@ import team.unnamed.molang.parser.ast.TernaryConditionalExpression;
 import team.unnamed.molang.parser.ast.AssignExpression;
 import team.unnamed.molang.parser.ast.ConditionalExpression;
 import team.unnamed.molang.parser.ast.InfixExpression;
-import team.unnamed.molang.parser.ast.NullCoalescingExpression;
 import team.unnamed.molang.parser.ast.CallExpression;
 import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
@@ -86,11 +85,6 @@ final class CompoundExpressionParser {
                 } else {
                     return new ConditionalExpression(left, trueValue);
                 }
-            }
-            case QUESQUES: {
-                if (attachmentPower > OperatorPrecedence.NULL_COALESCING) break;
-                lexer.next();
-                return new NullCoalescingExpression(left, MolangParserImpl.parseCompoundExpression(lexer, OperatorPrecedence.NULL_COALESCING));
             }
             case EQ: {
                 lexer.next();
@@ -151,6 +145,11 @@ final class CompoundExpressionParser {
             case SLASH: {
                 op = InfixExpression.Op.DIV;
                 precedence = OperatorPrecedence.MULTIPLICATION_AND_DIVISION;
+                break;
+            }
+            case QUESQUES: {
+                op = InfixExpression.Op.NULL_COALESCE;
+                precedence = OperatorPrecedence.NULL_COALESCING;
                 break;
             }
             default: {

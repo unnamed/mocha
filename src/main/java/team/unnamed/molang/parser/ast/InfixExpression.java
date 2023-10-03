@@ -44,13 +44,9 @@ public final class InfixExpression implements Expression {
         ADD,
         SUB,
         MUL,
-        DIV
+        DIV,
+        NULL_COALESCE
     }
-
-    public static final int AND = 0;
-    public static final int OR = 1;
-    public static final int LESS_THAN_OR_EQUAL = 3;
-    public static final int GREATER_THAN_OR_EQUAL = 5;
 
     private final Op op;
     private final Expression left;
@@ -70,16 +66,16 @@ public final class InfixExpression implements Expression {
         return op;
     }
 
-    public Expression left() {
+    public @NotNull Expression left() {
         return left;
     }
 
-    public Expression right() {
+    public @NotNull Expression right() {
         return right;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitInfix(this);
     }
 
@@ -89,7 +85,7 @@ public final class InfixExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InfixExpression that = (InfixExpression) o;

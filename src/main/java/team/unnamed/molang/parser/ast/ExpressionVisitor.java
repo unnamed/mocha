@@ -89,17 +89,6 @@ public interface ExpressionVisitor<R> {
     }
 
     /**
-     * Evaluate for null coalescing expression.
-     *
-     * @param expression The expression.
-     * @return The result.
-     * @since 3.0.0
-     */
-    default R visitNullCoalescing(final @NotNull NullCoalescingExpression expression) {
-        return visit(expression);
-    }
-
-    /**
      * Evaluate for ternary conditional expression.
      *
      * @param expression The expression.
