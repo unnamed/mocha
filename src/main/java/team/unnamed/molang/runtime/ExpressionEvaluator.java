@@ -52,13 +52,25 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 if (divisor == 0) return 0;
                 else return dividend / divisor;
             }),
-            (a, b) -> { // null coalesce
-                Object val = a.eval();
+            (evaluator, a, b) -> { // null coalesce
+                Object val = a.visit(evaluator);
                 if (val == null) {
-                    return b.eval();
+                    return b.visit(evaluator);
                 } else {
                     return val;
                 }
+            },
+            (evaluator, variable, b) -> {
+                Object val = b.visit(evaluator);
+                if (variable instanceof AccessExpression) {
+                    AccessExpression access = (AccessExpression) variable;
+                    Object binding = access.object().visit(evaluator);
+                    if (binding instanceof ObjectBinding) {
+                        ((ObjectBinding) binding).setProperty(access.property(), val);
+                    }
+                }
+                // TODO: (else case) This isn't fail-fast, we can only assign to access expressions
+                return val;
             }
     };
 
@@ -87,21 +99,6 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     public Object popReturnValue() {
         Object val = this.returnValue;
         this.returnValue = null;
-        return val;
-    }
-
-    @Override
-    public Object visitAssign(@NotNull AssignExpression expression) {
-        Object val = expression.value().visit(this);
-        Expression variable = expression.variable();
-        if (variable instanceof AccessExpression) {
-            AccessExpression access = (AccessExpression) variable;
-            Object binding = access.object().visit(this);
-            if (binding instanceof ObjectBinding) {
-                ((ObjectBinding) binding).setProperty(access.property(), val);
-            }
-        }
-        // TODO: (else case) This isn't fail-fast, we can only assign to access expressions
         return val;
     }
 
@@ -163,8 +160,9 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     @Override
     public Object visitInfix(@NotNull InfixExpression expression) {
         return INFIX_EVALUATORS[expression.op().ordinal()].eval(
-                () -> expression.left().visit(this),
-                () -> expression.right().visit(this)
+                this,
+                expression.left(),
+                expression.right()
         );
     }
 
@@ -219,48 +217,27 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     private interface Evaluator {
-        Object eval(LazyEvaluableObject a, LazyEvaluableObject b);
-        interface LazyEvaluableObject {
-            Object eval();
-        }
+        Object eval(ExpressionEvaluator evaluator, Expression a, Expression b);
     }
 
     private static Evaluator bool(BooleanOperator op) {
-        return (a, b) -> op.operate(
-                () -> {
-                    Object obj = a.eval();
-                    return ValueConversions.asBoolean(obj);
-                },
-                () -> {
-                    Object obj = b.eval();
-                    return ValueConversions.asBoolean(obj);
-                }
+        return (evaluator, a, b) -> op.operate(
+                () -> ValueConversions.asBoolean(a.visit(evaluator)),
+                () -> ValueConversions.asBoolean(b.visit(evaluator))
         ) ? 1F : 0F;
     }
 
     private static Evaluator compare(Comparator comp) {
-        return (a, b) -> comp.compare(
-                () -> {
-                    Object obj = a.eval();
-                    return ValueConversions.asFloat(obj);
-                },
-                () -> {
-                    Object obj = b.eval();
-                    return ValueConversions.asFloat(obj);
-                }
+        return (evaluator, a, b) -> comp.compare(
+                () -> ValueConversions.asFloat(a.visit(evaluator)),
+                () -> ValueConversions.asFloat(b.visit(evaluator))
         ) ? 1F : 0F;
     }
 
     private static Evaluator arithmetic(ArithmeticOperator op) {
-        return (a, b) -> op.operate(
-                () -> {
-                    Object obj = a.eval();
-                    return ValueConversions.asFloat(obj);
-                },
-                () -> {
-                    Object obj = b.eval();
-                    return ValueConversions.asFloat(obj);
-                }
+        return (evaluator, a, b) -> op.operate(
+                () -> ValueConversions.asFloat(a.visit(evaluator)),
+                () -> ValueConversions.asFloat(b.visit(evaluator))
         );
     }
 

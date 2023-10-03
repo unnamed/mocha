@@ -34,6 +34,7 @@ final class OperatorPrecedence {
     public static final int AND = 300;
     public static final int OR = 200;
     public static final int NULL_COALESCING = -500;
+    public static final int ASSIGN = -1000;
 
     private OperatorPrecedence() {
     }

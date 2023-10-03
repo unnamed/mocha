@@ -144,17 +144,6 @@ public interface ExpressionVisitor<R> {
     }
 
     /**
-     * Evaluate for assign expression.
-     *
-     * @param expression The expression.
-     * @return The result.
-     * @since 3.0.0
-     */
-    default R visitAssign(final @NotNull AssignExpression expression) {
-        return visit(expression);
-    }
-
-    /**
      * Evaluate for call expression.
      *
      * @param expression The expression.

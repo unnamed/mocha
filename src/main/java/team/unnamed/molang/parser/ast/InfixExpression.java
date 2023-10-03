@@ -45,7 +45,9 @@ public final class InfixExpression implements Expression {
         SUB,
         MUL,
         DIV,
-        NULL_COALESCE
+        NULL_COALESCE,
+        ASSIGN,
+        CONDITIONAL
     }
 
     private final Op op;

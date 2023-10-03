@@ -26,7 +26,6 @@ package team.unnamed.molang.parser;
 
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.parser.ast.TernaryConditionalExpression;
-import team.unnamed.molang.parser.ast.AssignExpression;
 import team.unnamed.molang.parser.ast.ConditionalExpression;
 import team.unnamed.molang.parser.ast.InfixExpression;
 import team.unnamed.molang.parser.ast.CallExpression;
@@ -85,10 +84,6 @@ final class CompoundExpressionParser {
                 } else {
                     return new ConditionalExpression(left, trueValue);
                 }
-            }
-            case EQ: {
-                lexer.next();
-                return new AssignExpression(left, MolangParserImpl.parseCompoundExpression(lexer));
             }
         }
 
@@ -150,6 +145,11 @@ final class CompoundExpressionParser {
             case QUESQUES: {
                 op = InfixExpression.Op.NULL_COALESCE;
                 precedence = OperatorPrecedence.NULL_COALESCING;
+                break;
+            }
+            case EQ: {
+                op = InfixExpression.Op.ASSIGN;
+                precedence = OperatorPrecedence.ASSIGN;
                 break;
             }
             default: {
