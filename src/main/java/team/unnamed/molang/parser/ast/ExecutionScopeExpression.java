@@ -30,12 +30,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Expression implementation of MoLang 1.17
- * execution scopes
- * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/
- * Molang#%7B%20%7D%20Brace%20Scope%20Delimiters
+ * Execution scope expression implementation. Execution
+ * scopes define a new scope and a new sequence of
+ * expressions to evaluate.
+ *
+ * <p>Execution scope expression examples: {@code { print('a'); print('b'); }},
+ * {@code { doThisFirst(); thenDoThis(); }}, {@code { v.x = v.x + 1; }}</p>
+ *
+ * @since 3.0.0
  */
-public class ExecutionScopeExpression implements Expression {
+public final class ExecutionScopeExpression implements Expression {
 
     private final List<Expression> expressions;
 

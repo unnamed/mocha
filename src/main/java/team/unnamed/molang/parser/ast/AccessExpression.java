@@ -29,10 +29,15 @@ import org.jetbrains.annotations.NotNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * {@link Expression} implementation for
- * representing property accessing
+ * Property accessing expression implementation,
+ * access to a property on another expression result.
+ *
+ * <p>Example property accessing expressions: {@code v.x},
+ * {@code v.location.x}, {@code 'str'.length}, {@code query.print}</p>
+ *
+ * @since 3.0.0
  */
-public class AccessExpression implements Expression {
+public final class AccessExpression implements Expression {
 
     private final Expression object;
     private final String property;
@@ -45,10 +50,23 @@ public class AccessExpression implements Expression {
         this.property = requireNonNull(property, "property");
     }
 
+    /**
+     * Gets the "object" expression, the property is
+     * evaluated on this expression's result.
+     *
+     * @return The object expression.
+     * @since 3.0.0
+     */
     public @NotNull Expression object() {
         return object;
     }
 
+    /**
+     * Gets the accessed property name.
+     *
+     * @return The property name.
+     * @since 3.0.0
+     */
     public @NotNull String property() {
         return property;
     }

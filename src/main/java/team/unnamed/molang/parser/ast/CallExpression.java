@@ -31,8 +31,13 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Expression implementation for MoLang 1.17 function
- * call expression
+ * Call expression implementation, executes functions
+ * with certain arguments.
+ *
+ * <p>Example call expressions: {@code print('hello')},
+ * {@code math.sqrt(9)}, {@code math.pow(3, 2)}</p>
+ *
+ * @since 3.0.0
  */
 public final class CallExpression implements Expression {
 
@@ -48,16 +53,19 @@ public final class CallExpression implements Expression {
     }
 
     /**
-     * Returns the expression evaluated to the
-     * invoked function
+     * Gets the function expression.
+     *
+     * @since 3.0.0
      */
     public @NotNull Expression function() {
         return function;
     }
 
     /**
-     * Returns the expressions evaluated to the
-     * function arguments
+     * Gets the list of arguments to pass to
+     * the function.
+     *
+     * @since 3.0.0
      */
     public @NotNull List<Expression> arguments() {
         return arguments;

@@ -28,58 +28,69 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * Implementation of MoLang 1.17 ternary conditional expression,
- * it's similar to an "if {...} else {...}" expression.
+ * Ternary conditional expression implementation, similar to
+ * "if {...} else {...}" expressions in other languages.
  *
- * See https://bedrock.dev/docs/1.17.0.0/1.17.30.4/Molang#Conditionals
+ * <p>If the {@code conditional} expression evaluates to a
+ * truthy value, then {@code trueExpression} is evaluated
+ * as the result, otherwise, {@code falseExpression} is.</p>
  *
- * Depending on the conditional expression, it may
- * return the {@code trueExpression} or the {@code falseExpression}
+ * <p>Example ternary conditional expressions: {@code true ? 1 : 0},
+ * {@code (age > 18) ? 'adult' : 'minor'}, {@code open ? 'open' : 'closed'}</p>
+ *
+ * @since 3.0.0
  */
-public class TernaryConditionalExpression implements Expression {
+public final class TernaryConditionalExpression implements Expression {
 
     private final Expression conditional;
     private final Expression trueExpression;
     private final Expression falseExpression;
 
     public TernaryConditionalExpression(
-            Expression conditional,
-            Expression trueExpression,
-            Expression falseExpression
+            final @NotNull Expression conditional,
+            final @NotNull Expression trueExpression,
+            final @NotNull Expression falseExpression
     ) {
-        this.conditional = conditional;
-        this.trueExpression = trueExpression;
-        this.falseExpression = falseExpression;
+        this.conditional = requireNonNull(conditional, "conditional");
+        this.trueExpression = requireNonNull(trueExpression, "trueExpression");
+        this.falseExpression = requireNonNull(falseExpression, "falseExpression");
     }
 
     /**
-     * Returns the condition of this ternary conditional expression, if this
-     * condition is evaluated to {@code true}, the {@code trueExpression} is
-     * evaluated and returned as value when evaluated
+     * Gets the expression condition.
+     *
+     * @since 3.0.0
      */
-    public Expression condition() {
+    public @NotNull Expression condition() {
         return conditional;
     }
 
     /**
-     * Returns the expression evaluated when the {@code conditional} expression
-     * is evaluated to {@code true}
+     * Gets the expression that should be used when
+     * condition is evaluated as a truthy value.
+     *
+     * @since 3.0.0
      */
-    public Expression trueExpression() {
+    public @NotNull Expression trueExpression() {
         return trueExpression;
     }
 
+
     /**
-     * Returns the expression evaluated when the {@code conditional} expression
-     * is evaluated to {@code false}
+     * Gets the expression that should be used when
+     * condition is evaluated as a falsy value.
+     *
+     * @since 3.0.0
      */
-    public Expression falseExpression() {
+    public @NotNull Expression falseExpression() {
         return falseExpression;
     }
 
     @Override
-    public <R> R visit(@NotNull ExpressionVisitor<R> visitor) {
+    public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
         return visitor.visitTernaryConditional(this);
     }
 
@@ -91,7 +102,7 @@ public class TernaryConditionalExpression implements Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TernaryConditionalExpression that = (TernaryConditionalExpression) o;

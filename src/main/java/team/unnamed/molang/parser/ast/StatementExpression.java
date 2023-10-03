@@ -28,6 +28,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Statement expression implementation. Statement expressions
+ * do not have children expressions, they just have a single
+ * operation type.
+ *
+ * <p>Example statement expressions: {@code break}, {@code continue}</p>
+ *
+ * @since 3.0.0
+ */
 public final class StatementExpression implements Expression {
 
     private final Op op;
@@ -36,6 +45,12 @@ public final class StatementExpression implements Expression {
         this.op = Objects.requireNonNull(op, "op");
     }
 
+    /**
+     * Gets the operation/type of this statement.
+     *
+     * @return The statement operation/type.
+     * @since 3.0.0
+     */
     public @NotNull Op op() {
         return op;
     }
@@ -45,8 +60,26 @@ public final class StatementExpression implements Expression {
         return visitor.visitStatement(this);
     }
 
+
+    /**
+     * Enum containing all the possible operations/types
+     * of statement expressions.
+     *
+     * @since 3.0.0
+     */
     public enum Op {
+        /**
+         * The break statement type
+         *
+         * @since 3.0.0
+         */
         BREAK,
+
+        /**
+         * The continue statement type
+         *
+         * @since 3.0.0
+         */
         CONTINUE
     }
 

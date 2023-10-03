@@ -30,8 +30,13 @@ import org.jetbrains.annotations.NotNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Represents any binary expression that operates two
- * expressions, they can be arithmetic or boolean
+ * Expression implementation for binary expressions
+ * (expressions composed by <b>two</b> other expressions)
+ *
+ * <p>Example binary expressions: {@code 1 + 1}, {@code 5 * 9},
+ * {@code a == b}, {@code a < b}, {@code true ?? false}</p>
+ *
+ * @since 3.0.0
  */
 public final class InfixExpression implements Expression {
 
@@ -49,14 +54,34 @@ public final class InfixExpression implements Expression {
         this.right = requireNonNull(right, "right");
     }
 
+    /**
+     * Gets the binary expression type/operation.
+     *
+     * @return The expression operation.
+     * @since 3.0.0
+     */
     public @NotNull Op op() {
         return op;
     }
 
+    /**
+     * Gets the left-hand expression for this
+     * binary expression.
+     *
+     * @return The left-hand expression
+     * @since 3.0.0
+     */
     public @NotNull Expression left() {
         return left;
     }
 
+    /**
+     * Gets the right-hand expression for this
+     * binary expression.
+     *
+     * @return The right-hand expression
+     * @since 3.0.0
+     */
     public @NotNull Expression right() {
         return right;
     }
