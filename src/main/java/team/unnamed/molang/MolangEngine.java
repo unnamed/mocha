@@ -27,17 +27,21 @@ package team.unnamed.molang;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.runtime.binding.StandardBindings;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
+import team.unnamed.molang.runtime.binding.StandardBindings;
 
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * The engine's entry class. Provides methods to evaluate
+ * and parse Molang code from strings and readers.
+ *
+ * @since 3.0.0
+ */
 public interface MolangEngine {
 
     /**
@@ -48,7 +52,7 @@ public interface MolangEngine {
      * the given {@code reader}</strong>
      *
      * @throws ParseException If read failed or there
-     * are syntax errors in the script
+     *                        are syntax errors in the script
      */
     List<Expression> parse(Reader reader) throws IOException;
 
