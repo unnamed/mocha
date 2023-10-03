@@ -100,9 +100,9 @@ public final class InfixExpression implements Expression {
         SUB(900),
         MUL(1000),
         DIV(1000),
-        NULL_COALESCE(-500),
-        ASSIGN(-1000),
-        CONDITIONAL(-1000);
+        NULL_COALESCE(2),
+        ASSIGN(1),
+        CONDITIONAL(1);
 
         private final int precedence;
 
