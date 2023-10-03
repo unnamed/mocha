@@ -24,9 +24,9 @@
 
 package team.unnamed.molang;
 
+import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
-import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 import team.unnamed.molang.runtime.binding.StandardBindings;
 
@@ -57,7 +57,7 @@ final class MolangEngineImpl implements MolangEngine {
     @Override
     public Object eval(List<Expression> expressions) {
         ObjectBinding bindings = createBindings();
-        ExpressionEvaluator evaluator = new ExpressionEvaluator(bindings);
+        ExpressionEvaluator evaluator = ExpressionEvaluator.evaluator(bindings);
         Object lastResult = 0;
 
         for (Expression expression : expressions) {
@@ -88,7 +88,8 @@ final class MolangEngineImpl implements MolangEngine {
         Expression expr;
         while ((expr = parser.next()) != null) {
             expressions.add(expr);
-        };
+        }
+        ;
         return expressions;
     }
 

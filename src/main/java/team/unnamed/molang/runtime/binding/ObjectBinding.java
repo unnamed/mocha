@@ -24,6 +24,7 @@
 
 package team.unnamed.molang.runtime.binding;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,13 @@ import static java.util.Objects.requireNonNull;
  * sometimes written
  */
 public class ObjectBinding {
+
+    public static final ObjectBinding EMPTY;
+
+    static {
+        EMPTY = new ObjectBinding(Collections.emptyMap());
+        EMPTY.block();
+    }
 
     private final Map<String, Object> properties;
     private boolean blocked = false;

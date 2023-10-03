@@ -25,240 +25,71 @@
 package team.unnamed.molang.runtime;
 
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.molang.parser.ast.*;
-import team.unnamed.molang.runtime.binding.CallableBinding;
+import org.jetbrains.annotations.Nullable;
+import team.unnamed.molang.parser.ast.ExpressionVisitor;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
-import team.unnamed.molang.runtime.binding.ValueConversions;
 
-import java.util.List;
+/**
+ * An {@link ExpressionVisitor} implementation that evaluates
+ * (interprets) the expressions it visits and returns a single
+ * value, commonly, a double value.
+ *
+ * @since 3.0.0
+ */
+public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluatorImpl */ extends ExpressionVisitor<Object> {
 
-public class ExpressionEvaluator implements ExpressionVisitor<Object> {
+    /**
+     * Gets the bindings for this evaluator.
+     *
+     * @return The evaluator bindings.
+     * @since 3.0.0
+     */
+    @NotNull ObjectBinding bindings();
 
-    private static final Evaluator[] INFIX_EVALUATORS = {
-            bool((a, b) -> a.eval() && b.eval()),
-            bool((a, b) -> a.eval() || b.eval()),
-            compare((a, b) -> a.eval() < b.eval()),
-            compare((a, b) -> a.eval() <= b.eval()),
-            compare((a, b) -> a.eval() > b.eval()),
-            compare((a, b) -> a.eval() >= b.eval()),
-            arithmetic((a, b) -> a.eval() + b.eval()),
-            arithmetic((a, b) -> a.eval() - b.eval()),
-            arithmetic((a, b) -> a.eval() * b.eval()),
-            arithmetic((a, b) -> {
-                // Molang allows division by zero,
-                // which is always equal to 0
-                float dividend = a.eval();
-                float divisor = b.eval();
-                if (divisor == 0) return 0;
-                else return dividend / divisor;
-            }),
-            (evaluator, a, b) -> { // null coalesce
-                Object val = a.visit(evaluator);
-                if (val == null) {
-                    return b.visit(evaluator);
-                } else {
-                    return val;
-                }
-            },
-            (evaluator, a, b) -> { // assignation
-                Object val = b.visit(evaluator);
-                if (a instanceof AccessExpression) {
-                    AccessExpression access = (AccessExpression) a;
-                    Object binding = access.object().visit(evaluator);
-                    if (binding instanceof ObjectBinding) {
-                        ((ObjectBinding) binding).setProperty(access.property(), val);
-                    }
-                }
-                // TODO: (else case) This isn't fail-fast, we can only assign to access expressions
-                return val;
-            },
-            (evaluator, a, b) -> { // conditional
-                Object condition = a.visit(evaluator);
-                if (ValueConversions.asBoolean(condition)) {
-                    return b.visit(evaluator);
-                } else {
-                    return 0;
-                }
-            }
-    };
+    /**
+     * Creates a new, child, expression evaluator.
+     *
+     * <p>Child evaluators have all the bindings of
+     * their parents and may have extra bindings.</p>
+     *
+     * <p>Child evaluators have their own stack.</p>
+     *
+     * @return The child expression evaluator.
+     * @since 3.0.0
+     */
+    @NotNull ExpressionEvaluator createChild();
 
-    private final ObjectBinding bindings;
-    private Object returnValue;
+    /**
+     * Pops the return value, set by the last "return"
+     * expression.
+     *
+     * @return The return value, null if no "return"
+     * expression is found.
+     * @since 3.0.0
+     */
+    @Nullable Object popReturnValue();
 
-    public ExpressionEvaluator(ObjectBinding bindings) {
-        this.bindings = bindings;
+    /**
+     * Creates a new {@link ExpressionEvaluator} instance with
+     * the given bindings.
+     *
+     * @param bindings The bindings to use.
+     * @return The created expression evaluator.
+     * @since 3.0.0
+     */
+    static @NotNull ExpressionEvaluator evaluator(final @NotNull ObjectBinding bindings) {
+        return new ExpressionEvaluatorImpl(bindings);
     }
 
-    private ExpressionEvaluator createChild() {
-        // Note that it will have its own returnValue, but same bindings
-        // (Should we create new bindings?)
-        return new ExpressionEvaluator(this.bindings);
+    /**
+     * Creates a new {@link ExpressionEvaluator} instance
+     * without bindings.
+     *
+     * @return The created expression evaluator.
+     * @since 3.0.0
+     */
+    static @NotNull ExpressionEvaluator evaluator() {
+        return evaluator(ObjectBinding.EMPTY);
     }
-
-    @Override
-    public Object visitAccess(@NotNull AccessExpression expression) {
-        Object binding = expression.object().visit(this);
-        if (binding instanceof ObjectBinding) {
-            return ((ObjectBinding) binding).getProperty(expression.property());
-        }
-        return null;
-    }
-
-    public Object popReturnValue() {
-        Object val = this.returnValue;
-        this.returnValue = null;
-        return val;
-    }
-
-    @Override
-    public Object visitCall(@NotNull CallExpression expression) {
-        Object binding = expression.function().visit(this);
-        if (!(binding instanceof CallableBinding)) {
-            // TODO: This isn't fail-fast, check this in specification
-            return 0;
-        }
-
-        List<Expression> arguments = expression.arguments();
-        Object[] evaluatedArguments = new Object[arguments.size()];
-        for (int i = 0; i < arguments.size(); i++) {
-            evaluatedArguments[i] = arguments.get(i).visit(this);
-        }
-        return ((CallableBinding) binding).call(evaluatedArguments);
-    }
-
-    @Override
-    public Object visitDouble(@NotNull DoubleExpression expression) {
-        return expression.value();
-    }
-
-    @Override
-    public Object visitExecutionScope(@NotNull ExecutionScopeExpression executionScope) {
-        List<Expression> expressions = executionScope.expressions();
-        ExpressionEvaluator evaluatorForThisScope = createChild();
-        return (CallableBinding) arguments -> {
-            for (Expression expression : expressions) {
-                // eval expression, ignore result
-                expression.visit(evaluatorForThisScope);
-
-                // check for return values
-                Object returnValue = evaluatorForThisScope.popReturnValue();
-                if (returnValue != null) {
-                    return returnValue;
-                }
-            }
-            return 0;
-        };
-    }
-
-    @Override
-    public Object visitIdentifier(@NotNull IdentifierExpression expression) {
-        return bindings.getProperty(expression.name());
-    }
-
-    @Override
-    public Object visitInfix(@NotNull InfixExpression expression) {
-        return INFIX_EVALUATORS[expression.op().ordinal()].eval(
-                this,
-                expression.left(),
-                expression.right()
-        );
-    }
-
-    @Override
-    public Object visitUnary(@NotNull UnaryExpression expression) {
-        Object value = expression.expression().visit(this);
-        switch (expression.op()) {
-            case LOGICAL_NEGATION:
-                return !ValueConversions.asBoolean(value);
-            case ARITHMETICAL_NEGATION:
-                return -ValueConversions.asFloat(value);
-            case RETURN: {
-                this.returnValue = value;
-                return 0D;
-            }
-            default:
-                throw new IllegalStateException("Unknown operation");
-        }
-    }
-
-    @Override
-    public Object visitStatement(@NotNull StatementExpression expression) {
-        switch (expression.op()) {
-            case BREAK: {
-                this.returnValue = StatementExpression.Op.BREAK;
-                break;
-            }
-            case CONTINUE: {
-                this.returnValue = StatementExpression.Op.CONTINUE;
-                break;
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public Object visitString(@NotNull StringExpression expression) {
-        return expression.value();
-    }
-
-    @Override
-    public Object visitTernaryConditional(@NotNull TernaryConditionalExpression expression) {
-        Object obj = expression.condition().visit(this);
-        return ValueConversions.asBoolean(obj)
-                ? expression.trueExpression().visit(this)
-                : expression.falseExpression().visit(this);
-    }
-
-    @Override
-    public Object visit(@NotNull Expression expression) {
-        throw new UnsupportedOperationException("Unsupported expression type: " + expression);
-    }
-
-    private interface Evaluator {
-        Object eval(ExpressionEvaluator evaluator, Expression a, Expression b);
-    }
-
-    private static Evaluator bool(BooleanOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asBoolean(a.visit(evaluator)),
-                () -> ValueConversions.asBoolean(b.visit(evaluator))
-        ) ? 1F : 0F;
-    }
-
-    private static Evaluator compare(Comparator comp) {
-        return (evaluator, a, b) -> comp.compare(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        ) ? 1F : 0F;
-    }
-
-    private static Evaluator arithmetic(ArithmeticOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        );
-    }
-
-    private interface BooleanOperator {
-        boolean operate(LazyEvaluableBoolean a, LazyEvaluableBoolean b);
-    }
-
-    interface LazyEvaluableBoolean {
-        boolean eval();
-    }
-
-    interface LazyEvaluableFloat {
-        float eval();
-    }
-
-    private interface Comparator {
-        boolean compare(LazyEvaluableFloat a, LazyEvaluableFloat b);
-
-    }
-
-    private interface ArithmeticOperator {
-        float operate(LazyEvaluableFloat a, LazyEvaluableFloat b);
-    }
-
 
 }
