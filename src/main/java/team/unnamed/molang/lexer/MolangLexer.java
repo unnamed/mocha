@@ -55,6 +55,12 @@ import java.util.List;
  *     // tokens: [ Double, Plus, Double ]
  * }</pre>
  *
+ * <p>Or using the shorter, convenience method:</p>
+ * <pre>{@code
+ *      List<Token> tokens = MolangLexer.tokenizeAll("1 + 1");
+ *      // tokens: [ Double, Plus, Double ]
+ * }</pre>
+ *
  * @since 3.0.0
  */
 @ApiStatus.NonExtendable
