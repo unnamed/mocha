@@ -264,31 +264,31 @@ final class MolangParserImpl implements MolangParser {
                     lexer.next();
                     return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parseCompoundExpression(lexer, 0));
                 } else {
-                    return new InfixExpression(InfixExpression.Op.CONDITIONAL, left, trueValue);
+                    return new BinaryExpression(BinaryExpression.Op.CONDITIONAL, left, trueValue);
                 }
             }
         }
 
-        // check for infix expressions
-        final InfixExpression.Op op;
+        // check for binary expressions
+        final BinaryExpression.Op op;
 
         // @formatter:off
         // i wish this was java 17
         switch (current.kind()) {
-            case AMPAMP: op = InfixExpression.Op.AND; break;
-            case BARBAR: op = InfixExpression.Op.OR; break;
-            case LT: op = InfixExpression.Op.LT; break;
-            case LTE: op = InfixExpression.Op.LTE; break;
-            case GT: op = InfixExpression.Op.GT; break;
-            case GTE: op = InfixExpression.Op.GTE; break;
-            case PLUS: op = InfixExpression.Op.ADD; break;
-            case SUB: op = InfixExpression.Op.SUB; break;
-            case STAR: op = InfixExpression.Op.MUL; break;
-            case SLASH: op = InfixExpression.Op.DIV; break;
-            case QUESQUES: op = InfixExpression.Op.NULL_COALESCE; break;
-            case EQ: op = InfixExpression.Op.ASSIGN; break;
-            case EQEQ: op = InfixExpression.Op.EQ; break;
-            case BANGEQ: op = InfixExpression.Op.NEQ; break;
+            case AMPAMP: op = BinaryExpression.Op.AND; break;
+            case BARBAR: op = BinaryExpression.Op.OR; break;
+            case LT: op = BinaryExpression.Op.LT; break;
+            case LTE: op = BinaryExpression.Op.LTE; break;
+            case GT: op = BinaryExpression.Op.GT; break;
+            case GTE: op = BinaryExpression.Op.GTE; break;
+            case PLUS: op = BinaryExpression.Op.ADD; break;
+            case SUB: op = BinaryExpression.Op.SUB; break;
+            case STAR: op = BinaryExpression.Op.MUL; break;
+            case SLASH: op = BinaryExpression.Op.DIV; break;
+            case QUESQUES: op = BinaryExpression.Op.NULL_COALESCE; break;
+            case EQ: op = BinaryExpression.Op.ASSIGN; break;
+            case EQEQ: op = BinaryExpression.Op.EQ; break;
+            case BANGEQ: op = BinaryExpression.Op.NEQ; break;
             default: return left;
         }
         // @formatter:on
@@ -299,7 +299,7 @@ final class MolangParserImpl implements MolangParser {
         }
 
         lexer.next();
-        return new InfixExpression(op, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
+        return new BinaryExpression(op, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
     }
 
 }

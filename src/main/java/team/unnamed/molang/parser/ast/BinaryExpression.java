@@ -38,13 +38,13 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 3.0.0
  */
-public final class InfixExpression implements Expression {
+public final class BinaryExpression implements Expression {
 
     private final Op op;
     private final Expression left;
     private final Expression right;
 
-    public InfixExpression(
+    public BinaryExpression(
             final @NotNull Op op,
             final @NotNull Expression left,
             final @NotNull Expression right
@@ -88,7 +88,7 @@ public final class InfixExpression implements Expression {
 
     @Override
     public <R> R visit(final @NotNull ExpressionVisitor<R> visitor) {
-        return visitor.visitInfix(this);
+        return visitor.visitBinary(this);
     }
 
     @Override
@@ -100,7 +100,7 @@ public final class InfixExpression implements Expression {
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InfixExpression that = (InfixExpression) o;
+        BinaryExpression that = (BinaryExpression) o;
         if (op != that.op) return false;
         if (!left.equals(that.left)) return false;
         return right.equals(that.right);

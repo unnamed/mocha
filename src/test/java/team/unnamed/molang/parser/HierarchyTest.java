@@ -26,8 +26,8 @@ package team.unnamed.molang.parser;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.molang.MolangEngine;
+import team.unnamed.molang.parser.ast.BinaryExpression;
 import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.parser.ast.InfixExpression;
 
 import java.util.List;
 
@@ -45,25 +45,25 @@ public class HierarchyTest {
 
         // OR expression (a || b)
         Expression expression = expressions.get(0);
-        assertTrue(expression instanceof InfixExpression, "Expression must be infix");
-        InfixExpression infixExpr = (InfixExpression) expression;
-        assertEquals(InfixExpression.Op.OR, infixExpr.op(), "Expression must be OR");
+        assertTrue(expression instanceof BinaryExpression, "Expression must be binary");
+        BinaryExpression binaryExpr = (BinaryExpression) expression;
+        assertEquals(BinaryExpression.Op.OR, binaryExpr.op(), "Expression must be OR");
 
         // Left-hand expression (age <= 5)
         {
-            Expression lh = infixExpr.left();
-            assertTrue(lh instanceof InfixExpression, "Expression must be infix");
-            InfixExpression infixlh = (InfixExpression) lh;
-            assertEquals(InfixExpression.Op.LTE, infixlh.op(), "Expression must be LESS_THAN_OR_EQUAL");
+            Expression lh = binaryExpr.left();
+            assertTrue(lh instanceof BinaryExpression, "Expression must be binary");
+            BinaryExpression binarylh = (BinaryExpression) lh;
+            assertEquals(BinaryExpression.Op.LTE, binarylh.op(), "Expression must be LESS_THAN_OR_EQUAL");
         }
 
 
         // Right-hand expression (age >= 70)
         {
-            Expression rh = infixExpr.right();
-            assertTrue(rh instanceof InfixExpression, "Expression must be infix");
-            InfixExpression infixrh = (InfixExpression) rh;
-            assertEquals(InfixExpression.Op.GTE, infixrh.op(), "Expression must be GREATER_THAN_OR_EQUAL");
+            Expression rh = binaryExpr.right();
+            assertTrue(rh instanceof BinaryExpression, "Expression must be binary");
+            BinaryExpression binaryrh = (BinaryExpression) rh;
+            assertEquals(BinaryExpression.Op.GTE, binaryrh.op(), "Expression must be GREATER_THAN_OR_EQUAL");
         }
     }
 

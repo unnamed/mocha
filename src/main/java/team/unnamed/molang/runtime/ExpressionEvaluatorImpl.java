@@ -36,7 +36,7 @@ import java.util.Objects;
 
 public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
 
-    private static final Evaluator[] INFIX_EVALUATORS = {
+    private static final Evaluator[] BINARY_EVALUATORS = {
             bool((a, b) -> a.eval() && b.eval()),
             bool((a, b) -> a.eval() || b.eval()),
             compare((a, b) -> a.eval() < b.eval()),
@@ -168,8 +168,8 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     }
 
     @Override
-    public Object visitInfix(@NotNull InfixExpression expression) {
-        return INFIX_EVALUATORS[expression.op().ordinal()].eval(
+    public Object visitBinary(@NotNull BinaryExpression expression) {
+        return BINARY_EVALUATORS[expression.op().ordinal()].eval(
                 this,
                 expression.left(),
                 expression.right()

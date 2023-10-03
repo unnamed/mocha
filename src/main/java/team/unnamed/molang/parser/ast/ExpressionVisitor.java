@@ -122,13 +122,13 @@ public interface ExpressionVisitor<R> {
     }
 
     /**
-     * Evaluate for infix expression.
+     * Evaluate for binary expression.
      *
      * @param expression The expression.
      * @return The result.
      * @since 3.0.0
      */
-    default R visitInfix(final @NotNull InfixExpression expression) {
+    default R visitBinary(final @NotNull BinaryExpression expression) {
         return visit(expression);
     }
 
