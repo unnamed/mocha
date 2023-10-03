@@ -99,57 +99,57 @@ final class CompoundExpressionParser {
         }
 
         // check for infix expressions
-        int code;
+        InfixExpression.Op op;
         int precedence;
 
         switch (current.kind()) {
             case AMPAMP: {
-                code = InfixExpression.AND;
+                op = InfixExpression.Op.AND;
                 precedence = OperatorPrecedence.AND;
                 break;
             }
             case BARBAR: {
-                code = InfixExpression.OR;
+                op = InfixExpression.Op.OR;
                 precedence = OperatorPrecedence.OR;
                 break;
             }
             case LT: {
-                code = InfixExpression.LESS_THAN;
+                op = InfixExpression.Op.LT;
                 precedence = OperatorPrecedence.COMPARISON;
                 break;
             }
             case LTE: {
-                code = InfixExpression.LESS_THAN_OR_EQUAL;
+                op = InfixExpression.Op.LTE;
                 precedence = OperatorPrecedence.COMPARISON;
                 break;
             }
             case GT: {
-                code = InfixExpression.GREATER_THAN;
+                op = InfixExpression.Op.GT;
                 precedence = OperatorPrecedence.COMPARISON;
                 break;
             }
             case GTE: {
-                code = InfixExpression.GREATER_THAN_OR_EQUAL;
+                op = InfixExpression.Op.GTE;
                 precedence = OperatorPrecedence.COMPARISON;
                 break;
             }
             case PLUS: {
-                code = InfixExpression.ADD;
+                op = InfixExpression.Op.ADD;
                 precedence = OperatorPrecedence.ADDITION_AND_SUBTRACTION;
                 break;
             }
             case SUB: {
-                code = InfixExpression.SUBTRACT;
+                op = InfixExpression.Op.SUB;
                 precedence = OperatorPrecedence.ADDITION_AND_SUBTRACTION;
                 break;
             }
             case STAR: {
-                code = InfixExpression.MULTIPLY;
+                op = InfixExpression.Op.MUL;
                 precedence = OperatorPrecedence.MULTIPLICATION_AND_DIVISION;
                 break;
             }
             case SLASH: {
-                code = InfixExpression.DIVIDE;
+                op = InfixExpression.Op.DIV;
                 precedence = OperatorPrecedence.MULTIPLICATION_AND_DIVISION;
                 break;
             }
@@ -163,8 +163,7 @@ final class CompoundExpressionParser {
         }
 
         lexer.next();
-        return new InfixExpression(code, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
-
+        return new InfixExpression(op, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
     }
 
 }

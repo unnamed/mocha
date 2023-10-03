@@ -26,47 +26,48 @@ package team.unnamed.molang.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Represents any binary expression that operates two
  * expressions, they can be arithmetic or boolean
  */
 public final class InfixExpression implements Expression {
 
-    private static final String[] NAMES = {
-            "And", "Or", "LessThan", "LessThanOrEqual", "GreaterThan", "GreaterThanOrEqual",
-            "Add", "Subtract", "Multiply", "Divide"
-    };
-    private static final String[] SYMBOLS = {
-            "&&", "||", "<", "<=", ">", ">=",
-            "+", "-", "*", "/"
-    };
+    public enum Op {
+        AND,
+        OR,
+        LT,
+        LTE,
+        GT,
+        GTE,
+        ADD,
+        SUB,
+        MUL,
+        DIV
+    }
+
     public static final int AND = 0;
     public static final int OR = 1;
-    public static final int LESS_THAN = 2;
     public static final int LESS_THAN_OR_EQUAL = 3;
-    public static final int GREATER_THAN = 4;
     public static final int GREATER_THAN_OR_EQUAL = 5;
-    public static final int ADD = 6;
-    public static final int SUBTRACT = 7;
-    public static final int MULTIPLY = 8;
-    public static final int DIVIDE = 9;
 
-    private final int code;
+    private final Op op;
     private final Expression left;
     private final Expression right;
 
     public InfixExpression(
-            int code,
-            Expression left,
-            Expression right
+            final @NotNull Op op,
+            final @NotNull Expression left,
+            final @NotNull Expression right
     ) {
-        this.code = code;
-        this.left = left;
-        this.right = right;
+        this.op = requireNonNull(op, "op");
+        this.left = requireNonNull(left, "left");
+        this.right = requireNonNull(right, "right");
     }
 
-    public int code() {
-        return code;
+    public @NotNull Op op() {
+        return op;
     }
 
     public Expression left() {
@@ -84,7 +85,7 @@ public final class InfixExpression implements Expression {
 
     @Override
     public String toString() {
-        return NAMES[code] + "(" + left + ", " + right + ")";
+        return op.name() + "(" + left + ", " + right + ")";
     }
 
     @Override
@@ -92,16 +93,17 @@ public final class InfixExpression implements Expression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InfixExpression that = (InfixExpression) o;
-        if (code != that.code) return false;
+        if (op != that.op) return false;
         if (!left.equals(that.left)) return false;
         return right.equals(that.right);
     }
 
     @Override
     public int hashCode() {
-        int result = code;
+        int result = op.hashCode();
         result = 31 * result + left.hashCode();
         result = 31 * result + right.hashCode();
         return result;
     }
+
 }

@@ -47,14 +47,14 @@ public class HierarchyTest {
         Expression expression = expressions.get(0);
         assertTrue(expression instanceof InfixExpression, "Expression must be infix");
         InfixExpression infixExpr = (InfixExpression) expression;
-        assertEquals(InfixExpression.OR, infixExpr.code(), "Expression must be OR");
+        assertEquals(InfixExpression.Op.OR, infixExpr.op(), "Expression must be OR");
 
         // Left-hand expression (age <= 5)
         {
             Expression lh = infixExpr.left();
             assertTrue(lh instanceof InfixExpression, "Expression must be infix");
             InfixExpression infixlh = (InfixExpression) lh;
-            assertEquals(InfixExpression.LESS_THAN_OR_EQUAL, infixlh.code(), "Expression must be LESS_THAN_OR_EQUAL");
+            assertEquals(InfixExpression.Op.LTE, infixlh.op(), "Expression must be LESS_THAN_OR_EQUAL");
         }
 
 
@@ -63,7 +63,7 @@ public class HierarchyTest {
             Expression rh = infixExpr.right();
             assertTrue(rh instanceof InfixExpression, "Expression must be infix");
             InfixExpression infixrh = (InfixExpression) rh;
-            assertEquals(InfixExpression.GREATER_THAN_OR_EQUAL, infixrh.code(), "Expression must be GREATER_THAN_OR_EQUAL");
+            assertEquals(InfixExpression.Op.GTE, infixrh.op(), "Expression must be GREATER_THAN_OR_EQUAL");
         }
     }
 

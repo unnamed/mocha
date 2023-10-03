@@ -154,7 +154,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     @Override
     public Object visitInfix(@NotNull InfixExpression expression) {
-        return INFIX_EVALUATORS[expression.code()].eval(
+        return INFIX_EVALUATORS[expression.op().ordinal()].eval(
                 () -> expression.left().visit(this),
                 () -> expression.right().visit(this)
         );
