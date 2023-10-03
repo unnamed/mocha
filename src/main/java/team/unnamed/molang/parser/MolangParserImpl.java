@@ -28,7 +28,6 @@ import team.unnamed.molang.lexer.MolangLexer;
 import team.unnamed.molang.lexer.Token;
 import team.unnamed.molang.lexer.TokenKind;
 import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.lexer.Characters;
 
 import java.io.IOException;
 
@@ -39,7 +38,6 @@ import static java.util.Objects.requireNonNull;
  * it's Hephaestus-MoLang parser since some MoLang
  * characteristics may change
  *
- * @see Characters
  * @see Expression
  */
 final class MolangParserImpl implements MolangParser {
@@ -97,6 +95,11 @@ final class MolangParserImpl implements MolangParser {
         return expression;
     }
 
+    @Override
+    public void close() throws IOException {
+        this.lexer.close();
+    }
+
     static Expression parseCompoundExpression(MolangLexer lexer) throws IOException {
         return parseCompoundExpression(lexer, 0);
     }
@@ -117,11 +120,6 @@ final class MolangParserImpl implements MolangParser {
 
             expr = compositeExpr;
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.lexer.close();
     }
 
 }

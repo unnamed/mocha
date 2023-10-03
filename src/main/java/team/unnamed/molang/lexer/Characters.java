@@ -32,17 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
  * tokens
  */
 @ApiStatus.Internal
-public final class Characters {
-
-    /**
-     * Character used to escape other characters
-     * to consider them special characters or
-     * non-tokens
-     */
-    public static final char ESCAPE = '\\';
-    public static final char UNDERSCORE = '_';
-    public static final char DOT = '.';
-    public static final char QUOTE = '\'';
+final class Characters {
 
     private Characters() {
     }
@@ -52,7 +42,7 @@ public final class Characters {
     }
 
     public static boolean isValidForWordStart(final int c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == UNDERSCORE;
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
     }
 
     public static boolean isValidForWordContinuation(final int c) {
