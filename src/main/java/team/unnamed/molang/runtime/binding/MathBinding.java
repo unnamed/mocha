@@ -24,6 +24,9 @@
 
 package team.unnamed.molang.runtime.binding;
 
+import org.jetbrains.annotations.NotNull;
+import team.unnamed.molang.runtime.Function;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -43,18 +46,18 @@ public class MathBinding extends ObjectBinding {
 
     public MathBinding() {
 
-        bindCallable("abs", args -> Math.abs(toDouble(args[0])));
-        bindCallable("acos", args -> Math.acos(toDouble(args[0])) / RADIAN);
-        bindCallable("asin", args -> Math.asin(toDouble(args[0])) / RADIAN);
-        bindCallable("atan", args -> Math.atan(toDouble(args[0])) / RADIAN);
-        bindCallable("atan2", args -> Math.atan2(toDouble(args[0]), toDouble(args[1])) / RADIAN);
-        bindCallable("ceil", args -> Math.ceil(toDouble(args[0])));
-        bindCallable("clamp", args -> Math.max(Math.min(toDouble(args[0]), toDouble(args[2])), toDouble(args[1])));
-        bindCallable("cos", args -> Math.cos(toRadians(args[0])));
-        bindCallable("die_roll", args -> {
-            int amount = (int) toDouble(args[0]);
-            int low = (int) (toDouble(args[1]) * DECIMAL_PART);
-            int high = (int) (toDouble(args[2]) * DECIMAL_PART) - low;
+        bindCallable("abs", (ctx, args) -> Math.abs(args[0].evalAsDouble()));
+        bindCallable("acos", (ctx, args) -> Math.acos(args[0].evalAsDouble()) / RADIAN);
+        bindCallable("asin", (ctx, args) -> Math.asin(args[0].evalAsDouble()) / RADIAN);
+        bindCallable("atan", (ctx, args) -> Math.atan(args[0].evalAsDouble()) / RADIAN);
+        bindCallable("atan2", (ctx, args) -> Math.atan2(args[0].evalAsDouble(), args[1].evalAsDouble()) / RADIAN);
+        bindCallable("ceil", (ctx, args) -> Math.ceil(args[0].evalAsDouble()));
+        bindCallable("clamp", (ctx, args) -> Math.max(Math.min(args[0].evalAsDouble(), args[2].evalAsDouble()), args[1].evalAsDouble()));
+        bindCallable("cos", (ctx, args) -> Math.cos(args[0].evalAsDouble()));
+        bindCallable("die_roll", (ctx, args) -> {
+            int amount = (int) args[0].evalAsDouble();
+            int low = (int) (args[1].evalAsDouble() * DECIMAL_PART);
+            int high = (int) (args[2].evalAsDouble() * DECIMAL_PART) - low;
             double result = 0;
             for (int i = 0; i < amount; i++) {
                 result += RANDOM.nextInt(high) + low;
@@ -63,12 +66,12 @@ public class MathBinding extends ObjectBinding {
         });
         // TODO: die_roll_integer
 
-        bindCallable("exp", args -> Math.exp(toDouble(args[0])));
-        bindCallable("floor", args -> Math.floor(toDouble(args[0])));
-        bindCallable("lerprotate", args -> {
-            double start = radify(toDouble(args[0]));
-            double end = radify(toDouble(args[1]));
-            double lerp = toDouble(args[2]);
+        bindCallable("exp", (ctx, args) -> Math.exp(args[0].evalAsDouble()));
+        bindCallable("floor", (ctx, args) -> Math.floor(args[0].evalAsDouble()));
+        bindCallable("lerprotate", (ctx, args) -> {
+            double start = radify(args[0].evalAsDouble());
+            double end = radify(args[1].evalAsDouble());
+            double lerp = args[2].evalAsDouble();
 
             if (start > end) {
                 // swap
@@ -85,20 +88,33 @@ public class MathBinding extends ObjectBinding {
             }
         });
         // TODO: hermite_blend, lerp, lerprotate
-        bindCallable("ln", args -> Math.log(toDouble(args[0])));
-        bindCallable("max", args -> Math.max(toDouble(args[0]), toDouble(args[1])));
-        bindCallable("min", args -> Math.min(toDouble(args[0]), toDouble(args[1])));
-        bindCallable("mod", args -> toDouble(args[0]) % toDouble(args[1]));
+        bindCallable("ln", (ctx, args) -> Math.log(args[0].evalAsDouble()));
+        bindCallable("max", (ctx, args) -> Math.max(args[0].evalAsDouble(), args[1].evalAsDouble()));
+        bindCallable("min", (ctx, args) -> Math.min(args[0].evalAsDouble(), args[1].evalAsDouble()));
+        bindCallable("mod", (ctx, args) -> args[0].evalAsDouble() % args[1].evalAsDouble());
         bindings.put("pi", Math.PI);
-        bindCallable("pow", args -> Math.pow(toDouble(args[0]), toDouble(args[1])));
+        bindCallable("pow", (ctx, args) -> Math.pow(args[0].evalAsDouble(), args[1].evalAsDouble()));
         // TODO: random, random_integer
-        bindCallable("round", args -> Math.round(toDouble(args[0])));
-        bindCallable("sin", args -> Math.sin(toRadians(args[0])));
-        bindCallable("sqrt", args -> Math.sqrt(toDouble(args[0])));
+        bindCallable("round", (ctx, args) -> Math.round(args[0].evalAsDouble()));
+        bindCallable("sin", (ctx, args) -> Math.sin(toRadians(args[0])));
+        bindCallable("sqrt", (ctx, args) -> Math.sqrt(args[0].evalAsDouble()));
         // TODO: trunc
     }
 
-    private void bindCallable(String name, CallableBinding binding) {
+    private static double radify(double n) {
+        return (((n + 180) % 360) + 180) % 360;
+    }
+
+    private static double toRadians(Object object) {
+        if (object instanceof Number) {
+            return Math.toRadians(((Number) object).doubleValue());
+        } else {
+            // not fail-fast
+            return 0D;
+        }
+    }
+
+    private void bindCallable(final @NotNull String name, final @NotNull Function binding) {
         bindings.put(name, binding);
     }
 
@@ -109,27 +125,6 @@ public class MathBinding extends ObjectBinding {
 
     @Override
     public void setProperty(String name, Object value) {
-    }
-
-    private static double radify(double n) {
-        return (((n + 180) % 360) + 180) % 360;
-    }
-
-    private static double toDouble(Object object) {
-        if (object instanceof Number) {
-            return ((Number) object).doubleValue();
-        } else {
-            return 0D;
-        }
-    }
-
-    private static double toRadians(Object object) {
-        if (object instanceof Number) {
-            return Math.toRadians(((Number) object).doubleValue());
-        } else {
-            // not fail-fast
-            return 0D;
-        }
     }
 
 }

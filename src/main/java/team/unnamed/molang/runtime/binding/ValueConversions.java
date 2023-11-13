@@ -24,6 +24,8 @@
 
 package team.unnamed.molang.runtime.binding;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class ValueConversions {
 
     private ValueConversions() {
@@ -51,7 +53,7 @@ public final class ValueConversions {
         }
     }
 
-    public static double toDouble(Object obj) {
+    public static double asDouble(final @Nullable Object obj) {
         if (obj instanceof Boolean) {
             return ((Boolean) obj) ? 1.0D : 0.0D;
         } else if (obj instanceof Number) {

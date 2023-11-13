@@ -27,12 +27,12 @@ package team.unnamed.molang.runtime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.parser.ast.*;
-import team.unnamed.molang.runtime.binding.CallableBinding;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 import team.unnamed.molang.runtime.binding.ValueConversions;
 
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
 
@@ -90,7 +90,28 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     private @Nullable Object returnValue;
 
     public ExpressionEvaluatorImpl(final @NotNull ObjectBinding bindings) {
-        this.bindings = Objects.requireNonNull(bindings, "bindings");
+        this.bindings = requireNonNull(bindings, "bindings");
+    }
+
+    private static Evaluator bool(BooleanOperator op) {
+        return (evaluator, a, b) -> op.operate(
+                () -> ValueConversions.asBoolean(a.visit(evaluator)),
+                () -> ValueConversions.asBoolean(b.visit(evaluator))
+        ) ? 1F : 0F;
+    }
+
+    private static Evaluator compare(Comparator comp) {
+        return (evaluator, a, b) -> comp.compare(
+                () -> ValueConversions.asFloat(a.visit(evaluator)),
+                () -> ValueConversions.asFloat(b.visit(evaluator))
+        ) ? 1F : 0F;
+    }
+
+    private static Evaluator arithmetic(ArithmeticOperator op) {
+        return (evaluator, a, b) -> op.operate(
+                () -> ValueConversions.asFloat(a.visit(evaluator)),
+                () -> ValueConversions.asFloat(b.visit(evaluator))
+        );
     }
 
     @Override
@@ -104,7 +125,6 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     public @NotNull ObjectBinding bindings() {
         return bindings;
     }
-
 
     @Override
     public @Nullable Object popReturnValue() {
@@ -123,19 +143,19 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     }
 
     @Override
-    public Object visitCall(@NotNull CallExpression expression) {
-        Object binding = expression.function().visit(this);
-        if (!(binding instanceof CallableBinding)) {
+    public @Nullable Object visitCall(final @NotNull CallExpression expression) {
+        final Object function = expression.function().visit(this);
+        if (!(function instanceof Function)) {
             // TODO: This isn't fail-fast, check this in specification
             return 0;
         }
 
-        List<Expression> arguments = expression.arguments();
-        Object[] evaluatedArguments = new Object[arguments.size()];
-        for (int i = 0; i < arguments.size(); i++) {
-            evaluatedArguments[i] = arguments.get(i).visit(this);
+        final List<Expression> argumentsExpressions = expression.arguments();
+        final Function.Argument[] arguments = new Function.Argument[argumentsExpressions.size()];
+        for (int i = 0; i < argumentsExpressions.size(); i++) {
+            arguments[i] = new FunctionArgumentImpl(argumentsExpressions.get(i));
         }
-        return ((CallableBinding) binding).call(evaluatedArguments);
+        return ((Function) function).evaluate(null, arguments);
     }
 
     @Override
@@ -147,7 +167,7 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     public Object visitExecutionScope(@NotNull ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
         ExpressionEvaluator evaluatorForThisScope = createChild();
-        return (CallableBinding) arguments -> {
+        return (Function) (context, arguments) -> {
             for (Expression expression : expressions) {
                 // eval expression, ignore result
                 expression.visit(evaluatorForThisScope);
@@ -226,27 +246,6 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }
 
-    private static Evaluator bool(BooleanOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asBoolean(a.visit(evaluator)),
-                () -> ValueConversions.asBoolean(b.visit(evaluator))
-        ) ? 1F : 0F;
-    }
-
-    private static Evaluator compare(Comparator comp) {
-        return (evaluator, a, b) -> comp.compare(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        ) ? 1F : 0F;
-    }
-
-    private static Evaluator arithmetic(ArithmeticOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        );
-    }
-
     private interface Evaluator {
         Object eval(ExpressionEvaluator evaluator, Expression a, Expression b);
     }
@@ -270,6 +269,24 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
 
     private interface ArithmeticOperator {
         float operate(LazyEvaluableFloat a, LazyEvaluableFloat b);
+    }
+
+    private class FunctionArgumentImpl implements Function.Argument {
+        private final Expression expression;
+
+        FunctionArgumentImpl(final @NotNull Expression expression) {
+            this.expression = requireNonNull(expression, "expression");
+        }
+
+        @Override
+        public @NotNull Expression expression() {
+            return expression;
+        }
+
+        @Override
+        public @Nullable Object eval() {
+            return expression.visit(ExpressionEvaluatorImpl.this);
+        }
     }
 
 
