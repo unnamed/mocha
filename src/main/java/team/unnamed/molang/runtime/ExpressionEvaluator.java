@@ -26,6 +26,7 @@ package team.unnamed.molang.runtime;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.parser.ast.ExpressionVisitor;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 
@@ -36,7 +37,39 @@ import team.unnamed.molang.runtime.binding.ObjectBinding;
  *
  * @since 3.0.0
  */
-public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluatorImpl */ extends ExpressionVisitor<Object> {
+public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluatorImpl */ extends ExecutionContext, ExpressionVisitor<Object> {
+    /**
+     * Creates a new {@link ExpressionEvaluator} instance with
+     * the given bindings.
+     *
+     * @param bindings The bindings to use.
+     * @return The created expression evaluator.
+     * @since 3.0.0
+     */
+    static @NotNull ExpressionEvaluator evaluator(final @NotNull ObjectBinding bindings) {
+        return new ExpressionEvaluatorImpl(bindings);
+    }
+
+    /**
+     * Creates a new {@link ExpressionEvaluator} instance
+     * without bindings.
+     *
+     * @return The created expression evaluator.
+     * @since 3.0.0
+     */
+    static @NotNull ExpressionEvaluator evaluator() {
+        return evaluator(ObjectBinding.EMPTY);
+    }
+
+    @Override
+    default Object entity() {
+        return null;
+    }
+
+    @Override
+    default @Nullable Object eval(final @NotNull Expression expression) {
+        return expression.visit(this);
+    }
 
     /**
      * Gets the bindings for this evaluator.
@@ -68,28 +101,5 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @since 3.0.0
      */
     @Nullable Object popReturnValue();
-
-    /**
-     * Creates a new {@link ExpressionEvaluator} instance with
-     * the given bindings.
-     *
-     * @param bindings The bindings to use.
-     * @return The created expression evaluator.
-     * @since 3.0.0
-     */
-    static @NotNull ExpressionEvaluator evaluator(final @NotNull ObjectBinding bindings) {
-        return new ExpressionEvaluatorImpl(bindings);
-    }
-
-    /**
-     * Creates a new {@link ExpressionEvaluator} instance
-     * without bindings.
-     *
-     * @return The created expression evaluator.
-     * @since 3.0.0
-     */
-    static @NotNull ExpressionEvaluator evaluator() {
-        return evaluator(ObjectBinding.EMPTY);
-    }
 
 }

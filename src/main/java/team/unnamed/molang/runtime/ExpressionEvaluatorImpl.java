@@ -43,7 +43,15 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
             compare((a, b) -> a.eval() <= b.eval()),
             compare((a, b) -> a.eval() > b.eval()),
             compare((a, b) -> a.eval() >= b.eval()),
-            arithmetic((a, b) -> a.eval() + b.eval()),
+            (evaluator, a, b) -> {
+                final Object aVal = a.visit(evaluator);
+                final Object bVal = b.visit(evaluator);
+                if (aVal instanceof String || bVal instanceof String) {
+                    return aVal + String.valueOf(bVal);
+                } else {
+                    return ValueConversions.asFloat(aVal) + ValueConversions.asFloat(bVal);
+                }
+            },
             arithmetic((a, b) -> a.eval() - b.eval()),
             arithmetic((a, b) -> a.eval() * b.eval()),
             arithmetic((a, b) -> {
@@ -77,10 +85,12 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
             (evaluator, a, b) -> { // conditional
                 Object condition = a.visit(evaluator);
                 if (ValueConversions.asBoolean(condition)) {
-                    return b.visit(evaluator);
-                } else {
-                    return 0;
+                    final Object predicateVal = b.visit(evaluator);
+                    if (predicateVal instanceof Function) {
+                        return ((Function) predicateVal).evaluate(evaluator);
+                    }
                 }
+                return 0;
             },
             arithmetic((a, b) -> ((a.eval() == b.eval()) ? 1.0F : 0.0F)), // eq
             arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
@@ -155,7 +165,7 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
         for (int i = 0; i < argumentsExpressions.size(); i++) {
             arguments[i] = new FunctionArgumentImpl(argumentsExpressions.get(i));
         }
-        return ((Function) function).evaluate(null, arguments);
+        return ((Function) function).evaluate(this, arguments);
     }
 
     @Override

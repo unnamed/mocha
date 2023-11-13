@@ -115,7 +115,7 @@ public final class StandardBindings {
                 for (final Object val : arrayIterable) {
                     // set 'val' as current value
                     // eval (objectExpr.propertyName = val)
-                    final Object evaluatedObjectValue = objectExpr.visit(null);
+                    final Object evaluatedObjectValue = ctx.eval(objectExpr);
                     if (evaluatedObjectValue instanceof ObjectBinding) {
                         ((ObjectBinding) evaluatedObjectValue).setProperty(propertyName, val);
                     }

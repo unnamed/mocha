@@ -1,13 +1,11 @@
 package team.unnamed.molang.runtime;
 
-public final class ExecutionContext<T> {
-    private final T entity;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import team.unnamed.molang.parser.ast.Expression;
 
-    public ExecutionContext(T entity) {
-        this.entity = entity;
-    }
+public interface ExecutionContext<T> {
+    T entity();
 
-    public T entity() {
-        return entity;
-    }
+    @Nullable Object eval(final @NotNull Expression expression);
 }
