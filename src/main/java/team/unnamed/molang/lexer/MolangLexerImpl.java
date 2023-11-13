@@ -118,12 +118,14 @@ final class MolangLexerImpl implements MolangLexer {
             String word = builder.toString();
             TokenKind kind;
             switch (word.toLowerCase()) {
+                //@formatter:off
                 case "break": kind = TokenKind.BREAK; break;
                 case "continue": kind = TokenKind.CONTINUE; break;
                 case "return": kind = TokenKind.RETURN; break;
                 case "true": kind = TokenKind.TRUE; break;
                 case "false": kind = TokenKind.FALSE; break;
                 default: kind = TokenKind.IDENTIFIER; break;
+                //@formatter:on
             }
 
             return new Token(
@@ -245,6 +247,7 @@ final class MolangLexerImpl implements MolangLexer {
                     }
                     break;
                 }
+                //@formatter:off
                 case '/': tokenKind = TokenKind.SLASH; break;
                 case '*': tokenKind = TokenKind.STAR; break;
                 case '+': tokenKind = TokenKind.PLUS; break;
@@ -258,10 +261,11 @@ final class MolangLexerImpl implements MolangLexer {
                 case '[': tokenKind = TokenKind.LBRACKET; break;
                 case ']': tokenKind = TokenKind.RBRACKET; break;
                 case ';': tokenKind = TokenKind.SEMICOLON; break;
+                //@formatter:on
                 default: {
                     // "c" is something we don't know about!
                     tokenKind = TokenKind.ERROR;
-                    value = "Unexpected token '" + c + "': invalid token";
+                    value = "Unexpected token '" + ((char) c) + "': invalid token";
                     break;
                 }
             }
