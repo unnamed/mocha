@@ -125,6 +125,7 @@ public final class BinaryExpression implements Expression {
         SUB(900),
         MUL(1000),
         DIV(1000),
+        ARROW(2000),
         NULL_COALESCE(2),
         ASSIGN(1),
         CONDITIONAL(1),

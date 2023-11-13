@@ -62,6 +62,15 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
                 if (divisor == 0) return 0;
                 else return dividend / divisor;
             }),
+            (evaluator, a, b) -> { // arrow
+                final Object val = a.visit(evaluator);
+                if (val == null) {
+                    return 0;
+                } else {
+                    // todo: consider val's context instead of this context
+                    return b.visit(evaluator);
+                }
+            },
             (evaluator, a, b) -> { // null coalesce
                 Object val = a.visit(evaluator);
                 if (val == null) {

@@ -231,6 +231,7 @@ final class MolangParserImpl implements MolangParser {
             case EQ: op = BinaryExpression.Op.ASSIGN; break;
             case EQEQ: op = BinaryExpression.Op.EQ; break;
             case BANGEQ: op = BinaryExpression.Op.NEQ; break;
+            case ARROW: op = BinaryExpression.Op.ARROW; break;
             default: return left;
         }
         // @formatter:on
