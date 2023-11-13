@@ -88,6 +88,8 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
                     final Object predicateVal = b.visit(evaluator);
                     if (predicateVal instanceof Function) {
                         return ((Function) predicateVal).evaluate(evaluator);
+                    } else {
+                        return predicateVal;
                     }
                 }
                 return 0;
