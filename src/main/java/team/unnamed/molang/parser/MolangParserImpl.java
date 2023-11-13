@@ -51,59 +51,6 @@ final class MolangParserImpl implements MolangParser {
         this.lexer = requireNonNull(lexer, "lexer");
     }
 
-    @Override
-    public @NotNull MolangLexer lexer() {
-        return lexer;
-    }
-
-    @Override
-    public @Nullable Expression current() {
-        if (current == UNSET_FLAG) {
-            throw new IllegalStateException("No current parsed expression, call next() at least once!");
-        }
-        return (Expression) current;
-    }
-
-    @Override
-    public @Nullable Expression next() throws IOException {
-        final Expression expr = next0();
-        current = expr;
-        return expr;
-    }
-
-    //
-    // Parses an expression until it finds an unexpected token,
-    // a semicolon, or an end-of-file token.
-    //
-    private @Nullable Expression next0() throws IOException {
-        Token token = lexer.next();
-
-        if (token.kind() == TokenKind.EOF) {
-            // reached end-of-file!
-            return null;
-        }
-
-        if (token.kind() == TokenKind.ERROR) {
-            // tokenization error!
-            throw new ParseException("Found an invalid token (error): " + token.value(), cursor());
-        }
-
-        final Expression expression = parseCompoundExpression(lexer, 0);
-
-        // check current token, should be a semicolon or an eof
-        token = lexer.current();
-        if (token.kind() != TokenKind.EOF && token.kind() != TokenKind.SEMICOLON) {
-            throw new ParseException("Expected a semicolon, but was " + token, lexer.cursor());
-        }
-
-        return expression;
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.lexer.close();
-    }
-
     //
     // Parses a single expression.
     // Single expressions don't require a left-hand expression
@@ -150,9 +97,11 @@ final class MolangParserImpl implements MolangParser {
                                 "Found the end before the execution scope closing token",
                                 null
                         );
+                    } else if (token.kind() == TokenKind.ERROR) {
+                        throw new ParseException("Found an invalid token (error): " + token.value(), lexer.cursor());
                     } else {
                         if (token.kind() != TokenKind.SEMICOLON) {
-                            throw new ParseException("Missing semicolon", null);
+                            throw new ParseException("Missing semicolon", lexer.cursor());
                         }
                         lexer.next();
                     }
@@ -293,6 +242,59 @@ final class MolangParserImpl implements MolangParser {
 
         lexer.next();
         return new BinaryExpression(op, left, MolangParserImpl.parseCompoundExpression(lexer, precedence));
+    }
+
+    @Override
+    public @NotNull MolangLexer lexer() {
+        return lexer;
+    }
+
+    @Override
+    public @Nullable Expression current() {
+        if (current == UNSET_FLAG) {
+            throw new IllegalStateException("No current parsed expression, call next() at least once!");
+        }
+        return (Expression) current;
+    }
+
+    @Override
+    public @Nullable Expression next() throws IOException {
+        final Expression expr = next0();
+        current = expr;
+        return expr;
+    }
+
+    //
+    // Parses an expression until it finds an unexpected token,
+    // a semicolon, or an end-of-file token.
+    //
+    private @Nullable Expression next0() throws IOException {
+        Token token = lexer.next();
+
+        if (token.kind() == TokenKind.EOF) {
+            // reached end-of-file!
+            return null;
+        }
+
+        if (token.kind() == TokenKind.ERROR) {
+            // tokenization error!
+            throw new ParseException("Found an invalid token (error): " + token.value(), cursor());
+        }
+
+        final Expression expression = parseCompoundExpression(lexer, 0);
+
+        // check current token, should be a semicolon or an eof
+        token = lexer.current();
+        if (token.kind() != TokenKind.EOF && token.kind() != TokenKind.SEMICOLON) {
+            throw new ParseException("Expected a semicolon, but was " + token, lexer.cursor());
+        }
+
+        return expression;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.lexer.close();
     }
 
 }
