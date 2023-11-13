@@ -24,9 +24,12 @@
 
 package team.unnamed.molang.runtime.binding;
 
+import team.unnamed.molang.parser.ast.AccessExpression;
+import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.parser.ast.StatementExpression;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -68,6 +71,58 @@ public final class StandardBindings {
                     // (not necessary, callable already exits when returnValue
                     //  is set to any non-null value)
                     // if (value == StatementExpression.Op.CONTINUE) continue;
+                }
+            }
+            return 0;
+        });
+        o.setProperty("for_each", (CallableBinding) (args) -> {
+            // Parameters:
+            // - any:              Variable
+            // - array:            Any array
+            // - CallableBinding:  The looped expressions
+
+            if (args.length < 3) {
+                return 0;
+            }
+
+            final Object variableExpr = args[0];
+            if (!(variableExpr instanceof AccessExpression)) {
+                // first argument must be an access expression,
+                // e.g. 'variable.test', 'v.pig', 't.entity' or
+                // 't.entity.location.world'
+                return 0;
+            }
+            final AccessExpression variableAccess = (AccessExpression) variableExpr;
+            final Expression objectExpr = variableAccess.object();
+            final String propertyName = variableAccess.property();
+
+            final Object arrayExpr = args[1];
+            final Iterable<?> arrayIterable;
+            if (arrayExpr instanceof Object[]) {
+                arrayIterable = Arrays.asList((Object[]) arrayExpr);
+            } else if (arrayExpr instanceof Iterable<?>) {
+                arrayIterable = (Iterable<?>) arrayExpr;
+            } else {
+                // second argument must be an array or iterable
+                return 0;
+            }
+
+            final Object expr = args[2];
+
+            if (expr instanceof CallableBinding) {
+                final CallableBinding callable = (CallableBinding) expr;
+                for (final Object val : arrayIterable) {
+                    // set 'val' as current value
+                    // eval (objectExpr.propertyName = val)
+                    final Object evaluatedObjectValue = objectExpr.visit(null);
+                    if (evaluatedObjectValue instanceof ObjectBinding) {
+                        ((ObjectBinding) evaluatedObjectValue).setProperty(propertyName, val);
+                    }
+                    final Object returnValue = callable.call();
+
+                    if (returnValue == StatementExpression.Op.BREAK) {
+                        break;
+                    }
                 }
             }
             return 0;
