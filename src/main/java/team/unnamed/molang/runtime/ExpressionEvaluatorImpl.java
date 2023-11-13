@@ -67,8 +67,7 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
                 if (val == null) {
                     return 0;
                 } else {
-                    // todo: consider val's context instead of this context
-                    return b.visit(evaluator);
+                    return b.visit(evaluator.createChild(val));
                 }
             },
             (evaluator, a, b) -> { // null coalesce
@@ -107,10 +106,12 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
             arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
     };
 
+    private final Object entity;
     private final ObjectBinding bindings;
     private @Nullable Object returnValue;
 
-    public ExpressionEvaluatorImpl(final @NotNull ObjectBinding bindings) {
+    public ExpressionEvaluatorImpl(final @Nullable Object entity, final @NotNull ObjectBinding bindings) {
+        this.entity = entity;
         this.bindings = requireNonNull(bindings, "bindings");
     }
 
@@ -136,10 +137,21 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     }
 
     @Override
+    public <T> T entity(final @NotNull Class<T> clazz) {
+        requireNonNull(clazz, "clazz");
+        return clazz.cast(entity);
+    }
+
+    @Override
+    public @NotNull ExpressionEvaluator createChild(final @Nullable Object entity) {
+        return new ExpressionEvaluatorImpl(entity, this.bindings);
+    }
+
+    @Override
     public @NotNull ExpressionEvaluator createChild() {
         // Note that it will have its own returnValue, but same bindings
         // (Should we create new bindings?)
-        return new ExpressionEvaluatorImpl(this.bindings);
+        return new ExpressionEvaluatorImpl(this.entity, this.bindings);
     }
 
     @Override

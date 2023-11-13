@@ -42,12 +42,25 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * Creates a new {@link ExpressionEvaluator} instance with
      * the given bindings.
      *
+     * @param entity   The entity object
+     * @param bindings The bindings to use.
+     * @return The created expression evaluator.
+     * @since 3.0.0
+     */
+    static @NotNull ExpressionEvaluator evaluator(final @Nullable Object entity, final @NotNull ObjectBinding bindings) {
+        return new ExpressionEvaluatorImpl(entity, bindings);
+    }
+
+    /**
+     * Creates a new {@link ExpressionEvaluator} instance with
+     * the given bindings.
+     *
      * @param bindings The bindings to use.
      * @return The created expression evaluator.
      * @since 3.0.0
      */
     static @NotNull ExpressionEvaluator evaluator(final @NotNull ObjectBinding bindings) {
-        return new ExpressionEvaluatorImpl(bindings);
+        return evaluator(null, bindings);
     }
 
     /**
@@ -59,11 +72,6 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      */
     static @NotNull ExpressionEvaluator evaluator() {
         return evaluator(ObjectBinding.EMPTY);
-    }
-
-    @Override
-    default Object entity() {
-        return null;
     }
 
     @Override
@@ -91,6 +99,20 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @since 3.0.0
      */
     @NotNull ExpressionEvaluator createChild();
+
+    /**
+     * Creates a new, child, expression evaluator.
+     *
+     * <p>Child evaluators have all the bindings of
+     * their parents and may have extra bindings.</p>
+     *
+     * <p>Child evaluators have their own stack.</p>
+     *
+     * @param entity The new entity value
+     * @return The child expression evaluator.
+     * @since 3.0.0
+     */
+    @NotNull ExpressionEvaluator createChild(final @Nullable Object entity);
 
     /**
      * Pops the return value, set by the last "return"

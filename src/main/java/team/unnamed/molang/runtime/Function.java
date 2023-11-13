@@ -26,7 +26,7 @@ public interface Function {
      * @return The function result
      * @since 3.0.0
      */
-    @Nullable Object evaluate(final @NotNull ExecutionContext<?> context, final @NotNull Argument @NotNull ... arguments);
+    @Nullable Object evaluate(final @NotNull ExecutionContext context, final @NotNull Argument @NotNull ... arguments);
 
     /**
      * Represents a {@link Function} argument. It is an expression
