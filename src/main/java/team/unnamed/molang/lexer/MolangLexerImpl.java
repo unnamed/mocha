@@ -92,29 +92,29 @@ final class MolangLexerImpl implements MolangLexer {
         }
 
         int start = cursor.index();
-        if (Characters.isDigit(c)) {
+        if (Character.isDigit(c)) {
             StringBuilder builder = new StringBuilder(8);
             builder.appendCodePoint(c);
 
             // first char is a digit, continue reading number
-            while (Characters.isDigit(c = read())) {
+            while (Character.isDigit(c = read())) {
                 builder.appendCodePoint(c);
             }
 
             if (c == '.') {
                 builder.append('.');
-                while (Characters.isDigit(c = read())) {
+                while (Character.isDigit(c = read())) {
                     builder.appendCodePoint(c);
                 }
             }
 
             return new Token(TokenKind.FLOAT, builder.toString(), start, cursor.index());
-        } else if (Characters.isValidForWordStart(c)) {
+        } else if (Characters.isValidForWordStart(c)) { // [A-z_]
             // may be an identifier or a keyword
             StringBuilder builder = new StringBuilder();
             do {
                 builder.appendCodePoint(c);
-            } while (Characters.isValidForWordContinuation(c = read()));
+            } while (Characters.isValidForWordContinuation(c = read())); // [A-z_0-9]
             String word = builder.toString();
             TokenKind kind;
             switch (word.toLowerCase()) {
