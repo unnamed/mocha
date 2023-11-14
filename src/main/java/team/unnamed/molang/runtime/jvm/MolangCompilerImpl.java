@@ -224,7 +224,7 @@ final class MolangCompilerImpl implements MolangCompiler {
             }
 
             scriptCtClass.addMethod(CtMethod.make(method, scriptCtClass));
-            return clazz.cast(scriptCtClass.toClass().newInstance());
+            return clazz.cast(classPool.toClass(scriptCtClass, null, classLoader, null).newInstance());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
