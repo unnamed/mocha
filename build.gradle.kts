@@ -28,7 +28,7 @@ tasks {
 license {
     header.set(rootProject.resources.text.fromFile("header.txt"))
     include("**/*.java")
-    newLine = true
+    newLine = false
 }
 
 java {
