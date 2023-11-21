@@ -25,6 +25,8 @@ package team.unnamed.molang.runtime.jvm;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
@@ -37,6 +39,7 @@ import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ast.Expression;
 
 import java.io.Reader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -70,14 +73,15 @@ final class MolangCompilerImpl implements MolangCompiler {
             }
 
             final String functionName = spec.value();
-            final RegisteredMolangNative _native = new RegisteredMolangNative(functionName, clazz, null, method);
+            final RegisteredMolangNative _native = new RegisteredMolangNative(functionName, null, null, method);
             natives.put(functionName, _native);
         }
     }
 
     @Override
-    public void registerNatives(final @NotNull Object object) {
+    public void registerNatives(final @NotNull Object object, final @NotNull String name) {
         requireNonNull(object, "object");
+        requireNonNull(name, "name");
         final Class<?> clazz = object.getClass();
         for (final Method method : clazz.getDeclaredMethods()) {
             if (Modifier.isStatic(method.getModifiers()) || method.isSynthetic()) {
@@ -89,8 +93,8 @@ final class MolangCompilerImpl implements MolangCompiler {
                 continue;
             }
 
-            final String functionName = spec.value();
-            final RegisteredMolangNative _native = new RegisteredMolangNative(functionName, clazz, object, method);
+            final String functionName = name + '.' + spec.value();
+            final RegisteredMolangNative _native = new RegisteredMolangNative(functionName, name, object, method);
             natives.put(functionName, _native);
         }
     }
@@ -120,44 +124,65 @@ final class MolangCompilerImpl implements MolangCompiler {
         }
 
         final Map<String, Integer> argumentParameterIndexes = new HashMap<>();
-        final Parameter[] parameters = implementedMethod.getParameters();
-        final CtClass[] ctParameters = new CtClass[parameters.length];
+        final CtClass[] ctParameters;
 
-        for (int i = 0; i < parameters.length; ++i) {
-            final Parameter parameter = parameters[i];
-            final Named named = parameter.getDeclaredAnnotation(Named.class);
+        // check method parameter types
+        {
+            final Parameter[] parameters = implementedMethod.getParameters();
+            ctParameters = new CtClass[parameters.length];
 
-            if (named == null) {
-                throw new IllegalArgumentException("Parameter " + parameter.getName() + " (index " + i
-                        + ") must be annotated with @Named and specify a name");
-            }
+            for (int i = 0; i < parameters.length; ++i) {
+                final Parameter parameter = parameters[i];
+                final Named named = parameter.getDeclaredAnnotation(Named.class);
+                final String name;
 
-            argumentParameterIndexes.put(named.value(), i);
-            try {
-                ctParameters[i] = classPool.get(parameter.getType().getName());
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
+                if (named != null) {
+                    name = named.value();
+                } else if (parameter.isNamePresent()) {
+                    name = parameter.getName();
+                } else {
+                    throw new IllegalArgumentException("Parameter " + parameter.getName() + " (index " + i
+                            + ") must be annotated with @Named and specify a name");
+                }
+
+                argumentParameterIndexes.put(name, i);
+                try {
+                    ctParameters[i] = classPool.get(parameter.getType().getName());
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
-        final String scriptId = "MolangFunctionImpl_" + clazz.getSimpleName() + "_" + implementedMethod.getName()
+        final String scriptClassName = getClass().getPackage().getName() + ".MolangFunctionImpl_" + clazz.getSimpleName() + "_" + implementedMethod.getName()
                 + "_" + Long.toHexString(System.currentTimeMillis());
 
         try {
-            CtClass scriptCtClass = classPool.makeClass("team.unnamed.molang.runtime.jvm." + scriptId);
+            CtClass scriptCtClass = classPool.makeClass(scriptClassName);
             scriptCtClass.addInterface(classPool.get(clazz.getName()));
             scriptCtClass.setModifiers(Modifier.FINAL | Modifier.PUBLIC);
 
             final Class<?> returnType = implementedMethod.getReturnType();
+            final CtClass returnCtType = classPool.get(returnType.getName());
 
             final List<Expression> expressions = MolangParser.parseAll(source);
             final Bytecode bytecode = new Bytecode(scriptCtClass.getClassFile().getConstPool());
+
+            final FunctionCompileState compileState = new FunctionCompileState(
+                    this,
+                    classPool,
+                    scriptCtClass,
+                    bytecode,
+                    implementedMethod,
+                    natives,
+                    argumentParameterIndexes
+            );
 
             if (expressions.isEmpty()) {
                 // add only a "return 0", "return" or "return null" instruction
                 MolangCompilingVisitor.visitEmpty(bytecode, returnType);
             } else {
-                final MolangCompilingVisitor visitor = new MolangCompilingVisitor(classPool, bytecode, implementedMethod, argumentParameterIndexes);
+                final MolangCompilingVisitor visitor = new MolangCompilingVisitor(compileState);
                 for (final Expression expression : expressions) {
                     expression.visit(visitor);
                 }
@@ -188,25 +213,6 @@ final class MolangCompilerImpl implements MolangCompiler {
             bytecode.setMaxLocals(16);
             bytecode.setMaxStack(24);
 
-            // print bytecode mnemonics for debugging
-//            if (false) {
-//                CodeIterator it = bytecode.toCodeAttribute().iterator();
-//                while (it.hasNext()) {
-//                    int index = it.next();
-//                    int op = it.byteAt(index);
-//                    System.out.print(index + ": " + Mnemonic.OPCODE[op]);
-//                    int next = it.lookAhead();
-//                    if (next - 1 > index) {
-//                        System.out.print("    ");
-//                        while (index < next - 1) {
-//                            System.out.print(" " + it.byteAt(index + 1));
-//                            index++;
-//                        }
-//                    }
-//                    System.out.println();
-//                }
-//            }
-
             final MethodInfo method = new MethodInfo(
                     scriptCtClass.getClassFile().getConstPool(),
                     implementedMethod.getName(),
@@ -223,7 +229,59 @@ final class MolangCompilerImpl implements MolangCompiler {
             }
 
             scriptCtClass.addMethod(CtMethod.make(method, scriptCtClass));
-            return clazz.cast(classPool.toClass(scriptCtClass, null, classLoader, null).newInstance());
+
+            final Map<String, Object> requirements = compileState.requirements();
+
+            // add fields for the requirements
+            for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
+                final String fieldName = entry.getKey();
+                final Object fieldValue = entry.getValue();
+                final CtClass fieldType = classPool.get(fieldValue.getClass().getName());
+                scriptCtClass.addField(new CtField(fieldType, fieldName, scriptCtClass));
+            }
+
+            // add constructor that needs requirements and initializes them
+            final CtClass[] constructorParameterCtTypes = new CtClass[requirements.size()];
+            int j = 0;
+            for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
+                constructorParameterCtTypes[j] = classPool.get(entry.getValue().getClass().getName());
+                ++j;
+            }
+
+            {
+                final CtConstructor ctConstructor = new CtConstructor(constructorParameterCtTypes, scriptCtClass);
+                final Bytecode constructorBytecode = new Bytecode(scriptCtClass.getClassFile().getConstPool());
+                constructorBytecode.addAload(0); // load this
+                constructorBytecode.addInvokespecial(classPool.get(Object.class.getName()), "<init>", "()V"); // invoke superclass constructor
+                // put!
+                int parameterIndex = 0;
+                for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
+                    final String fieldName = entry.getKey();
+                    final Object fieldValue = entry.getValue();
+                    constructorBytecode.addAload(0); // load this
+                    constructorBytecode.addAload(parameterIndex + 1); // load parameter
+                    constructorBytecode.addPutfield(scriptCtClass, fieldName, Descriptor.of(classPool.get(fieldValue.getClass().getName()))); // set!
+                    parameterIndex++;
+                }
+                ctConstructor.getMethodInfo().setCodeAttribute(constructorBytecode.toCodeAttribute());
+                scriptCtClass.addConstructor(ctConstructor);
+            }
+
+            final Class<?> compiledClass = classPool.toClass(scriptCtClass, null, classLoader, null);
+
+            // find the constructor with the requirements
+            final Class<?>[] constructorParameterTypes = new Class[requirements.size()];
+            final Object[] constructorArguments = new Object[requirements.size()];
+            int i = 0;
+            for (final Object requirement : requirements.values()) {
+                constructorParameterTypes[i] = requirement.getClass();
+                constructorArguments[i] = requirement;
+                ++i;
+            }
+
+            final Constructor<?> constructor = compiledClass.getDeclaredConstructor(constructorParameterTypes);
+            final Object instance = constructor.newInstance(constructorArguments);
+            return clazz.cast(instance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

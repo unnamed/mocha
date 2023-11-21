@@ -26,11 +26,23 @@ package team.unnamed.molang.runtime.jvm;
 import org.junit.jupiter.api.Test;
 
 class MolangCompilerTest {
+    @MolangNative("math.abs")
+    public static double abs(double a) {
+        return Math.abs(a);
+    }
+
     @Test
     void test() {
         MolangCompiler compiler = MolangCompiler.compiler();
         ScriptType script = compiler.compile("false ? a : b", ScriptType.class);
         System.out.println(script.eval(1, 2));
+    }
+
+    @Test
+    void test_native() {
+        final MolangCompiler compiler = MolangCompiler.compiler();
+        compiler.registerStaticNatives(MolangCompilerTest.class);
+        System.out.println(compiler.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
     }
 
     interface ScriptType extends MolangFunction {

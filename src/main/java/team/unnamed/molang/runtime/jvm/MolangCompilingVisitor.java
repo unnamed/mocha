@@ -24,41 +24,33 @@
 package team.unnamed.molang.runtime.jvm;
 
 import javassist.ClassPool;
+import javassist.CtClass;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.molang.parser.ast.BinaryExpression;
-import team.unnamed.molang.parser.ast.DoubleExpression;
-import team.unnamed.molang.parser.ast.Expression;
-import team.unnamed.molang.parser.ast.ExpressionVisitor;
-import team.unnamed.molang.parser.ast.IdentifierExpression;
-import team.unnamed.molang.parser.ast.StringExpression;
-import team.unnamed.molang.parser.ast.TernaryConditionalExpression;
-import team.unnamed.molang.parser.ast.UnaryExpression;
+import team.unnamed.molang.parser.ast.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Map;
-
-import static java.util.Objects.requireNonNull;
 
 final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
     private final ClassPool classPool;
     private final Bytecode bytecode;
     private final Method method;
 
+    private final Map<String, RegisteredMolangNative> natives;
+    private final Map<String, Object> requirements;
     private final Map<String, Integer> argumentParameterIndexes;
 
-    MolangCompilingVisitor(
-            final @NotNull ClassPool classPool,
-            final @NotNull Bytecode bytecode,
-            final @NotNull Method method,
-            final @NotNull Map<String, Integer> argumentParameterIndexes
-    ) {
-        this.classPool = requireNonNull(classPool, "classPool");
-        this.bytecode = requireNonNull(bytecode, "bytecode");
-        this.method = requireNonNull(method, "method");
-        this.argumentParameterIndexes = requireNonNull(argumentParameterIndexes, "argumentParameterIndexes");
+    MolangCompilingVisitor(final @NotNull FunctionCompileState compileState) {
+        this.classPool = compileState.classPool();
+        this.bytecode = compileState.bytecode();
+        this.method = compileState.method();
+        this.natives = compileState.natives();
+        this.requirements = compileState.requirements();
+        this.argumentParameterIndexes = compileState.argumentParameterIndexes();
     }
 
     public static void visitEmpty(final @NotNull Bytecode bytecode, final @NotNull Class<?> returnType) {
@@ -70,13 +62,8 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
             bytecode.addDconst(0);
         } else if (returnType.equals(float.class)) {
             bytecode.addFconst(0);
-        } else if (returnType.equals(boolean.class)) {
-            bytecode.addIconst(0);
-        } else if (returnType.equals(char.class)) {
-            bytecode.addIconst(0);
-        } else if (returnType.equals(short.class)) {
-            bytecode.addIconst(0);
-        } else if (returnType.equals(byte.class)) {
+        } else if (returnType.equals(boolean.class) || returnType.equals(char.class)
+                || returnType.equals(short.class) || returnType.equals(byte.class)) {
             bytecode.addIconst(0);
         } else if (!returnType.equals(void.class)) {
             // return null
@@ -210,6 +197,81 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
             bytecode.addOpcode(Bytecode.I2D);
         } else if (parameterType.equals(boolean.class)) {
             bytecode.addOpcode(Bytecode.I2D);
+        }
+        return null;
+    }
+
+    private @NotNull String stringify(final @NotNull Expression expression) {
+        if (expression instanceof IdentifierExpression) {
+            return ((IdentifierExpression) expression).name();
+        } else if (expression instanceof AccessExpression) {
+            final AccessExpression access = (AccessExpression) expression;
+            return stringify(access.object()) + '.' + access.property();
+        } else {
+            throw new IllegalStateException("Can't call expression: " + expression);
+        }
+    }
+
+    @Override
+    public Void visitCall(final @NotNull CallExpression expression) {
+        final Expression function = expression.function();
+        final String functionName = stringify(function);
+
+        final RegisteredMolangNative _native = natives.get(functionName);
+        if (_native == null) {
+            throw new IllegalArgumentException("Unknown function: " + functionName);
+        }
+
+        final Method nativeMethod = _native.method();
+        final Parameter[] parameters = nativeMethod.getParameters();
+        final List<Expression> arguments = expression.arguments();
+
+        if (arguments.size() != parameters.length) {
+            // invalid amount of arguments, just set to zero in compile-time
+            bytecode.addDconst(0D);
+            return null;
+        }
+
+        final CtClass[] ctParameters = new CtClass[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter parameter = parameters[i];
+            try {
+                ctParameters[i] = classPool.get(parameter.getType().getName());
+            } catch (final NotFoundException e) {
+                throw new IllegalStateException("Parameter type not found", e);
+            }
+        }
+
+        final Object object = _native.object();
+
+        // load arguments
+        for (final Expression argument : arguments) {
+            argument.visit(this);
+        }
+
+        if (object == null) {
+            // invoke static
+            try {
+                bytecode.addInvokestatic(
+                        classPool.get(nativeMethod.getDeclaringClass().getName()),
+                        nativeMethod.getName(),
+                        classPool.get(nativeMethod.getReturnType().getName()),
+                        ctParameters
+                );
+            } catch (final NotFoundException e) {
+                throw new IllegalStateException("Method not found", e);
+            }
+        } else {
+            throw new UnsupportedOperationException("Instance calls are not supported yet");
+            // requirements.put(_native.objectName(), object);
+
+            // we must load object
+            // bytecode.addAload(0);
+            // bytecode.addGetfield(
+            //classPool.get(method.getDeclaringClass().getName()),
+            //_native.objectName(),
+            //Descriptor.of(classPool.get(object.getClass().getName()))
+            //);
         }
         return null;
     }

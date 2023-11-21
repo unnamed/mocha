@@ -57,9 +57,10 @@ public interface MolangCompiler {
      * them accessible from the compiled scripts.
      *
      * @param object The object to register natives from.
+     * @param name   The object's name in the script.
      * @since 3.0.0
      */
-    void registerNatives(final @NotNull Object object);
+    void registerNatives(final @NotNull Object object, final @NotNull String name);
 
     /**
      * Compiles the given source code into a Molang function

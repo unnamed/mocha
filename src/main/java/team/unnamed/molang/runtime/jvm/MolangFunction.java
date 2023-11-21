@@ -48,8 +48,12 @@ package team.unnamed.molang.runtime.jvm;
  * }</pre>
  *
  * <p>Note that all the parameters from the function method <b>must</b>
- * be annotated with {@link Named} to know what is their name in the
- * script.</p>
+ * have a name, they can either be annotated with the {@link Named}
+ * annotation or have a name in runtime (Compiler's -parameters flag)</p>
+ *
+ * <p>Also note that the function's returned value can take a null-like
+ * value depending on the specified return type. For numbers, it will be
+ * zero, and for objects it will be {@code null}</p>
  *
  * @see MolangCompiler
  * @see Named

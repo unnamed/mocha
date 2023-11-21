@@ -32,19 +32,23 @@ import static java.util.Objects.requireNonNull;
 
 final class RegisteredMolangNative {
     private final String name;
-    private final Class<?> clazz;
+    private final String objectName;
     private final Object object;
     private final Method method;
 
-    RegisteredMolangNative(String name, Class<?> clazz, Object object, Method method) {
+    RegisteredMolangNative(String name, String objectName, Object object, Method method) {
         this.name = requireNonNull(name, "name");
-        this.clazz = clazz;
+        this.objectName = objectName;
         this.object = object;
         this.method = requireNonNull(method, "method");
     }
 
     public @NotNull String name() {
         return name;
+    }
+
+    public @Nullable String objectName() {
+        return objectName;
     }
 
     public @Nullable Object object() {
