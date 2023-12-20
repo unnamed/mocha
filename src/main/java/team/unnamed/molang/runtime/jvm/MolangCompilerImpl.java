@@ -180,7 +180,7 @@ final class MolangCompilerImpl implements MolangCompiler {
 
             if (expressions.isEmpty()) {
                 // add only a "return 0", "return" or "return null" instruction
-                MolangCompilingVisitor.visitEmpty(bytecode, returnType);
+                bytecode.addConstZero(returnCtType);
             } else {
                 final MolangCompilingVisitor visitor = new MolangCompilingVisitor(compileState);
                 for (final Expression expression : expressions) {

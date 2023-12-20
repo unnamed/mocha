@@ -43,6 +43,20 @@ import java.util.List;
  */
 public interface MolangEngine {
 
+    static Builder builder() {
+        return new Builder();
+    }
+
+    static MolangEngine createDefault() {
+        return new Builder()
+                .withDefaultBindings()
+                .build();
+    }
+
+    static MolangEngine createEmpty() {
+        return new Builder().build();
+    }
+
     /**
      * Parses the data from the given {@code reader}
      * to a {@link List} of {@link Expression}
@@ -83,20 +97,6 @@ public interface MolangEngine {
         } catch (IOException e) {
             throw new ScriptException(e);
         }
-    }
-
-    static Builder builder() {
-        return new Builder();
-    }
-
-    static MolangEngine createDefault() {
-        return new Builder()
-                .withDefaultBindings()
-                .build();
-    }
-
-    static MolangEngine createEmpty() {
-        return new Builder().build();
     }
 
     class Builder {

@@ -35,7 +35,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
-final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
+final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResult> {
     private final ClassPool classPool;
     private final Bytecode bytecode;
     private final Method method;
@@ -53,39 +53,45 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
         this.argumentParameterIndexes = compileState.argumentParameterIndexes();
     }
 
-    public static void visitEmpty(final @NotNull Bytecode bytecode, final @NotNull Class<?> returnType) {
-        if (returnType.equals(int.class)) {
-            bytecode.addIconst(0);
-        } else if (returnType.equals(long.class)) {
-            bytecode.addLconst(0);
-        } else if (returnType.equals(double.class)) {
-            bytecode.addDconst(0);
-        } else if (returnType.equals(float.class)) {
-            bytecode.addFconst(0);
-        } else if (returnType.equals(boolean.class) || returnType.equals(char.class)
-                || returnType.equals(short.class) || returnType.equals(byte.class)) {
-            bytecode.addIconst(0);
-        } else if (!returnType.equals(void.class)) {
-            // return null
-            bytecode.addOpcode(Bytecode.ACONST_NULL);
-        }
-    }
-
     @Override
-    public Void visitBinary(final @NotNull BinaryExpression expression) {
+    public CompileVisitResult visitBinary(final @NotNull BinaryExpression expression) {
         expression.left().visit(this);   // pushes lhs value to stack
         expression.right().visit(this);  // pushes rhs value to stack
 
         //@formatter:off
         switch (expression.op()) {
-            case AND: {
-
-                break;
+            case AND:
+            case OR:
+            case LT:
+            case LTE:
+            case GT:
+            case GTE: {
+                // not implemented
+                return new CompileVisitResult(CtClass.doubleType);
             }
-            case ADD: bytecode.addOpcode(Bytecode.DADD); break;
-            case SUB: bytecode.addOpcode(Bytecode.DSUB); break;
-            case MUL: bytecode.addOpcode(Bytecode.DMUL); break;
-            case DIV: bytecode.addOpcode(Bytecode.DDIV); break;
+            case ADD: {
+                bytecode.addOpcode(Bytecode.DADD);
+                return new CompileVisitResult(CtClass.doubleType);
+            }
+            case SUB: {
+                bytecode.addOpcode(Bytecode.DSUB);
+                return new CompileVisitResult(CtClass.doubleType);
+            }
+            case MUL: {
+                bytecode.addOpcode(Bytecode.DMUL);
+                return new CompileVisitResult(CtClass.doubleType);
+            }
+            case DIV: {
+                bytecode.addOpcode(Bytecode.DDIV);
+                return new CompileVisitResult(CtClass.doubleType);
+            }
+            case ARROW:
+            case NULL_COALESCE:
+                case ASSIGN:
+            case CONDITIONAL:
+            case EQ:
+            case NEQ:
+                break;
         }
         //@formatter:on
         return null;
@@ -100,20 +106,24 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
     }
 
     @Override
-    public Void visitDouble(final @NotNull DoubleExpression expression) {
+    public CompileVisitResult visitDouble(final @NotNull DoubleExpression expression) {
         bytecode.addLdc2w(expression.value());
-        return null;
+        return new CompileVisitResult(CtClass.doubleType);
     }
 
     @Override
-    public Void visitString(final @NotNull StringExpression expression) {
+    public CompileVisitResult visitString(final @NotNull StringExpression expression) {
         bytecode.addLdc(expression.value());
-        return null;
+        try {
+            return new CompileVisitResult(classPool.get(String.class.getName()));
+        } catch (final NotFoundException e) {
+            throw new IllegalStateException("Couldn't find CtClass for String", e);
+        }
     }
 
     @Override
-    public Void visitUnary(final @NotNull UnaryExpression expression) {
-        expression.expression().visit(this); // push value to stack
+    public CompileVisitResult visitUnary(final @NotNull UnaryExpression expression) {
+        final CompileVisitResult result = expression.expression().visit(this); // push value to stack
 
         switch (expression.op()) {
             case RETURN: {
@@ -133,7 +143,21 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
                 break;
             }
             case ARITHMETICAL_NEGATION: {
-                bytecode.addOpcode(Bytecode.DNEG); // double negation
+                if (result.is(CtClass.doubleType)) {
+                    bytecode.addOpcode(Bytecode.DNEG);
+                } else if (result.is(CtClass.longType)) {
+                    bytecode.addOpcode(Bytecode.LNEG);
+                } else if (result.is(CtClass.floatType)) {
+                    bytecode.addOpcode(Bytecode.FNEG);
+                } else if (result.is(CtClass.intType)) {
+                    bytecode.addOpcode(Bytecode.INEG);
+                } else if (result.is(CtClass.booleanType)) {
+                    // logical negation
+                    bytecode.addOpcode(Bytecode.ICONST_1);
+                    bytecode.addOpcode(Bytecode.IXOR);
+                } else {
+                    throw new IllegalStateException("Unsupported type for negation: " + result);
+                }
                 break;
             }
             default:
@@ -143,21 +167,33 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
     }
 
     @Override
-    public Void visitTernaryConditional(final @NotNull TernaryConditionalExpression expression) {
-        expression.condition().visit(this); // push value to stack
-        bytecode.addOpcode(Bytecode.DCONST_0); // push 0
-        bytecode.addOpcode(Bytecode.DCMPL); // compare
+    public CompileVisitResult visitTernaryConditional(final @NotNull TernaryConditionalExpression expression) {
+        final CompileVisitResult conditionRes = expression.condition().visit(this); // push value to stack
+        if (conditionRes.lastPushedType() != null && !conditionRes.is(CtClass.booleanType) && !conditionRes.is(CtClass.intType)) {
+            bytecode.addConstZero(conditionRes.lastPushedType()); // push 0
+            // compare
+            if (conditionRes.is(CtClass.doubleType)) {
+                bytecode.addOpcode(Bytecode.DCMPL);
+            } else if (conditionRes.is(CtClass.floatType)) {
+                bytecode.addOpcode(Bytecode.FCMPL);
+            } else if (conditionRes.is(CtClass.longType)) {
+                bytecode.addOpcode(Bytecode.LCMP);
+            } else {
+                throw new IllegalStateException("Unsupported type for comparison: " + conditionRes);
+            }
+        }
+
         bytecode.addOpcode(Bytecode.IFEQ); // if false skip
         bytecode.addIndex(7);
-        expression.trueExpression().visit(this); // push true value to stack
+        final CompileVisitResult trueRes = expression.trueExpression().visit(this); // push true value to stack
         bytecode.addOpcode(Bytecode.GOTO); // skip pushing false value
         bytecode.addIndex(4);
-        expression.falseExpression().visit(this); // push false value to stack
+        final CompileVisitResult falseRes = expression.falseExpression().visit(this); // push false value to stack
         return null;
     }
 
     @Override
-    public Void visitIdentifier(final @NotNull IdentifierExpression expression) {
+    public CompileVisitResult visitIdentifier(final @NotNull IdentifierExpression expression) {
         final String name = expression.name();
         final Integer paramIndex = argumentParameterIndexes.get(name);
         if (paramIndex == null) {
@@ -213,7 +249,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
     }
 
     @Override
-    public Void visitCall(final @NotNull CallExpression expression) {
+    public CompileVisitResult visitCall(final @NotNull CallExpression expression) {
         final Expression function = expression.function();
         final String functionName = stringify(function);
 
@@ -277,7 +313,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<Void> {
     }
 
     @Override
-    public Void visit(final @NotNull Expression expression) {
+    public CompileVisitResult visit(final @NotNull Expression expression) {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }
 }

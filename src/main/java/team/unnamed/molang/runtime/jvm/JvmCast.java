@@ -27,6 +27,11 @@ final class JvmCast {
     private JvmCast() {
     }
 
+    public static boolean isWrapper(final @NotNull CtClass type) {
+        requireNonNull(type, "type");
+        return WRAPPER_TYPE_NAMES.contains(type.getName());
+    }
+
     public static void addCast(final @NotNull Bytecode bytecode, final @NotNull CtClass from, final @NotNull CtClass to) {
         requireNonNull(bytecode, "bytecode");
         requireNonNull(from, "from");
