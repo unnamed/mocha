@@ -67,10 +67,9 @@ public class FibonacciTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream stdout = new PrintStream(out);
 
-        MolangEngine.Builder builder = MolangEngine.builder()
-                .withDefaultBindings();
-        builder.bindings.setProperty("query", StandardBindings.createQueryBinding(() -> stdout));
-        MolangEngine engine = builder.build();
+        MolangEngine engine = MolangEngine.create();
+        engine.bindDefaults();
+        engine.bindings().setProperty("query", StandardBindings.createQueryBinding(() -> stdout));
         Object result;
 
         try (Reader reader = new InputStreamReader(FibonacciTest.class.getClassLoader().getResourceAsStream("fibonacci.molang"))) {

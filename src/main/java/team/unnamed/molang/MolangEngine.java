@@ -23,6 +23,7 @@
  */
 package team.unnamed.molang;
 
+import org.jetbrains.annotations.NotNull;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
@@ -42,19 +43,14 @@ import java.util.List;
  * @since 3.0.0
  */
 public interface MolangEngine {
-
-    static Builder builder() {
-        return new Builder();
+    static MolangEngine create() {
+        return new MolangEngineImpl();
     }
 
     static MolangEngine createDefault() {
-        return new Builder()
-                .withDefaultBindings()
-                .build();
-    }
-
-    static MolangEngine createEmpty() {
-        return new Builder().build();
+        final MolangEngine engine = create();
+        engine.bindDefaults();
+        return engine;
     }
 
     /**
@@ -89,7 +85,13 @@ public interface MolangEngine {
 
     Object eval(List<Expression> expressions) throws ScriptException;
 
-    Object eval(Reader reader) throws ScriptException;
+    default Object eval(Reader reader) throws ScriptException {
+        try {
+            return eval(parse(reader));
+        } catch (IOException e) {
+            throw new ScriptException(e);
+        }
+    }
 
     default Object eval(String script) throws ScriptException {
         try (Reader reader = new StringReader(script)) {
@@ -99,37 +101,28 @@ public interface MolangEngine {
         }
     }
 
-    class Builder {
+    /**
+     * Returns the bindings for this Molang engine
+     * instance.
+     *
+     * @return This engine's bindings
+     * @since 3.0.0
+     */
+    @NotNull ObjectBinding bindings();
 
-        // @VisibleForTesting
-        final ObjectBinding bindings = new ObjectBinding();
-        ObjectBinding variables;
-
-        public Builder bindVariable(String key, Object binding) {
-            ensureBoundVariables();
-            variables.setProperty(key, binding);
-            return this;
-        }
-
-        private void ensureBoundVariables() {
-            if (variables == null) {
-                variables = new ObjectBinding();
-                bindings.setProperty("variable", variables);
-                bindings.setProperty("v", variables); // <-- alias
-            }
-        }
-
-        public Builder withDefaultBindings() {
-            bindings.setProperty("query", StandardBindings.QUERY_BINDING);
-            bindings.setProperty("math", StandardBindings.MATH_BINDING);
-            ensureBoundVariables();
-            return this;
-        }
-
-        public MolangEngine build() {
-            return new MolangEngineImpl(this);
-        }
-
+    /**
+     * Makes this engine use the default bindings.
+     *
+     * <p>Default bindings include math and query bindings.</p>
+     *
+     * @since 3.0.0
+     */
+    default void bindDefaults() {
+        final ObjectBinding bindings = bindings();
+        bindings.setProperty("query", StandardBindings.QUERY_BINDING);
+        bindings.setProperty("q", StandardBindings.QUERY_BINDING);
+        bindings.setProperty("math", StandardBindings.MATH_BINDING);
     }
 
+    void bindVariable(String key, Object binding);
 }

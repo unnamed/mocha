@@ -41,31 +41,30 @@ class ArrowOperatorTest {
         new Entity(world, 15, "Chicken");
         new Entity(world, 0, "Zombie");
 
-        final MolangEngine engine = MolangEngine.builder()
-                .withDefaultBindings()
-                .bindVariable("self", self)
-                .bindVariable("get_nearby_entities", (Function) (ctx, args) -> {
-                    if (args.length < 1) {
-                        return 0;
-                    }
+        final MolangEngine engine = MolangEngine.create();
+        engine.bindDefaults();
+        engine.bindVariable("self", self);
+        engine.bindVariable("get_name", (Function) (ctx, args) -> ctx.entity(Entity.class).name);
+        engine.bindVariable("get_nearby_entities", (Function) (ctx, args) -> {
+            if (args.length < 1) {
+                return 0;
+            }
 
-                    final Entity entity = ctx.entity(Entity.class);
-                    final double distance = args[0].evalAsDouble();
+            final Entity entity = ctx.entity(Entity.class);
+            final double distance = args[0].evalAsDouble();
 
-                    final int from = (int) Math.max(entity.location - distance, 0);
-                    final int to = (int) Math.min(entity.location + distance, entity.world.entities.length);
+            final int from = (int) Math.max(entity.location - distance, 0);
+            final int to = (int) Math.min(entity.location + distance, entity.world.entities.length);
 
-                    List<Entity> found = new ArrayList<>();
-                    for (int i = from; i < to; i++) {
-                        final Entity nearby = entity.world.entities[i];
-                        if (nearby != null) {
-                            found.add(nearby);
-                        }
-                    }
-                    return found;
-                })
-                .bindVariable("get_name", (Function) (ctx, args) -> ctx.entity(Entity.class).name)
-                .build();
+            List<Entity> found = new ArrayList<>();
+            for (int i = from; i < to; i++) {
+                final Entity nearby = entity.world.entities[i];
+                if (nearby != null) {
+                    found.add(nearby);
+                }
+            }
+            return found;
+        });
 
         final Object result = engine.eval(
                 "t.first = 1;\n"

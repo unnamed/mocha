@@ -23,39 +23,39 @@
  */
 package team.unnamed.molang;
 
+import org.jetbrains.annotations.NotNull;
 import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
-import team.unnamed.molang.runtime.binding.StandardBindings;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
 final class MolangEngineImpl implements MolangEngine {
-
     private final ObjectBinding bindings;
 
-    MolangEngineImpl(MolangEngine.Builder builder) {
-        this.bindings = builder.bindings;
+    public MolangEngineImpl() {
+        bindings = new ObjectBinding();
+        final ObjectBinding variableBindings = new ObjectBinding();
+        bindings.setProperty("variable", variableBindings);
+        bindings.setProperty("v", variableBindings);
     }
 
-    private ObjectBinding createBindings() {
-        ObjectBinding bindings = new ObjectBinding();
-        bindings.setAllFrom(StandardBindings.BUILT_IN);
-        bindings.setAllFrom(this.bindings);
-        ObjectBinding temp = new ObjectBinding();
-        bindings.setProperty("temp", temp);
-        bindings.setProperty("t", temp);
-        return bindings;
-    }
 
     @Override
     public Object eval(List<Expression> expressions) {
-        ObjectBinding bindings = createBindings();
-        ExpressionEvaluator evaluator = ExpressionEvaluator.evaluator(bindings);
+        // create bindings that just apply for this evaluation
+        final ObjectBinding localBindings = new ObjectBinding();
+        localBindings.setAllFrom(this.bindings);
+        {
+            // create temp bindings
+            ObjectBinding temp = new ObjectBinding();
+            localBindings.setProperty("temp", temp);
+            localBindings.setProperty("t", temp);
+        }
+        ExpressionEvaluator evaluator = ExpressionEvaluator.evaluator(localBindings);
         Object lastResult = 0;
 
         for (Expression expression : expressions) {
@@ -71,12 +71,14 @@ final class MolangEngineImpl implements MolangEngine {
     }
 
     @Override
-    public Object eval(Reader reader) throws ScriptException {
-        try {
-            return eval(parse(reader));
-        } catch (IOException e) {
-            throw new ScriptException(e);
-        }
+    public @NotNull ObjectBinding bindings() {
+        return bindings;
+    }
+
+    @Override
+    public void bindVariable(String key, Object binding) {
+        final ObjectBinding variableBinding = (ObjectBinding) bindings.getProperty("variable");
+        variableBinding.setProperty(key, binding);
     }
 
     @Override

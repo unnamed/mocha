@@ -35,10 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ForEachTest {
     @Test
     void test() throws Exception {
-        final MolangEngine engine = MolangEngine.builder()
-                .withDefaultBindings()
-                .bindVariable("list_people", (Function) (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"))
-                .build();
+        final MolangEngine engine = MolangEngine.create();
+        engine.bindDefaults();
+        engine.bindVariable("list_people", (Function) (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
 
         Object result;
         try (Reader reader = new InputStreamReader(ForEachTest.class.getClassLoader().getResourceAsStream("for_each.molang"))) {
