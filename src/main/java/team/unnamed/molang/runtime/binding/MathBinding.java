@@ -44,7 +44,6 @@ public class MathBinding extends ObjectBinding {
     private final Map<String, Object> bindings = new HashMap<>();
 
     public MathBinding() {
-
         bindCallable("abs", (ctx, args) -> Math.abs(args[0].evalAsDouble()));
         bindCallable("acos", (ctx, args) -> Math.acos(args[0].evalAsDouble()) / RADIAN);
         bindCallable("asin", (ctx, args) -> Math.asin(args[0].evalAsDouble()) / RADIAN);
@@ -63,8 +62,16 @@ public class MathBinding extends ObjectBinding {
             }
             return result / DECIMAL_PART;
         });
-        // TODO: die_roll_integer
-
+        bindCallable("die_roll_integer", (ctx, args) -> {
+            int amount = (int) args[0].evalAsDouble();
+            int low = (int) args[1].evalAsDouble();
+            int high = (int) args[2].evalAsDouble();
+            int result = 0;
+            for (int i = 0; i < amount; i++) {
+                result += RANDOM.nextInt(low, high);
+            }
+            return result;
+        });
         bindCallable("exp", (ctx, args) -> Math.exp(args[0].evalAsDouble()));
         bindCallable("floor", (ctx, args) -> Math.floor(args[0].evalAsDouble()));
         bindCallable("lerprotate", (ctx, args) -> {
