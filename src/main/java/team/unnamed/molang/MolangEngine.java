@@ -124,8 +124,9 @@ public interface MolangEngine<T> {
      */
     default void bindDefaults() {
         final ObjectBinding bindings = bindings();
-        bindings.setProperty("query", StandardBindings.QUERY_BINDING);
-        bindings.setProperty("q", StandardBindings.QUERY_BINDING);
+        final ObjectBinding queryBinding = StandardBindings.createQueryBinding();
+        bindings.setProperty("query", queryBinding);
+        bindings.setProperty("q", queryBinding);
         bindings.setProperty("math", StandardBindings.MATH_BINDING);
     }
 

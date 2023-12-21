@@ -42,7 +42,6 @@ public final class StandardBindings {
 
     public static final ObjectBinding BUILT_IN = createBuiltIn();
     public static final ObjectBinding MATH_BINDING = new MathBinding();
-    public static final ObjectBinding QUERY_BINDING = createQueryBinding(() -> System.out);
 
     private StandardBindings() {
     }
@@ -131,6 +130,10 @@ public final class StandardBindings {
         return o;
     }
 
+    public static ObjectBinding createQueryBinding() {
+        return createQueryBinding(() -> System.out);
+    }
+
     public static ObjectBinding createQueryBinding(Supplier<PrintStream> stdout) {
         ObjectBinding o = new ObjectBinding();
         o.setProperty("print", (Function) (ctx, args) -> {
@@ -144,7 +147,6 @@ public final class StandardBindings {
             }
             return 0;
         });
-        o.block();
         return o;
     }
 
