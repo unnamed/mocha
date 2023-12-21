@@ -39,7 +39,6 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class Token {
-
     private final TokenKind kind;
     private final @Nullable String value;
     private final int start;
@@ -132,5 +131,4 @@ public final class Token {
         result = 31 * result + end;
         return result;
     }
-
 }

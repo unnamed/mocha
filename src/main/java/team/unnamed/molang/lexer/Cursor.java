@@ -37,7 +37,6 @@ import java.util.Objects;
  * @since 3.0.0
  */
 public final class Cursor implements Cloneable {
-
     private int index = 0;
     private int line = 0;
     private int column = 0;
@@ -96,5 +95,4 @@ public final class Cursor implements Cloneable {
     public int hashCode() {
         return Objects.hash(line, column);
     }
-
 }

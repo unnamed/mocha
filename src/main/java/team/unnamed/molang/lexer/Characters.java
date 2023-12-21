@@ -32,7 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Internal
 final class Characters {
-
     private Characters() {
     }
 
@@ -43,5 +42,4 @@ final class Characters {
     public static boolean isValidForWordContinuation(final int c) {
         return isValidForWordStart(c) || Character.isDigit(c);
     }
-
 }

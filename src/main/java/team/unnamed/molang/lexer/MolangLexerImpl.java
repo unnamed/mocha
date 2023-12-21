@@ -31,7 +31,6 @@ import java.io.Reader;
 import static java.util.Objects.requireNonNull;
 
 final class MolangLexerImpl implements MolangLexer {
-
     // the source reader
     private final Reader reader;
 
@@ -285,5 +284,4 @@ final class MolangLexerImpl implements MolangLexer {
         next = c;
         return c;
     }
-
 }

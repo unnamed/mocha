@@ -64,6 +64,59 @@ import java.util.List;
  */
 @ApiStatus.NonExtendable
 public /* sealed */ interface MolangLexer /* permits MolangLexerImpl */ extends Closeable {
+    /**
+     * Creates a new lexer that will read the characters from the
+     * given reader.
+     *
+     * @param reader The reader to use.
+     * @return The created lexer
+     * @throws IOException If lexer initialization fails.
+     * @since 3.0.0
+     */
+    static @NotNull MolangLexer lexer(final @NotNull Reader reader) throws IOException {
+        return new MolangLexerImpl(reader);
+    }
+
+    /**
+     * Creates a new lexer that will read the characters from
+     * the given string.
+     *
+     * @param string The string to tokenize.
+     * @return The created lexer
+     * @throws IOException If lexer initialization fails.
+     * @since 3.0.0
+     */
+    static @NotNull MolangLexer lexer(final @NotNull String string) throws IOException {
+        return lexer(new StringReader(string));
+    }
+
+    /**
+     * Tokenizes all the data from the given reader.
+     *
+     * @param reader The reader.
+     * @return The emitted tokens.
+     * @throws IOException If reading fails.
+     * @since 3.0.0
+     */
+    static @NotNull List<Token> tokenizeAll(final @NotNull Reader reader) throws IOException {
+        try (MolangLexer lexer = lexer(reader)) {
+            return lexer.tokenizeAll();
+        }
+    }
+
+    /**
+     * Tokenizes the provided string.
+     *
+     * @param string The string.
+     * @return The emitted tokens.
+     * @throws IOException If reading fails.
+     * @since 3.0.0
+     */
+    static @NotNull List<Token> tokenizeAll(final @NotNull String string) throws IOException {
+        try (MolangLexer lexer = lexer(string)) {
+            return lexer.tokenizeAll();
+        }
+    }
 
     /**
      * Returns the cursor for this lexer, the cursor maintains
@@ -131,59 +184,4 @@ public /* sealed */ interface MolangLexer /* permits MolangLexerImpl */ extends 
      */
     @Override
     void close() throws IOException;
-
-    /**
-     * Creates a new lexer that will read the characters from the
-     * given reader.
-     *
-     * @param reader The reader to use.
-     * @return The created lexer
-     * @throws IOException If lexer initialization fails.
-     * @since 3.0.0
-     */
-    static @NotNull MolangLexer lexer(final @NotNull Reader reader) throws IOException {
-        return new MolangLexerImpl(reader);
-    }
-
-    /**
-     * Creates a new lexer that will read the characters from
-     * the given string.
-     *
-     * @param string The string to tokenize.
-     * @return The created lexer
-     * @throws IOException If lexer initialization fails.
-     * @since 3.0.0
-     */
-    static @NotNull MolangLexer lexer(final @NotNull String string) throws IOException {
-        return lexer(new StringReader(string));
-    }
-
-    /**
-     * Tokenizes all the data from the given reader.
-     *
-     * @param reader The reader.
-     * @return The emitted tokens.
-     * @throws IOException If reading fails.
-     * @since 3.0.0
-     */
-    static @NotNull List<Token> tokenizeAll(final @NotNull Reader reader) throws IOException {
-        try (MolangLexer lexer = lexer(reader)) {
-            return lexer.tokenizeAll();
-        }
-    }
-
-    /**
-     * Tokenizes the provided string.
-     *
-     * @param string The string.
-     * @return The emitted tokens.
-     * @throws IOException If reading fails.
-     * @since 3.0.0
-     */
-    static @NotNull List<Token> tokenizeAll(final @NotNull String string) throws IOException {
-        try (MolangLexer lexer = lexer(string)) {
-            return lexer.tokenizeAll();
-        }
-    }
-
 }

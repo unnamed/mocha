@@ -43,17 +43,24 @@ import java.util.Set;
  * @since 3.0.0
  */
 public enum TokenKind {
-
-    /** End-of-file token, means that the end was reached */
+    /**
+     * End-of-file token, means that the end was reached
+     */
     EOF,
 
-    /** Error token, means that there was an error there */
+    /**
+     * Error token, means that there was an error there
+     */
     ERROR(Tag.HAS_VALUE),
 
-    /** Identifier token, has a string value of the identifier name */
+    /**
+     * Identifier token, has a string value of the identifier name
+     */
     IDENTIFIER(Tag.HAS_VALUE),
 
-    /** String literal token, has a string value of its content */
+    /**
+     * String literal token, has a string value of its content
+     */
     STRING(Tag.HAS_VALUE),
 
     /**
@@ -62,100 +69,164 @@ public enum TokenKind {
      */
     FLOAT(Tag.HAS_VALUE),
 
-    /** 'True' literal boolean token */
+    /**
+     * 'True' literal boolean token
+     */
     TRUE,
 
-    /** 'False' literal boolean token */
+    /**
+     * 'False' literal boolean token
+     */
     FALSE,
 
-    /** The "break" keyword */
+    /**
+     * The "break" keyword
+     */
     BREAK,
 
-    /** The "continue" keyword */
+    /**
+     * The "continue" keyword
+     */
     CONTINUE,
 
-    /** The "return" keyword */
+    /**
+     * The "return" keyword
+     */
     RETURN,
 
-    /** The dot symbol (.) */
+    /**
+     * The dot symbol (.)
+     */
     DOT,
 
-    /** The bang or exclamation symbol (!) */
+    /**
+     * The bang or exclamation symbol (!)
+     */
     BANG,
 
-    /** Double ampersand token (&&) */
+    /**
+     * Double ampersand token (&&)
+     */
     AMPAMP,
 
-    /** Double bar token (||) */
+    /**
+     * Double bar token (||)
+     */
     BARBAR,
 
-    /** Less-than token (<) */
+    /**
+     * Less-than token (<)
+     */
     LT,
 
-    /** Less-than-or-equal token (<=) */
+    /**
+     * Less-than-or-equal token (<=)
+     */
     LTE,
 
-    /** Greater-than token (>) */
+    /**
+     * Greater-than token (>)
+     */
     GT,
 
-    /** Greater-than-or-equal token (>=) */
+    /**
+     * Greater-than-or-equal token (>=)
+     */
     GTE,
 
-    /** Equal symbol (=) */
+    /**
+     * Equal symbol (=)
+     */
     EQ,
 
-    /** Equal-equal token (==) */
+    /**
+     * Equal-equal token (==)
+     */
     EQEQ,
 
-    /** Bang-eq token (!=) */
+    /**
+     * Bang-eq token (!=)
+     */
     BANGEQ,
 
-    /** Star symbol (*) */
+    /**
+     * Star symbol (*)
+     */
     STAR,
 
-    /** Slash symbol (/) */
+    /**
+     * Slash symbol (/)
+     */
     SLASH,
 
-    /** Plus symbol (+) */
+    /**
+     * Plus symbol (+)
+     */
     PLUS,
 
-    /** Hyphen/sub symbol (-) */
+    /**
+     * Hyphen/sub symbol (-)
+     */
     SUB,
 
-    /** Left-parenthesis symbol "(" */
+    /**
+     * Left-parenthesis symbol "("
+     */
     LPAREN,
 
-    /** Right-parenthesis symbol ")" */
+    /**
+     * Right-parenthesis symbol ")"
+     */
     RPAREN,
 
-    /** Left-brace symbol "{" */
+    /**
+     * Left-brace symbol "{"
+     */
     LBRACE,
 
-    /** Right-brace symbol "}" */
+    /**
+     * Right-brace symbol "}"
+     */
     RBRACE,
 
-    /** Question-question token (??) */
+    /**
+     * Question-question token (??)
+     */
     QUESQUES,
 
-    /** Question symbol (?) */
+    /**
+     * Question symbol (?)
+     */
     QUES,
 
-    /** Colon symbol (:) */
+    /**
+     * Colon symbol (:)
+     */
     COLON,
 
-    /** Arrow token (->) */
+    /**
+     * Arrow token (->)
+     */
     ARROW,
 
-    /** Left-bracket token "[" */
+    /**
+     * Left-bracket token "["
+     */
     LBRACKET,
 
-    /** Right-bracket "] */
+    /**
+     * Right-bracket "]
+     */
     RBRACKET,
 
-    /** Comma symbol (,) */
+    /**
+     * Comma symbol (,)
+     */
     COMMA,
 
-    /** Semicolon symbol (;) */
+    /**
+     * Semicolon symbol (;)
+     */
     SEMICOLON;
 
     private final Set<Tag> tags;
@@ -189,7 +260,6 @@ public enum TokenKind {
      * @since 3.0.0
      */
     public enum Tag {
-
         /**
          * A token kind with HAS_VALUE tag will have a variable value,
          * for example, double or string literal tokens have variable
@@ -198,7 +268,5 @@ public enum TokenKind {
          * @since 3.0.0
          */
         HAS_VALUE
-
     }
-
 }
