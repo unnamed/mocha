@@ -92,3 +92,171 @@
 
 # 3 
 3
+
+# math.abs(-5) 
+5
+
+# math.abs(5) 
+5
+
+# math.abs(-0) 
+0
+
+# math.abs(0) 
+0
+
+# math.acos(20) 
+0
+
+# math.acos(30) 
+0
+
+# math.asin(30) 
+0
+
+# math.atan(30) 
+88.09084756700362
+
+# math.atan2(30, 40) 
+36.86989764584402
+
+# math.ceil(30.5) 
+31
+
+# math.ceil(30.1) 
+31
+
+# math.ceil(30.9) 
+31
+
+# math.clamp(30, 10, 20) 
+20
+
+# math.clamp(30, 10, 40) 
+30
+
+# math.clamp(30, 40, 50) 
+40
+
+# math.cos(30) 
+0.8660254037844387
+
+# math.exp(10) 
+22026.465794806718
+
+# math.floor(30.5) 
+30
+
+# math.floor(30.1) 
+30
+
+# math.floor(30.9) 
+30
+
+# math.hermite_blend(0.5) 
+0.5
+
+# math.hermite_blend(0.1) 
+0.028000000000000004
+
+# math.hermite_blend(0.9) 
+0.972
+
+# math.lerp(10, 20, 0.5) 
+15
+
+# math.lerp(10, 20, 0.1) 
+11
+
+# math.lerp(10, 20, 0.9) 
+19
+
+# math.lerprotate(10, 20, 0.5) 
+15
+
+# math.lerprotate(10, 20, 0.1) 
+11
+
+# math.lerprotate(10, 20, 0.9) 
+19
+
+# math.ln(10) 
+2.302585092994046
+
+# math.max(10, 20) 
+20
+
+# math.max(20, 10) 
+20
+
+# math.min(-5, -2) 
+-5
+
+# math.min(-2, -5) 
+-5
+
+# math.min(10, 20) 
+10
+
+# math.min_angle(360) 
+0
+
+# math.min_angle(720) 
+0
+
+# math.min_angle(1080) 
+0
+
+# math.mod(10, 3) 
+1
+
+# math.mod(10, 5) 
+0
+
+# math.mod(10, 10) 
+0
+
+# math.pi 
+3.141592653589793
+
+# math.pow(2, 3) 
+8
+
+# math.pow(2, 4) 
+16
+
+# math.round(10.5) 
+11
+
+# math.round(10.1) 
+10
+
+# math.round(10.9) 
+11
+
+# math.sin(30) 
+0.49999999999999994
+
+# math.sin(60) 
+0.8660254037844386
+
+# math.sqrt(4) 
+2
+
+# math.sqrt(9) 
+3
+
+# math.sqrt(16) 
+4
+
+# math.trunc(10.5) 
+10
+
+# math.trunc(10.1) 
+10
+
+# math.trunc(10.9) 
+10
+
+# math.trunc(-20.4) 
+-20
