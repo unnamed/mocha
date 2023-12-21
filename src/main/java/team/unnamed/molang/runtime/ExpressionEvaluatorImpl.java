@@ -187,7 +187,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         for (int i = 0; i < argumentsExpressions.size(); i++) {
             arguments[i] = new FunctionArgumentImpl(argumentsExpressions.get(i));
         }
-        return ((Function<T>) function).evaluate(this, arguments);
+        return ((Function<T>) function).evaluate(this, new FunctionArguments(arguments));
     }
 
     @Override
@@ -303,11 +303,50 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         float operate(LazyEvaluableFloat a, LazyEvaluableFloat b);
     }
 
+    public static class FunctionArguments implements Function.Arguments {
+        public static final Function.Arguments EMPTY = new FunctionArguments(new Function.Argument[0]);
+
+        private final Function.Argument[] arguments;
+        private int next;
+
+        FunctionArguments(final @NotNull Function.Argument @NotNull [] arguments) {
+            this.arguments = requireNonNull(arguments, "arguments");
+        }
+
+        @Override
+        public Function.@NotNull Argument next() {
+            if (next < arguments.length) {
+                return arguments[next++];
+            } else {
+                return EmptyFunctionArgument.EMPTY;
+            }
+        }
+
+        @Override
+        public int length() {
+            return arguments.length;
+        }
+    }
+
+    private static class EmptyFunctionArgument implements Function.Argument {
+        static final Function.Argument EMPTY = new EmptyFunctionArgument();
+
+        @Override
+        public @Nullable Expression expression() {
+            return null;
+        }
+
+        @Override
+        public @Nullable Object eval() {
+            return null;
+        }
+    }
+
     private class FunctionArgumentImpl implements Function.Argument {
         private final Expression expression;
 
         FunctionArgumentImpl(final @NotNull Expression expression) {
-            this.expression = requireNonNull(expression, "expression");
+            this.expression = expression;
         }
 
         @Override
@@ -320,6 +359,4 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
             return expression.visit(ExpressionEvaluatorImpl.this);
         }
     }
-
-
 }

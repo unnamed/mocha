@@ -29,7 +29,9 @@ import team.unnamed.molang.parser.ast.StatementExpression;
 import team.unnamed.molang.runtime.Function;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -52,16 +54,11 @@ public final class StandardBindings {
             // Parameters:
             // - double:           How many times should we loop
             // - CallableBinding:  The looped expressions
-
-            if (args.length < 2) {
-                return 0;
-            }
-
-            int n = Math.round(ValueConversions.asFloat(args[0].eval()));
-            Object expr = args[1].eval();
+            int n = Math.round((float) args.next().evalAsDouble());
+            Object expr = args.next().eval();
 
             if (expr instanceof Function) {
-                Function callable = (Function) expr;
+                final Function<?> callable = (Function<?>) expr;
                 for (int i = 0; i < n; i++) {
                     Object value = callable.evaluate(ctx);
                     if (value == StatementExpression.Op.BREAK) {
@@ -79,12 +76,7 @@ public final class StandardBindings {
             // - any:              Variable
             // - array:            Any array
             // - CallableBinding:  The looped expressions
-
-            if (args.length < 3) {
-                return 0;
-            }
-
-            final Expression variableExpr = args[0].expression();
+            final Expression variableExpr = args.next().expression();
             if (!(variableExpr instanceof AccessExpression)) {
                 // first argument must be an access expression,
                 // e.g. 'variable.test', 'v.pig', 't.entity' or
@@ -95,7 +87,7 @@ public final class StandardBindings {
             final Expression objectExpr = variableAccess.object();
             final String propertyName = variableAccess.property();
 
-            final Object array = args[1].eval();
+            final Object array = args.next().eval();
             final Iterable<?> arrayIterable;
             if (array instanceof Object[]) {
                 arrayIterable = Arrays.asList((Object[]) array);
@@ -106,7 +98,7 @@ public final class StandardBindings {
                 return 0;
             }
 
-            final Object expr = args[2].eval();
+            final Object expr = args.next().eval();
 
             if (expr instanceof Function) {
                 final Function callable = (Function) expr;
@@ -137,12 +129,13 @@ public final class StandardBindings {
     public static ObjectBinding createQueryBinding(Supplier<PrintStream> stdout) {
         ObjectBinding o = new ObjectBinding();
         o.setProperty("print", (Function) (ctx, args) -> {
-            int len = args.length;
-            if (len > 0) {
-                String[] strArgs = new String[len];
-                for (int i = 0; i < len; i++) {
-                    strArgs[i] = Objects.toString(args[i].eval());
-                }
+            Object val = args.next().eval();
+            if (val != null) {
+                List<String> strArgs = new ArrayList<>();
+                do {
+                    strArgs.add(Objects.toString(val));
+                    val = args.next().eval();
+                } while (val != null);
                 stdout.get().println(String.join(" ", strArgs));
             }
             return 0;

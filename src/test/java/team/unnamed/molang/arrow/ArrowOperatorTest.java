@@ -45,12 +45,8 @@ class ArrowOperatorTest {
         engine.bindVariable("self", self);
         engine.bindQueryFunction("get_name", (ctx, args) -> ctx.entity().name);
         engine.bindQueryFunction("get_nearby_entities", (ctx, args) -> {
-            if (args.length < 1) {
-                return 0;
-            }
-
             final Entity entity = ctx.entity();
-            final double distance = args[0].evalAsDouble();
+            final double distance = args.next().evalAsDouble();
 
             final int from = (int) Math.max(entity.location - distance, 0);
             final int to = (int) Math.min(entity.location + distance, entity.world.entities.length);

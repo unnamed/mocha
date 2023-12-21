@@ -46,18 +46,23 @@ public class MathBinding extends ObjectBinding {
     private final Map<String, Object> bindings = new HashMap<>();
 
     public MathBinding() {
-        bindCallable("abs", (ctx, args) -> Math.abs(args[0].evalAsDouble()));
-        bindCallable("acos", (ctx, args) -> preferZero(Math.acos(args[0].evalAsDouble()) / RADIAN));
-        bindCallable("asin", (ctx, args) -> preferZero(Math.asin(args[0].evalAsDouble()) / RADIAN));
-        bindCallable("atan", (ctx, args) -> Math.atan(args[0].evalAsDouble()) / RADIAN);
-        bindCallable("atan2", (ctx, args) -> Math.atan2(args[0].evalAsDouble(), args[1].evalAsDouble()) / RADIAN);
-        bindCallable("ceil", (ctx, args) -> Math.ceil(args[0].evalAsDouble()));
-        bindCallable("clamp", (ctx, args) -> Math.max(Math.min(args[0].evalAsDouble(), args[2].evalAsDouble()), args[1].evalAsDouble()));
-        bindCallable("cos", (ctx, args) -> Math.cos(args[0].evalAsDouble() * RADIAN));
+        bindCallable("abs", (ctx, args) -> Math.abs(args.next().evalAsDouble()));
+        bindCallable("acos", (ctx, args) -> preferZero(Math.acos(args.next().evalAsDouble()) / RADIAN));
+        bindCallable("asin", (ctx, args) -> preferZero(Math.asin(args.next().evalAsDouble()) / RADIAN));
+        bindCallable("atan", (ctx, args) -> Math.atan(args.next().evalAsDouble()) / RADIAN);
+        bindCallable("atan2", (ctx, args) -> Math.atan2(args.next().evalAsDouble(), args.next().evalAsDouble()) / RADIAN);
+        bindCallable("ceil", (ctx, args) -> Math.ceil(args.next().evalAsDouble()));
+        bindCallable("clamp", (ctx, args) -> {
+            final var value = args.next().evalAsDouble();
+            final var min = args.next().evalAsDouble();
+            final var max = args.next().evalAsDouble();
+            return Math.max(Math.min(value, max), min);
+        });
+        bindCallable("cos", (ctx, args) -> Math.cos(args.next().evalAsDouble() * RADIAN));
         bindCallable("die_roll", (ctx, args) -> {
-            int amount = (int) args[0].evalAsDouble();
-            int low = (int) (args[1].evalAsDouble() * DECIMAL_PART);
-            int high = (int) (args[2].evalAsDouble() * DECIMAL_PART) - low;
+            int amount = (int) args.next().evalAsDouble();
+            int low = (int) (args.next().evalAsDouble() * DECIMAL_PART);
+            int high = (int) (args.next().evalAsDouble() * DECIMAL_PART) - low;
             double result = 0;
             for (int i = 0; i < amount; i++) {
                 result += RANDOM.nextInt(high) + low;
@@ -65,33 +70,33 @@ public class MathBinding extends ObjectBinding {
             return result / DECIMAL_PART;
         });
         bindCallable("die_roll_integer", (ctx, args) -> {
-            int amount = (int) args[0].evalAsDouble();
-            int low = (int) args[1].evalAsDouble();
-            int high = (int) args[2].evalAsDouble();
+            int amount = (int) args.next().evalAsDouble();
+            int low = (int) args.next().evalAsDouble();
+            int high = (int) args.next().evalAsDouble();
             int result = 0;
             for (int i = 0; i < amount; i++) {
                 result += RANDOM.nextInt(low, high);
             }
             return result;
         });
-        bindCallable("exp", (ctx, args) -> Math.exp(args[0].evalAsDouble()));
-        bindCallable("floor", (ctx, args) -> Math.floor(args[0].evalAsDouble()));
+        bindCallable("exp", (ctx, args) -> Math.exp(args.next().evalAsDouble()));
+        bindCallable("floor", (ctx, args) -> Math.floor(args.next().evalAsDouble()));
         bindCallable("hermite_blend", (ctx, args) -> {
-            final var t = args[0].evalAsDouble();
+            final var t = args.next().evalAsDouble();
             final var t2 = t * t;
             final var t3 = t2 * t;
             return 3 * t2 - 2 * t3;
         });
         bindCallable("lerp", (ctx, args) -> {
-            final var start = args[0].evalAsDouble();
-            final var end = args[1].evalAsDouble();
-            final var lerp = args[2].evalAsDouble();
+            final var start = args.next().evalAsDouble();
+            final var end = args.next().evalAsDouble();
+            final var lerp = args.next().evalAsDouble();
             return start + lerp * (end - start);
         });
         bindCallable("lerprotate", (ctx, args) -> {
-            double start = radify(args[0].evalAsDouble());
-            double end = radify(args[1].evalAsDouble());
-            double lerp = args[2].evalAsDouble();
+            double start = radify(args.next().evalAsDouble());
+            double end = radify(args.next().evalAsDouble());
+            double lerp = args.next().evalAsDouble();
 
             if (start > end) {
                 // swap
@@ -107,12 +112,12 @@ public class MathBinding extends ObjectBinding {
                 return start + lerp * diff;
             }
         });
-        bindCallable("ln", (ctx, args) -> Math.log(args[0].evalAsDouble()));
-        bindCallable("max", (ctx, args) -> Math.max(args[0].evalAsDouble(), args[1].evalAsDouble()));
-        bindCallable("min", (ctx, args) -> Math.min(args[0].evalAsDouble(), args[1].evalAsDouble()));
+        bindCallable("ln", (ctx, args) -> Math.log(args.next().evalAsDouble()));
+        bindCallable("max", (ctx, args) -> Math.max(args.next().evalAsDouble(), args.next().evalAsDouble()));
+        bindCallable("min", (ctx, args) -> Math.min(args.next().evalAsDouble(), args.next().evalAsDouble()));
         bindCallable("min_angle", (ctx, args) -> {
             // Minimize angle magnitude (in degrees) into the range [-180, 180]
-            double angle = args[0].evalAsDouble();
+            double angle = args.next().evalAsDouble();
             // todo: is there any faster way to do this? brain hurts rn
             while (angle > 180)
                 angle -= 360;
@@ -120,16 +125,16 @@ public class MathBinding extends ObjectBinding {
                 angle += 360;
             return angle;
         });
-        bindCallable("mod", (ctx, args) -> args[0].evalAsDouble() % args[1].evalAsDouble());
+        bindCallable("mod", (ctx, args) -> args.next().evalAsDouble() % args.next().evalAsDouble());
         bindings.put("pi", Math.PI);
-        bindCallable("pow", (ctx, args) -> Math.pow(args[0].evalAsDouble(), args[1].evalAsDouble()));
-        bindCallable("random", (ctx, args) -> RANDOM.nextDouble() * args[1].evalAsDouble() + args[0].evalAsDouble());
-        bindCallable("random_integer", (ctx, args) -> RANDOM.nextInt((int) args[1].evalAsDouble() - (int) args[0].evalAsDouble()) + (int) args[0].evalAsDouble());
-        bindCallable("round", (ctx, args) -> Math.round(args[0].evalAsDouble()));
-        bindCallable("sin", (ctx, args) -> Math.sin(args[0].evalAsDouble() * RADIAN));
-        bindCallable("sqrt", (ctx, args) -> Math.sqrt(args[0].evalAsDouble()));
+        bindCallable("pow", (ctx, args) -> Math.pow(args.next().evalAsDouble(), args.next().evalAsDouble()));
+        bindCallable("random", (ctx, args) -> RANDOM.nextDouble(args.next().evalAsDouble(), args.next().evalAsDouble()));
+        bindCallable("random_integer", (ctx, args) -> RANDOM.nextInt((int) args.next().evalAsDouble(), (int) args.next().evalAsDouble()));
+        bindCallable("round", (ctx, args) -> Math.round(args.next().evalAsDouble()));
+        bindCallable("sin", (ctx, args) -> Math.sin(args.next().evalAsDouble() * RADIAN));
+        bindCallable("sqrt", (ctx, args) -> Math.sqrt(args.next().evalAsDouble()));
         bindCallable("trunc", (ctx, args) -> {
-            final var value = args[0].evalAsDouble();
+            final var value = args.next().evalAsDouble();
             return value - value % 1;
         });
     }

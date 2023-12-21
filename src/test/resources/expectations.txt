@@ -260,3 +260,126 @@
 
 # math.trunc(-20.4) 
 -20
+
+# math.abs() 
+0
+
+# math.abs(5, 20) 
+5
+
+# math.abs 
+0
+
+# math.acos() 
+90
+
+# math.acos(0.333333, 0.666666) 
+70.52879962262516
+
+# math.acos 
+0
+
+# math.asin() 
+0
+
+# math.asin(0.333333, 0.666666) 
+19.471200377374846
+
+# math.asin 
+0
+
+# math.atan() 
+0
+
+# math.atan(30, 40) 
+88.09084756700362
+
+# math.atan 
+0
+
+# math.atan2() 
+0
+
+# math.atan2(30, 40, 50) 
+36.86989764584402
+
+# math.atan2(20) 
+90
+
+# math.atan2 
+0
+
+# math.ceil() 
+0
+
+# math.ceil 
+0
+
+# math.ceil(1, 2, 3) 
+1
+
+# math.clamp() 
+0
+
+# math.clamp(1, 2) 
+2
+
+# math.clamp(1) 
+0
+
+# math.clamp 
+0
+
+# math.cos() 
+1
+
+# math.cos 
+0
+
+# math.cos(1, 3, 5) 
+0.9998476951563913
+
+# math.exp 
+0
+
+# math.exp() 
+1
+
+# math.exp(-12, 20) 
+0.00000614421235332821
+
+# math.floor 
+0
+
+# math.floor() 
+0
+
+# math.floor(1, 2, 3) 
+1
+
+# math.hermite_blend(60) 
+-421200
+
+# math.hermite_blend() 
+0
+
+# math.hermite_blend 
+0
+
+# math.hermite_blend(0.1, 0.2, 0.3) 
+0.028000000000000004
+
+# math.lerp(10, 20, 50, 20) 
+510
+
+# math.lerp 
+0
+
+# math.lerp() 
+0
+
+# math.lerp(1, 2) 
+1
+
+# math.lerp(1, 2, 3) 
+4

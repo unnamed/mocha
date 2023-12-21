@@ -49,7 +49,47 @@ public interface Function<T> {
      * @return The function result
      * @since 3.0.0
      */
-    @Nullable Object evaluate(final @NotNull ExecutionContext<T> context, final @NotNull Argument @NotNull ... arguments);
+    @Nullable Object evaluate(final @NotNull ExecutionContext<T> context, final @NotNull Arguments arguments);
+
+    /**
+     * Executes this function.
+     *
+     * @param context The execution context
+     * @return The function result
+     * @since 3.0.0
+     */
+    default @Nullable Object evaluate(final @NotNull ExecutionContext<T> context) {
+        return evaluate(context, Arguments.empty());
+    }
+
+    /**
+     * Represents a collection of {@link Function} {@link Argument}s.
+     *
+     * @since 3.0.0
+     */
+    interface Arguments {
+        static @NotNull Arguments empty() {
+            return ExpressionEvaluatorImpl.FunctionArguments.EMPTY;
+        }
+
+        /**
+         * Gets the next argument. If there are
+         * no more arguments, returns an {@link Argument}
+         * with no expression and that can be evaluated
+         * to null-like values (0 for numbers).
+         *
+         * @return The next argument.
+         */
+        @NotNull Argument next();
+
+        /**
+         * Gets the amount of arguments.
+         *
+         * @return The amount of arguments.
+         * @since 3.0.0
+         */
+        int length();
+    }
 
     /**
      * Represents a {@link Function} argument. It is an expression
@@ -59,12 +99,14 @@ public interface Function<T> {
      */
     interface Argument {
         /**
-         * Gets the argument expression.
+         * Gets the argument expression. Null if and only if
+         * the argument wasn't actually provided and is just
+         * returned by {@link Arguments} for ease of use.
          *
          * @return The argument expression.
          * @since 3.0.0
          */
-        @NotNull Expression expression();
+        @Nullable Expression expression();
 
         /**
          * Evaluates the argument expression.

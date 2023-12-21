@@ -27,7 +27,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import team.unnamed.molang.runtime.binding.StandardBindings;
 
-import javax.script.ScriptException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,8 +73,6 @@ public class FibonacciTest {
 
         try (Reader reader = new InputStreamReader(FibonacciTest.class.getClassLoader().getResourceAsStream("fibonacci.molang"))) {
             result = engine.eval(reader);
-        } catch (ScriptException e) {
-            throw new IOException("Evaluation failed", e);
         }
 
         // now check the output

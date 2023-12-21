@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
 
-import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,11 +84,10 @@ public class CompareTest {
                     // eval expression
                     try {
                         List<Expression> expressions = ENGINE.parse(expression);
-                        Object result = ENGINE.eval(expressions);
-                        Assertions.assertTrue(result instanceof Number, "Result is a number");
+                        final double result = ENGINE.eval(expressions);
                         Assertions.assertEquals(
                                 expectedValue,
-                                ((Number) result).floatValue(),
+                                (float) result,
                                 () -> "Incorrect result. Parsed syntax tree:\n\t" + expressions.stream()
                                         .map(Expression::toString)
                                         .collect(Collectors.joining(";\n\t")) + ";\n"
@@ -97,8 +95,6 @@ public class CompareTest {
                         );
                     } catch (ParseException e) {
                         Assertions.fail("Failed to parse expression: " + expression, e);
-                    } catch (ScriptException e) {
-                        Assertions.fail("Failed to eval expression '" + expression + "'", e);
                     }
                 }
             }
