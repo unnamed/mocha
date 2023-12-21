@@ -65,6 +65,10 @@ public final class ValueConversions {
         }
     }
 
+    public static double preferZero(final double value) {
+        return Double.isNaN(value) || Double.isInfinite(value) ? 0D : value;
+    }
+
     @Contract(value = "null -> null; !null -> !null", pure = true)
     public static @Nullable String asString(final @Nullable Object obj) {
         return Objects.toString(obj, null);

@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import static team.unnamed.molang.runtime.binding.ValueConversions.preferZero;
+
 /**
  * Math function bindings inside an object
  * binding, commonly named 'math'
@@ -45,13 +47,13 @@ public class MathBinding extends ObjectBinding {
 
     public MathBinding() {
         bindCallable("abs", (ctx, args) -> Math.abs(args[0].evalAsDouble()));
-        bindCallable("acos", (ctx, args) -> Math.acos(args[0].evalAsDouble()) / RADIAN);
-        bindCallable("asin", (ctx, args) -> Math.asin(args[0].evalAsDouble()) / RADIAN);
+        bindCallable("acos", (ctx, args) -> preferZero(Math.acos(args[0].evalAsDouble()) / RADIAN));
+        bindCallable("asin", (ctx, args) -> preferZero(Math.asin(args[0].evalAsDouble()) / RADIAN));
         bindCallable("atan", (ctx, args) -> Math.atan(args[0].evalAsDouble()) / RADIAN);
         bindCallable("atan2", (ctx, args) -> Math.atan2(args[0].evalAsDouble(), args[1].evalAsDouble()) / RADIAN);
         bindCallable("ceil", (ctx, args) -> Math.ceil(args[0].evalAsDouble()));
         bindCallable("clamp", (ctx, args) -> Math.max(Math.min(args[0].evalAsDouble(), args[2].evalAsDouble()), args[1].evalAsDouble()));
-        bindCallable("cos", (ctx, args) -> Math.cos(args[0].evalAsDouble()));
+        bindCallable("cos", (ctx, args) -> Math.cos(args[0].evalAsDouble() * RADIAN));
         bindCallable("die_roll", (ctx, args) -> {
             int amount = (int) args[0].evalAsDouble();
             int low = (int) (args[1].evalAsDouble() * DECIMAL_PART);
@@ -124,7 +126,7 @@ public class MathBinding extends ObjectBinding {
         bindCallable("random", (ctx, args) -> RANDOM.nextDouble() * args[1].evalAsDouble() + args[0].evalAsDouble());
         bindCallable("random_integer", (ctx, args) -> RANDOM.nextInt((int) args[1].evalAsDouble() - (int) args[0].evalAsDouble()) + (int) args[0].evalAsDouble());
         bindCallable("round", (ctx, args) -> Math.round(args[0].evalAsDouble()));
-        bindCallable("sin", (ctx, args) -> Math.sin(toRadians(args[0])));
+        bindCallable("sin", (ctx, args) -> Math.sin(args[0].evalAsDouble() * RADIAN));
         bindCallable("sqrt", (ctx, args) -> Math.sqrt(args[0].evalAsDouble()));
         bindCallable("trunc", (ctx, args) -> {
             final var value = args[0].evalAsDouble();
