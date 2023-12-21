@@ -23,7 +23,10 @@
  */
 package team.unnamed.molang.runtime.binding;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public final class ValueConversions {
 
@@ -62,4 +65,8 @@ public final class ValueConversions {
         }
     }
 
+    @Contract(value = "null -> null; !null -> !null", pure = true)
+    public static @Nullable String asString(final @Nullable Object obj) {
+        return Objects.toString(obj, null);
+    }
 }

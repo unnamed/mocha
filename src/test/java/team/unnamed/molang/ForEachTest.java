@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ForEachTest {
     @Test
     void test() throws Exception {
-        final MolangEngine engine = MolangEngine.create();
+        final MolangEngine<?> engine = MolangEngine.create();
         engine.bindDefaults();
         engine.bindVariable("list_people", (Function) (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
 

@@ -36,7 +36,7 @@ import team.unnamed.molang.runtime.binding.ObjectBinding;
  *
  * @since 3.0.0
  */
-public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluatorImpl */ extends ExecutionContext, ExpressionVisitor<Object> {
+public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvaluatorImpl */ extends ExecutionContext<T>, ExpressionVisitor<Object> {
     /**
      * Creates a new {@link ExpressionEvaluator} instance with
      * the given bindings.
@@ -46,8 +46,8 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static @NotNull ExpressionEvaluator evaluator(final @Nullable Object entity, final @NotNull ObjectBinding bindings) {
-        return new ExpressionEvaluatorImpl(entity, bindings);
+    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @Nullable T entity, final @NotNull ObjectBinding bindings) {
+        return new ExpressionEvaluatorImpl<>(entity, bindings);
     }
 
     /**
@@ -58,7 +58,7 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static @NotNull ExpressionEvaluator evaluator(final @NotNull ObjectBinding bindings) {
+    static @NotNull ExpressionEvaluator<?> evaluator(final @NotNull ObjectBinding bindings) {
         return evaluator(null, bindings);
     }
 
@@ -69,7 +69,7 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static @NotNull ExpressionEvaluator evaluator() {
+    static @NotNull ExpressionEvaluator<?> evaluator() {
         return evaluator(ObjectBinding.EMPTY);
     }
 
@@ -97,7 +97,7 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @return The child expression evaluator.
      * @since 3.0.0
      */
-    @NotNull ExpressionEvaluator createChild();
+    @NotNull ExpressionEvaluator<T> createChild();
 
     /**
      * Creates a new, child, expression evaluator.
@@ -111,7 +111,7 @@ public /* sealed */ interface ExpressionEvaluator /* permits ExpressionEvaluator
      * @return The child expression evaluator.
      * @since 3.0.0
      */
-    @NotNull ExpressionEvaluator createChild(final @Nullable Object entity);
+    <R> @NotNull ExpressionEvaluator<R> createChild(final @Nullable R entity);
 
     /**
      * Pops the return value, set by the last "return"

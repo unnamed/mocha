@@ -33,7 +33,7 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
+public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> {
 
     private static final Evaluator[] BINARY_EVALUATORS = {
             bool((a, b) -> a.eval() && b.eval()),
@@ -105,11 +105,11 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
             arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
     };
 
-    private final Object entity;
+    private final T entity;
     private final ObjectBinding bindings;
     private @Nullable Object returnValue;
 
-    public ExpressionEvaluatorImpl(final @Nullable Object entity, final @NotNull ObjectBinding bindings) {
+    public ExpressionEvaluatorImpl(final @Nullable T entity, final @NotNull ObjectBinding bindings) {
         this.entity = entity;
         this.bindings = requireNonNull(bindings, "bindings");
     }
@@ -136,21 +136,20 @@ public final class ExpressionEvaluatorImpl implements ExpressionEvaluator {
     }
 
     @Override
-    public <T> T entity(final @NotNull Class<T> clazz) {
-        requireNonNull(clazz, "clazz");
-        return clazz.cast(entity);
+    public T entity() {
+        return entity;
     }
 
     @Override
-    public @NotNull ExpressionEvaluator createChild(final @Nullable Object entity) {
-        return new ExpressionEvaluatorImpl(entity, this.bindings);
+    public <R> @NotNull ExpressionEvaluator<R> createChild(final @Nullable R entity) {
+        return new ExpressionEvaluatorImpl<>(entity, this.bindings);
     }
 
     @Override
-    public @NotNull ExpressionEvaluator createChild() {
+    public @NotNull ExpressionEvaluator<T> createChild() {
         // Note that it will have its own returnValue, but same bindings
         // (Should we create new bindings?)
-        return new ExpressionEvaluatorImpl(this.entity, this.bindings);
+        return new ExpressionEvaluatorImpl<>(this.entity, this.bindings);
     }
 
     @Override

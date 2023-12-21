@@ -25,7 +25,6 @@ package team.unnamed.molang.arrow;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.molang.MolangEngine;
-import team.unnamed.molang.runtime.Function;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +40,16 @@ class ArrowOperatorTest {
         new Entity(world, 15, "Chicken");
         new Entity(world, 0, "Zombie");
 
-        final MolangEngine engine = MolangEngine.create();
+        final MolangEngine<Entity> engine = MolangEngine.create(self);
         engine.bindDefaults();
         engine.bindVariable("self", self);
-        engine.bindVariable("get_name", (Function) (ctx, args) -> ctx.entity(Entity.class).name);
-        engine.bindVariable("get_nearby_entities", (Function) (ctx, args) -> {
+        engine.bindQueryFunction("get_name", (ctx, args) -> ctx.entity().name);
+        engine.bindQueryFunction("get_nearby_entities", (ctx, args) -> {
             if (args.length < 1) {
                 return 0;
             }
 
-            final Entity entity = ctx.entity(Entity.class);
+            final Entity entity = ctx.entity();
             final double distance = args[0].evalAsDouble();
 
             final int from = (int) Math.max(entity.location - distance, 0);
@@ -69,11 +68,11 @@ class ArrowOperatorTest {
         final Object result = engine.eval(
                 "t.first = 1;\n"
                         + "v.result = '';\n"
-                        + "for_each(t.nearby, v.self->v.get_nearby_entities(5), {\n"
+                        + "for_each(t.nearby, v.self->q.get_nearby_entities(5), {\n"
                         + "    (!t.first) ? {\n"
                         + "        v.result = v.result + ', ';\n"
                         + "    };\n"
-                        + "    v.result = v.result + t.nearby->v.get_name();\n"
+                        + "    v.result = v.result + t.nearby->q.get_name();\n"
                         + "    t.first = 0;\n"
                         + "});\n"
                         + "return v.result;"
@@ -84,11 +83,11 @@ class ArrowOperatorTest {
         final Object result2 = engine.eval(
                 "t.first = 1;\n"
                         + "v.result = '';\n"
-                        + "for_each(t.nearby, v.self->v.get_nearby_entities(500), {\n" // Same code but 500 instead of 5
+                        + "for_each(t.nearby, v.self->q.get_nearby_entities(500), {\n" // Same code but 500 instead of 5
                         + "    (!t.first) ? {\n"
                         + "        v.result = v.result + ', ';\n"
                         + "    };\n"
-                        + "    v.result = v.result + t.nearby->v.get_name();\n"
+                        + "    v.result = v.result + t.nearby->q.get_name();\n"
                         + "    t.first = 0;\n"
                         + "});\n"
                         + "return v.result;"

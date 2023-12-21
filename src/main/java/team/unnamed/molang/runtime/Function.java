@@ -40,7 +40,7 @@ import team.unnamed.molang.runtime.binding.ValueConversions;
  * @since 3.0.0
  */
 @FunctionalInterface
-public interface Function {
+public interface Function<T> {
     /**
      * Executes this function with the given arguments.
      *
@@ -49,7 +49,7 @@ public interface Function {
      * @return The function result
      * @since 3.0.0
      */
-    @Nullable Object evaluate(final @NotNull ExecutionContext context, final @NotNull Argument @NotNull ... arguments);
+    @Nullable Object evaluate(final @NotNull ExecutionContext<T> context, final @NotNull Argument @NotNull ... arguments);
 
     /**
      * Represents a {@link Function} argument. It is an expression
@@ -82,6 +82,16 @@ public interface Function {
          */
         default double evalAsDouble() {
             return ValueConversions.asDouble(eval());
+        }
+
+        /**
+         * Evaluates the argument expression as a string.
+         *
+         * @return The evaluation result as a string.
+         * @since 3.0.0
+         */
+        default @Nullable String evalAsString() {
+            return ValueConversions.asString(eval());
         }
     }
 }

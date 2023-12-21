@@ -24,6 +24,7 @@
 package team.unnamed.molang;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
@@ -33,10 +34,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-final class MolangEngineImpl implements MolangEngine {
+final class MolangEngineImpl<T> implements MolangEngine<T> {
+    private final T entity;
     private final ObjectBinding bindings;
 
-    public MolangEngineImpl() {
+    public MolangEngineImpl(final @Nullable T entity) {
+        this.entity = entity;
         bindings = new ObjectBinding();
         final ObjectBinding variableBindings = new ObjectBinding();
         bindings.setProperty("variable", variableBindings);
@@ -55,7 +58,7 @@ final class MolangEngineImpl implements MolangEngine {
             localBindings.setProperty("temp", temp);
             localBindings.setProperty("t", temp);
         }
-        ExpressionEvaluator evaluator = ExpressionEvaluator.evaluator(localBindings);
+        ExpressionEvaluator<T> evaluator = ExpressionEvaluator.evaluator(entity, localBindings);
         Object lastResult = 0;
 
         for (Expression expression : expressions) {

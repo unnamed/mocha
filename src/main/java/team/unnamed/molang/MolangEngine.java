@@ -43,13 +43,17 @@ import java.util.List;
  *
  * @since 3.0.0
  */
-public interface MolangEngine {
-    static MolangEngine create() {
-        return new MolangEngineImpl();
+public interface MolangEngine<T> {
+    static <T> @NotNull MolangEngine<T> create(T entity) {
+        return new MolangEngineImpl<>(entity);
     }
 
-    static MolangEngine createDefault() {
-        final MolangEngine engine = create();
+    static MolangEngine<?> create() {
+        return new MolangEngineImpl<>(null);
+    }
+
+    static MolangEngine<?> createDefault() {
+        final MolangEngine<?> engine = create();
         engine.bindDefaults();
         return engine;
     }
@@ -129,7 +133,7 @@ public interface MolangEngine {
 
     void bindQuery(String key, Object binding);
 
-    default void bindQueryFunction(String key, Function function) {
+    default void bindQueryFunction(String key, Function<T> function) {
         @SuppressWarnings("UnnecessaryLocalVariable") final Object binding = function;
         bindQuery(key, binding);
     }
