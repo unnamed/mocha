@@ -31,7 +31,6 @@ import team.unnamed.molang.runtime.Function;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 import team.unnamed.molang.runtime.binding.StandardBindings;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -88,21 +87,13 @@ public interface MolangEngine<T> {
         }
     }
 
-    Object eval(List<Expression> expressions) throws ScriptException;
+    double eval(List<Expression> expressions);
 
-    default Object eval(Reader reader) throws ScriptException {
-        try {
-            return eval(parse(reader));
-        } catch (IOException e) {
-            throw new ScriptException(e);
-        }
-    }
+    double eval(Reader reader);
 
-    default Object eval(String script) throws ScriptException {
-        try (Reader reader = new StringReader(script)) {
+    default double eval(String script) {
+        try (StringReader reader = new StringReader(script)) {
             return eval(reader);
-        } catch (IOException e) {
-            throw new ScriptException(e);
         }
     }
 

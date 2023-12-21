@@ -34,6 +34,11 @@ import team.unnamed.molang.runtime.binding.ObjectBinding;
  * (interprets) the expressions it visits and returns a single
  * value, commonly, a double value.
  *
+ * <p>It is recommended to use {@link team.unnamed.molang.MolangEngine}
+ * evaluation instead of this. While this interface's evaluation may return
+ * non-numerical values, the {@link team.unnamed.molang.MolangEngine} will
+ * ensure them to be numerical, to comply with the Molang specification.</p>
+ *
  * @since 3.0.0
  */
 public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvaluatorImpl */ extends ExecutionContext<T>, ExpressionVisitor<Object> {

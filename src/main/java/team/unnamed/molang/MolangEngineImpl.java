@@ -25,9 +25,11 @@ package team.unnamed.molang;
 
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.molang.parser.MolangParser;
+import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
+import team.unnamed.molang.runtime.binding.ValueConversions;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -47,7 +49,7 @@ final class MolangEngineImpl<T> implements MolangEngine<T> {
 
 
     @Override
-    public Object eval(List<Expression> expressions) {
+    public double eval(List<Expression> expressions) {
         // create bindings that just apply for this evaluation
         final ObjectBinding localBindings = new ObjectBinding();
         localBindings.setAllFrom(this.bindings);
@@ -69,7 +71,21 @@ final class MolangEngineImpl<T> implements MolangEngine<T> {
             }
         }
 
-        return lastResult;
+        // ensure returned value is a number
+        return ValueConversions.asDouble(lastResult);
+    }
+
+    @Override
+    public double eval(Reader reader) {
+        final List<Expression> parsed;
+        try {
+            parsed = parse(reader);
+        } catch (ParseException e) {
+            return 0;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read from given reader", e);
+        }
+        return eval(parsed);
     }
 
     @Override
