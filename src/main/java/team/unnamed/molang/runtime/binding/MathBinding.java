@@ -74,6 +74,18 @@ public class MathBinding extends ObjectBinding {
         });
         bindCallable("exp", (ctx, args) -> Math.exp(args[0].evalAsDouble()));
         bindCallable("floor", (ctx, args) -> Math.floor(args[0].evalAsDouble()));
+        bindCallable("hermite_blend", (ctx, args) -> {
+            final var t = args[0].evalAsDouble();
+            final var t2 = t * t;
+            final var t3 = t2 * t;
+            return 3 * t2 - 2 * t3;
+        });
+        bindCallable("lerp", (ctx, args) -> {
+            final var start = args[0].evalAsDouble();
+            final var end = args[1].evalAsDouble();
+            final var lerp = args[2].evalAsDouble();
+            return start + lerp * (end - start);
+        });
         bindCallable("lerprotate", (ctx, args) -> {
             double start = radify(args[0].evalAsDouble());
             double end = radify(args[1].evalAsDouble());
@@ -93,18 +105,31 @@ public class MathBinding extends ObjectBinding {
                 return start + lerp * diff;
             }
         });
-        // TODO: hermite_blend, lerp, lerprotate
         bindCallable("ln", (ctx, args) -> Math.log(args[0].evalAsDouble()));
         bindCallable("max", (ctx, args) -> Math.max(args[0].evalAsDouble(), args[1].evalAsDouble()));
         bindCallable("min", (ctx, args) -> Math.min(args[0].evalAsDouble(), args[1].evalAsDouble()));
+        bindCallable("min_angle", (ctx, args) -> {
+            // Minimize angle magnitude (in degrees) into the range [-180, 180]
+            double angle = args[0].evalAsDouble();
+            // todo: is there any faster way to do this? brain hurts rn
+            while (angle > 180)
+                angle -= 360;
+            while (angle < -180)
+                angle += 360;
+            return angle;
+        });
         bindCallable("mod", (ctx, args) -> args[0].evalAsDouble() % args[1].evalAsDouble());
         bindings.put("pi", Math.PI);
         bindCallable("pow", (ctx, args) -> Math.pow(args[0].evalAsDouble(), args[1].evalAsDouble()));
-        // TODO: random, random_integer
+        bindCallable("random", (ctx, args) -> RANDOM.nextDouble() * args[1].evalAsDouble() + args[0].evalAsDouble());
+        bindCallable("random_integer", (ctx, args) -> RANDOM.nextInt((int) args[1].evalAsDouble() - (int) args[0].evalAsDouble()) + (int) args[0].evalAsDouble());
         bindCallable("round", (ctx, args) -> Math.round(args[0].evalAsDouble()));
         bindCallable("sin", (ctx, args) -> Math.sin(toRadians(args[0])));
         bindCallable("sqrt", (ctx, args) -> Math.sqrt(args[0].evalAsDouble()));
-        // TODO: trunc
+        bindCallable("trunc", (ctx, args) -> {
+            final var value = args[0].evalAsDouble();
+            return value - value % 1;
+        });
     }
 
     private static double radify(double n) {
