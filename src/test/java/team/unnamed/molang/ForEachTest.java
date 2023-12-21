@@ -24,7 +24,6 @@
 package team.unnamed.molang;
 
 import org.junit.jupiter.api.Test;
-import team.unnamed.molang.runtime.Function;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -37,7 +36,7 @@ class ForEachTest {
     void test() throws Exception {
         final MolangEngine<?> engine = MolangEngine.create();
         engine.bindDefaults();
-        engine.bindVariable("list_people", (Function) (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
+        engine.bindQueryFunction("list_people", (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
 
         Object result;
         try (Reader reader = new InputStreamReader(ForEachTest.class.getClassLoader().getResourceAsStream("for_each.molang"))) {

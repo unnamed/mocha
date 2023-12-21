@@ -24,7 +24,6 @@
 package team.unnamed.molang;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import team.unnamed.molang.parser.MolangParser;
 import team.unnamed.molang.parser.ast.Expression;
 import team.unnamed.molang.runtime.ExpressionEvaluator;
@@ -38,7 +37,7 @@ final class MolangEngineImpl<T> implements MolangEngine<T> {
     private final T entity;
     private final ObjectBinding bindings;
 
-    public MolangEngineImpl(final @Nullable T entity) {
+    public MolangEngineImpl(final T entity) {
         this.entity = entity;
         bindings = new ObjectBinding();
         final ObjectBinding variableBindings = new ObjectBinding();

@@ -29,13 +29,14 @@ import team.unnamed.molang.parser.ast.*;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 import team.unnamed.molang.runtime.binding.ValueConversions;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
 public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> {
 
-    private static final Evaluator[] BINARY_EVALUATORS = {
+    private static final List<Evaluator> BINARY_EVALUATORS = Arrays.asList(
             bool((a, b) -> a.eval() && b.eval()),
             bool((a, b) -> a.eval() || b.eval()),
             compare((a, b) -> a.eval() < b.eval()),
@@ -103,7 +104,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
             },
             arithmetic((a, b) -> ((a.eval() == b.eval()) ? 1.0F : 0.0F)), // eq
             arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
-    };
+    );
 
     private final T entity;
     private final ObjectBinding bindings;
@@ -186,7 +187,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         for (int i = 0; i < argumentsExpressions.size(); i++) {
             arguments[i] = new FunctionArgumentImpl(argumentsExpressions.get(i));
         }
-        return ((Function) function).evaluate(this, arguments);
+        return ((Function<T>) function).evaluate(this, arguments);
     }
 
     @Override
@@ -197,8 +198,8 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     @Override
     public Object visitExecutionScope(@NotNull ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
-        ExpressionEvaluator evaluatorForThisScope = createChild();
-        return (Function) (context, arguments) -> {
+        ExpressionEvaluator<T> evaluatorForThisScope = createChild();
+        return (Function<T>) (context, arguments) -> {
             for (Expression expression : expressions) {
                 // eval expression, ignore result
                 expression.visit(evaluatorForThisScope);
@@ -220,7 +221,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
 
     @Override
     public Object visitBinary(@NotNull BinaryExpression expression) {
-        return BINARY_EVALUATORS[expression.op().ordinal()].eval(
+        return BINARY_EVALUATORS.get(expression.op().ordinal()).eval(
                 this,
                 expression.left(),
                 expression.right()
@@ -278,7 +279,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     private interface Evaluator {
-        Object eval(ExpressionEvaluator evaluator, Expression a, Expression b);
+        Object eval(ExpressionEvaluator<?> evaluator, Expression a, Expression b);
     }
 
     private interface BooleanOperator {

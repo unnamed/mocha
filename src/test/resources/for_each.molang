@@ -1,6 +1,6 @@
 v.i = 0;
 v.x = '';
-for_each(v.name, v.list_people(), {
+for_each(v.name, query.list_people(), {
     (v.i != 0) ? {
         v.x = v.x + ', ';
     };

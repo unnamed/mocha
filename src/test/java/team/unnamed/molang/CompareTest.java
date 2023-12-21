@@ -42,17 +42,7 @@ import java.util.stream.Collectors;
  */
 public class CompareTest {
 
-    private static final MolangEngine ENGINE = MolangEngine.createDefault();
-
-    /**
-     * Compares this library results with MolangJS
-     * of JannisX11
-     * https://github.com/JannisX11/MolangJS
-     */
-    @Test
-    public void compare_with_molangjs() throws IOException {
-        compare("expectations.txt", "tests.txt");
-    }
+    private static final MolangEngine<?> ENGINE = MolangEngine.createDefault();
 
     //#region Helper code
     private static BufferedReader createResourceReader(String name) {
@@ -113,6 +103,16 @@ public class CompareTest {
                 }
             }
         }
+    }
+
+    /**
+     * Compares this library results with MolangJS
+     * of JannisX11
+     * https://github.com/JannisX11/MolangJS
+     */
+    @Test
+    public void compare_with_molangjs() throws IOException {
+        compare("expectations.txt", "tests.txt");
     }
     //#endregion
 

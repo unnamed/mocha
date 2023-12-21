@@ -58,7 +58,7 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static @NotNull ExpressionEvaluator<?> evaluator(final @NotNull ObjectBinding bindings) {
+    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @NotNull ObjectBinding bindings) {
         return evaluator(null, bindings);
     }
 
@@ -69,7 +69,7 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static @NotNull ExpressionEvaluator<?> evaluator() {
+    static <T> @NotNull ExpressionEvaluator<T> evaluator() {
         return evaluator(ObjectBinding.EMPTY);
     }
 
@@ -111,7 +111,7 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @return The child expression evaluator.
      * @since 3.0.0
      */
-    <R> @NotNull ExpressionEvaluator<R> createChild(final @Nullable R entity);
+    <R> ExpressionEvaluator<R> createChild(final R entity);
 
     /**
      * Pops the return value, set by the last "return"

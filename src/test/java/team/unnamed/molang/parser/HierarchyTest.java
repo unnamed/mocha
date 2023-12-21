@@ -35,6 +35,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HierarchyTest {
 
+    private static void assertCreateSameTree(String expr1, String expr2) throws Exception {
+        MolangEngine<?> engine = MolangEngine.createDefault();
+        List<Expression> expressions1 = engine.parse(expr1);
+        List<Expression> expressions2 = engine.parse(expr2);
+        assertEquals(expressions1, expressions2, () -> "Expressions:\n\t- " +
+                expr1 +
+                "\n\t- " +
+                expr2 +
+                "\nGenerated different syntax trees:\n\t- " +
+                expressions1 +
+                "\n\t- " +
+                expressions2);
+    }
+
     @Test
     public void test_logical_hierarchy() throws Exception {
         List<Expression> expressions = MolangEngine.createDefault().parse("age <= 5 || age >= 70");
@@ -90,20 +104,6 @@ public class HierarchyTest {
         assertCreateSameTree("(((10 + (5 * 8)) + 20) - (8 / 4)) + ((9 / 4) * 5)", "10 + 5 * 8 + 20 - 8 / 4 + 9 / 4 * 5");
         // eq, neq
         assertCreateSameTree("(((true) && (false == false)) || (true))", "true && false == false || true");
-    }
-
-    private static void assertCreateSameTree(String expr1, String expr2) throws Exception {
-        MolangEngine engine = MolangEngine.createDefault();
-        List<Expression> expressions1 = engine.parse(expr1);
-        List<Expression> expressions2 = engine.parse(expr2);
-        assertEquals(expressions1, expressions2, () -> "Expressions:\n\t- " +
-                expr1 +
-                "\n\t- " +
-                expr2 +
-                "\nGenerated different syntax trees:\n\t- " +
-                expressions1 +
-                "\n\t- " +
-                expressions2);
     }
 
 }
