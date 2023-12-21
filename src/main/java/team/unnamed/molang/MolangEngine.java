@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import team.unnamed.molang.lexer.Cursor;
 import team.unnamed.molang.parser.ParseException;
 import team.unnamed.molang.parser.ast.Expression;
+import team.unnamed.molang.runtime.Function;
 import team.unnamed.molang.runtime.binding.ObjectBinding;
 import team.unnamed.molang.runtime.binding.StandardBindings;
 
@@ -125,4 +126,11 @@ public interface MolangEngine {
     }
 
     void bindVariable(String key, Object binding);
+
+    void bindQuery(String key, Object binding);
+
+    default void bindQueryFunction(String key, Function function) {
+        @SuppressWarnings("UnnecessaryLocalVariable") final Object binding = function;
+        bindQuery(key, binding);
+    }
 }

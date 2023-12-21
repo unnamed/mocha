@@ -82,6 +82,12 @@ final class MolangEngineImpl implements MolangEngine {
     }
 
     @Override
+    public void bindQuery(String key, Object binding) {
+        final ObjectBinding queryBinding = (ObjectBinding) bindings.getProperty("query");
+        queryBinding.setProperty(key, binding);
+    }
+
+    @Override
     public List<Expression> parse(Reader reader) throws IOException {
         return MolangParser.parser(reader).parseAll();
     }
