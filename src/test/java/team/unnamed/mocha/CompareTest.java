@@ -84,6 +84,14 @@ public class CompareTest {
                             (float) result,
                             () -> "Incorrect result for expression: " + expression
                     );
+                    
+                    // compile and eval expression
+                    final double compileResult = ENGINE.compile(expression).evaluate();
+                    Assertions.assertEquals(
+                            expectedValue,
+                            (float) compileResult,
+                            () -> "Incorrect result for compiled expression: " + expression
+                    );
                 }
             }
         }
