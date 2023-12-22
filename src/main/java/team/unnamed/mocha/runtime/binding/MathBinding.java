@@ -38,6 +38,8 @@ import static team.unnamed.mocha.runtime.binding.ValueConversions.preferZero;
  * binding, commonly named 'math'
  */
 public class MathBinding extends ObjectBinding {
+    @MolangNative("math.pi")
+    public static final double PI = Math.PI;
 
     private static final double RADIAN = Math.toRadians(1);
 
@@ -280,11 +282,6 @@ public class MathBinding extends ObjectBinding {
     @MolangNative("math.mod")
     public static double mod(final double a, final double b) {
         return a % b;
-    }
-
-    @MolangNative("math.pi")
-    public static double pi() {
-        return Math.PI;
     }
 
     @MolangNative("math.pow")
