@@ -30,6 +30,8 @@ import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.ExpressionEvaluator;
 import team.unnamed.mocha.runtime.binding.ObjectBinding;
 import team.unnamed.mocha.runtime.binding.ValueConversions;
+import team.unnamed.mocha.runtime.jvm.MolangCompiler;
+import team.unnamed.mocha.runtime.jvm.MolangNullaryFunction;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -37,6 +39,7 @@ import java.util.List;
 
 final class MolangEngineImpl<T> implements MolangEngine<T> {
     private final T entity;
+    private final MolangCompiler compiler = MolangCompiler.compiler();
     private final ObjectBinding bindings;
 
     public MolangEngineImpl(final T entity) {
@@ -86,6 +89,11 @@ final class MolangEngineImpl<T> implements MolangEngine<T> {
             throw new RuntimeException("Failed to read from given reader", e);
         }
         return eval(parsed);
+    }
+
+    @Override
+    public @NotNull MolangNullaryFunction compile(@NotNull String script) {
+        return compiler.compile(script);
     }
 
     @Override

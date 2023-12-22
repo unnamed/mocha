@@ -30,6 +30,7 @@ import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.Function;
 import team.unnamed.mocha.runtime.binding.ObjectBinding;
 import team.unnamed.mocha.runtime.binding.StandardBindings;
+import team.unnamed.mocha.runtime.jvm.MolangNullaryFunction;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -96,6 +97,16 @@ public interface MolangEngine<T> {
             return eval(reader);
         }
     }
+
+    /**
+     * Compiles the given script into a Molang function
+     * with no arguments.
+     *
+     * @param script The script to compile.
+     * @return The compiled function.
+     * @since 3.0.0
+     */
+    @NotNull MolangNullaryFunction compile(final @NotNull String script);
 
     /**
      * Returns the bindings for this Molang engine
