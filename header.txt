@@ -1,4 +1,4 @@
-This file is part of molang, licensed under the MIT license
+This file is part of mocha, licensed under the MIT license
 
 Copyright (c) 2021-2023 Unnamed Team
 

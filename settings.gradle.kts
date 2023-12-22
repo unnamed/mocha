@@ -1,2 +1,2 @@
-rootProject.name = "molang"
+rootProject.name = "mocha"
 

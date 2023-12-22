@@ -1,9 +1,10 @@
-# molang
-[![Build Status](https://img.shields.io/github/actions/workflow/status/unnamed/molang/build.yml?branch=main)](https://github.com/unnamed/molang/actions/workflows/build.yml)
+# mocha
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/unnamed/mocha/build.yml?branch=main)](https://github.com/unnamed/mocha/actions/workflows/build.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](license.txt)
 [![Discord](https://img.shields.io/discord/683899335405994062)](https://discord.gg/xbba2fy)
 
-A lightweight, fast and efficient Molang parser and interpreter for Java 8+. Molang is a
+`mocha`, a lightweight, fast and efficient Molang parser and interpreter for Java 8+. Molang is a
 simple **expression-based** language designed for fast and **data-driven** calculation of
 values at run-time.
 
