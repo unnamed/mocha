@@ -45,6 +45,8 @@ final class FunctionCompileState {
     private final Map<String, Object> requirements = new HashMap<>();
     private final Map<String, RegisteredMolangNative> natives;
     private final Map<String, Integer> argumentParameterIndexes;
+    private final Map<String, Integer> localsByName = new HashMap<>();
+    private int maxLocals = 0;
 
     FunctionCompileState(
             MolangCompilerImpl compiler,
@@ -89,5 +91,17 @@ final class FunctionCompileState {
 
     public @NotNull Map<String, Integer> argumentParameterIndexes() {
         return argumentParameterIndexes;
+    }
+
+    public int maxLocals() {
+        return maxLocals;
+    }
+
+    public void maxLocals(int maxLocals) {
+        this.maxLocals = maxLocals;
+    }
+
+    public Map<String, Integer> getLocalsByName() {
+        return localsByName;
     }
 }

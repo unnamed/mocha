@@ -34,6 +34,7 @@ import team.unnamed.mocha.runtime.binding.ValueConversions;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,11 +43,15 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
     private final Bytecode bytecode;
     private final Method method;
 
+    private final FunctionCompileState functionCompileState;
     private final Map<String, RegisteredMolangNative> natives;
     private final Map<String, Object> requirements;
     private final Map<String, Integer> argumentParameterIndexes;
 
+    private final Map<String, Integer> localsByName = new HashMap<>();
+
     MolangCompilingVisitor(final @NotNull FunctionCompileState compileState) {
+        this.functionCompileState = compileState;
         this.classPool = compileState.classPool();
         this.bytecode = compileState.bytecode();
         this.method = compileState.method();
@@ -57,6 +62,34 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
     @Override
     public CompileVisitResult visitBinary(final @NotNull BinaryExpression expression) {
+        final BinaryExpression.Op op = expression.op();
+
+        if (op == BinaryExpression.Op.ASSIGN) {
+            final Expression left = expression.left();
+            if (left instanceof AccessExpression) {
+                final Expression objectExpr = ((AccessExpression) left).object();
+                if (objectExpr instanceof IdentifierExpression) {
+                    final String name = ((IdentifierExpression) objectExpr).name();
+                    final String property = ((AccessExpression) left).property();
+
+                    if (name.equals("temp") || name.equals("t")) {
+                        final CompileVisitResult result = expression.right().visit(this);
+                        final int localIndex = localsByName.computeIfAbsent(property, k -> {
+                            int index = functionCompileState.maxLocals();
+                            if (result.lastPushedType() == CtClass.doubleType || result.lastPushedType() == CtClass.longType) {
+                                functionCompileState.maxLocals(index + 2);
+                            } else {
+                                functionCompileState.maxLocals(index + 1);
+                            }
+                            return index;
+                        });
+                        bytecode.addStore(localIndex, CtClass.doubleType);
+                        return null;
+                    }
+                }
+            }
+        }
+
         if (!expression.visit(new RequiresContextVisitor())) {
             // can be evaluated in compile-time
             final double result = ValueConversions.asDouble(expression.visit(ExpressionEvaluator.evaluator()));
@@ -68,7 +101,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         expression.right().visit(this);  // pushes rhs value to stack
 
         //@formatter:off
-        switch (expression.op()) {
+        switch (op) {
             case AND:
             case OR:
             case LT:
@@ -96,9 +129,17 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             }
             case ARROW:
             case NULL_COALESCE:
-                case ASSIGN:
             case CONDITIONAL:
+                break;
             case EQ:
+                bytecode.addOpcode(Bytecode.DCMPL);
+                bytecode.addOpcode(Bytecode.IFEQ);
+                bytecode.addIndex(7);
+                bytecode.addDconst(0D);
+                bytecode.addOpcode(Bytecode.GOTO);
+                bytecode.addIndex(4);
+                bytecode.addDconst(1D);
+                break;
             case NEQ:
                 break;
         }
@@ -144,7 +185,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         switch (expression.op()) {
             case RETURN: {
                 endVisit(); // force visit end
-                break;
+                return new CompileVisitResult(result.lastPushedType(), true);
             }
             case LOGICAL_NEGATION: {
                 // logical negation with doubles! so fun! (i spent 2 hours in the following 8 lines)
@@ -261,6 +302,28 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         } else if (parameterType.equals(boolean.class)) {
             bytecode.addOpcode(Bytecode.I2D);
         }
+        return null;
+    }
+
+    @Override
+    public CompileVisitResult visitAccess(final @NotNull AccessExpression expression) {
+        final Expression objectExpr = expression.object();
+        final String property = expression.property();
+
+        if (objectExpr instanceof IdentifierExpression) {
+            final String name = ((IdentifierExpression) objectExpr).name();
+            if (name.equals("temp") || name.equals("t")) {
+                // temps are locals
+                final Integer localIndex = localsByName.get(property);
+                if (localIndex == null) {
+                    bytecode.addConstZero(CtClass.doubleType);
+                } else {
+                    bytecode.addLoad(localIndex, CtClass.doubleType);
+                }
+                return new CompileVisitResult(CtClass.doubleType);
+            }
+        }
+
         return null;
     }
 

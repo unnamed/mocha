@@ -30,19 +30,24 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
+import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
+import javassist.bytecode.Mnemonic;
 import javassist.bytecode.StackMapTable;
 import javassist.bytecode.stackmap.MapMaker;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.MolangParser;
 import team.unnamed.mocha.parser.ast.Expression;
+import team.unnamed.mocha.runtime.binding.MathBinding;
 
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +62,8 @@ final class MolangCompilerImpl implements MolangCompiler {
     MolangCompilerImpl(final @NotNull ClassLoader classLoader) {
         this.classLoader = requireNonNull(classLoader, "classLoader");
         this.classPool = ClassPool.getDefault();
+
+        registerStaticNatives(MathBinding.class);
     }
 
     @Override
@@ -166,6 +173,7 @@ final class MolangCompilerImpl implements MolangCompiler {
             final CtClass returnCtType = classPool.get(returnType.getName());
 
             final List<Expression> expressions = MolangParser.parseAll(source);
+            System.out.println(expressions);
             final Bytecode bytecode = new Bytecode(scriptCtClass.getClassFile().getConstPool());
 
             final FunctionCompileState compileState = new FunctionCompileState(
@@ -178,39 +186,45 @@ final class MolangCompilerImpl implements MolangCompiler {
                     argumentParameterIndexes
             );
 
+            compileState.maxLocals(ctParameters.length + 1); // this
+
             if (expressions.isEmpty()) {
                 // add only a "return 0", "return" or "return null" instruction
                 bytecode.addConstZero(returnCtType);
             } else {
                 final MolangCompilingVisitor visitor = new MolangCompilingVisitor(compileState);
+                CompileVisitResult lastVisitResult = null;
+
                 for (final Expression expression : expressions) {
-                    expression.visit(visitor);
+                    lastVisitResult = expression.visit(visitor);
                 }
 
-                if (returnType.equals(int.class)) {
-                    bytecode.addOpcode(Bytecode.D2I);
-                } else if (returnType.equals(float.class)) {
-                    bytecode.addOpcode(Bytecode.D2F);
-                } else if (returnType.equals(long.class)) {
-                    bytecode.addOpcode(Bytecode.D2L);
-                } else if (returnType.equals(short.class)) {
-                    bytecode.addOpcode(Bytecode.D2I);
-                    bytecode.addOpcode(Bytecode.I2S);
-                } else if (returnType.equals(byte.class)) {
-                    bytecode.addOpcode(Bytecode.D2I);
-                    bytecode.addOpcode(Bytecode.I2B);
-                } else if (returnType.equals(char.class)) {
-                    bytecode.addOpcode(Bytecode.D2I);
-                    bytecode.addOpcode(Bytecode.I2C);
-                } else if (returnType.equals(boolean.class)) {
-                    bytecode.addOpcode(Bytecode.D2I);
-                    bytecode.addOpcode(Bytecode.I2B);
-                }
+                if (lastVisitResult == null || !lastVisitResult.returned()) {
+                    if (returnType.equals(int.class)) {
+                        bytecode.addOpcode(Bytecode.D2I);
+                    } else if (returnType.equals(float.class)) {
+                        bytecode.addOpcode(Bytecode.D2F);
+                    } else if (returnType.equals(long.class)) {
+                        bytecode.addOpcode(Bytecode.D2L);
+                    } else if (returnType.equals(short.class)) {
+                        bytecode.addOpcode(Bytecode.D2I);
+                        bytecode.addOpcode(Bytecode.I2S);
+                    } else if (returnType.equals(byte.class)) {
+                        bytecode.addOpcode(Bytecode.D2I);
+                        bytecode.addOpcode(Bytecode.I2B);
+                    } else if (returnType.equals(char.class)) {
+                        bytecode.addOpcode(Bytecode.D2I);
+                        bytecode.addOpcode(Bytecode.I2C);
+                    } else if (returnType.equals(boolean.class)) {
+                        bytecode.addOpcode(Bytecode.D2I);
+                        bytecode.addOpcode(Bytecode.I2B);
+                    }
 
-                visitor.endVisit();
+                    visitor.endVisit();
+                }
             }
 
-            bytecode.setMaxLocals(ctParameters.length + 1);
+            bytecode.setMaxLocals(compileState.maxLocals());
 
             final MethodInfo method = new MethodInfo(
                     scriptCtClass.getClassFile().getConstPool(),
@@ -223,6 +237,15 @@ final class MolangCompilerImpl implements MolangCompiler {
             method.setAccessFlags(Modifier.PUBLIC | Modifier.FINAL);
             method.setCodeAttribute(bytecode.toCodeAttribute());
             method.getCodeAttribute().computeMaxStack();
+
+            // print bytecode
+            final CodeIterator it = method.getCodeAttribute().iterator();
+            while (it.hasNext()) {
+                final int index = it.next();
+                final int opcode = it.byteAt(index);
+                final String opcodeName = Mnemonic.OPCODE[opcode];
+                System.out.println(index + " " + opcodeName);
+            }
 
             final StackMapTable stackMapTable = MapMaker.make(classPool, method);
             if (stackMapTable != null) {
@@ -271,6 +294,8 @@ final class MolangCompilerImpl implements MolangCompiler {
                 scriptCtClass.addConstructor(ctConstructor);
             }
 
+            // write class
+            Files.write(Paths.get("test.class"), scriptCtClass.toBytecode());
             final Class<?> compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
 
             // find the constructor with the requirements

@@ -28,9 +28,19 @@ import org.jetbrains.annotations.Nullable;
 
 final class CompileVisitResult {
     private final CtClass lastPushedType;
+    private final boolean returned;
+
+    public CompileVisitResult(final @Nullable CtClass lastPushedType, final boolean returned) {
+        this.lastPushedType = lastPushedType;
+        this.returned = returned;
+    }
 
     public CompileVisitResult(final @Nullable CtClass lastPushedType) {
-        this.lastPushedType = lastPushedType;
+        this(lastPushedType, false);
+    }
+
+    public boolean returned() {
+        return returned;
     }
 
     public @Nullable CtClass lastPushedType() {

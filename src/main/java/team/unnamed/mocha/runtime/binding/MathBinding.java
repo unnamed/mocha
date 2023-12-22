@@ -25,6 +25,7 @@ package team.unnamed.mocha.runtime.binding;
 
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.runtime.Function;
+import team.unnamed.mocha.runtime.jvm.MolangNative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -152,6 +153,175 @@ public class MathBinding extends ObjectBinding {
         }
     }
 
+    @MolangNative("math.abs")
+    public static double abs(final double value) {
+        return Math.abs(value);
+    }
+
+    @MolangNative("math.acos")
+    public static double acos(final double value) {
+        return preferZero(Math.acos(value) / RADIAN);
+    }
+
+    @MolangNative("math.asin")
+    public static double asin(final double value) {
+        return preferZero(Math.asin(value) / RADIAN);
+    }
+
+    @MolangNative("math.atan")
+    public static double atan(final double value) {
+        return Math.atan(value) / RADIAN;
+    }
+
+    @MolangNative("math.atan2")
+    public static double atan2(final double y, final double x) {
+        return Math.atan2(y, x) / RADIAN;
+    }
+
+    @MolangNative("math.ceil")
+    public static double ceil(final double value) {
+        return Math.ceil(value);
+    }
+
+    @MolangNative("math.clamp")
+    public static double clamp(final double value, final double min, final double max) {
+        return Math.max(Math.min(value, max), min);
+    }
+
+    @MolangNative("math.cos")
+    public static double cos(final double value) {
+        return Math.cos(value * RADIAN);
+    }
+
+    @MolangNative("math.die_roll")
+    public static double dieRoll(final double amount, final double low, final double high) {
+        double result = 0;
+        for (int i = 0; i < amount; i++) {
+            result += RANDOM.nextInt((int) high) + low;
+        }
+        return result / DECIMAL_PART;
+    }
+
+    @MolangNative("math.die_roll_integer")
+    public static int dieRollInteger(final double amount, final double low, final double high) {
+        int result = 0;
+        for (int i = 0; i < amount; i++) {
+            result += RANDOM.nextInt((int) low, (int) high);
+        }
+        return result;
+    }
+
+    @MolangNative("math.exp")
+    public static double exp(final double value) {
+        return Math.exp(value);
+    }
+
+    @MolangNative("math.floor")
+    public static double floor(final double value) {
+        return Math.floor(value);
+    }
+
+    @MolangNative("math.hermite_blend")
+    public static double hermiteBlend(final double t) {
+        final var t2 = t * t;
+        final var t3 = t2 * t;
+        return 3 * t2 - 2 * t3;
+    }
+
+    @MolangNative("math.lerp")
+    public static double lerp(final double start, final double end, final double lerp) {
+        return start + lerp * (end - start);
+    }
+
+    @MolangNative("math.lerprotate")
+    public static double lerpRotate(double start, double end, double lerp) {
+        start = radify(start);
+        end = radify(end);
+
+        if (start > end) {
+            // swap
+            double tmp = start;
+            start = end;
+            end = tmp;
+        }
+
+        double diff = end - start;
+        if (diff > 180F) {
+            return radify(end + lerp * (360F - diff));
+        } else {
+            return start + lerp * diff;
+        }
+    }
+
+    @MolangNative("math.ln")
+    public static double ln(final double value) {
+        return Math.log(value);
+    }
+
+    @MolangNative("math.max")
+    public static double max(final double a, final double b) {
+        return Math.max(a, b);
+    }
+
+    @MolangNative("math.min")
+    public static double min(final double a, final double b) {
+        return Math.min(a, b);
+    }
+
+    @MolangNative("math.min_angle")
+    public static double minAngle(double angle) {
+        while (angle > 180)
+            angle -= 360;
+        while (angle < -180)
+            angle += 360;
+        return angle;
+    }
+
+    @MolangNative("math.mod")
+    public static double mod(final double a, final double b) {
+        return a % b;
+    }
+
+    @MolangNative("math.pi")
+    public static double pi() {
+        return Math.PI;
+    }
+
+    @MolangNative("math.pow")
+    public static double pow(final double a, final double b) {
+        return Math.pow(a, b);
+    }
+
+    @MolangNative("math.random")
+    public static double random(final double min, final double max) {
+        return RANDOM.nextDouble(min, max);
+    }
+
+    @MolangNative("math.random_integer")
+    public static int randomInteger(final double min, final double max) {
+        return RANDOM.nextInt((int) min, (int) max);
+    }
+
+    @MolangNative("math.round")
+    public static double round(final double value) {
+        return Math.round(value);
+    }
+
+    @MolangNative("math.sin")
+    public static double sin(final double value) {
+        return Math.sin(value * RADIAN);
+    }
+
+    @MolangNative("math.sqrt")
+    public static double sqrt(final double value) {
+        return Math.sqrt(value);
+    }
+
+    @MolangNative("math.trunc")
+    public static double trunc(final double value) {
+        return value - value % 1;
+    }
+
     private void bindCallable(final @NotNull String name, final @NotNull Function binding) {
         bindings.put(name, binding);
     }
@@ -164,5 +334,4 @@ public class MathBinding extends ObjectBinding {
     @Override
     public void setProperty(String name, Object value) {
     }
-
 }
