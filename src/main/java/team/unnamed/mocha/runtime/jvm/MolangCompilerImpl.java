@@ -210,8 +210,7 @@ final class MolangCompilerImpl implements MolangCompiler {
                 visitor.endVisit();
             }
 
-            bytecode.setMaxLocals(16);
-            bytecode.setMaxStack(24);
+            bytecode.setMaxLocals(ctParameters.length + 1);
 
             final MethodInfo method = new MethodInfo(
                     scriptCtClass.getClassFile().getConstPool(),
@@ -223,6 +222,8 @@ final class MolangCompilerImpl implements MolangCompiler {
             );
             method.setAccessFlags(Modifier.PUBLIC | Modifier.FINAL);
             method.setCodeAttribute(bytecode.toCodeAttribute());
+            method.getCodeAttribute().computeMaxStack();
+
             final StackMapTable stackMapTable = MapMaker.make(classPool, method);
             if (stackMapTable != null) {
                 method.getCodeAttribute().setAttribute(stackMapTable);
@@ -263,7 +264,10 @@ final class MolangCompilerImpl implements MolangCompiler {
                     constructorBytecode.addPutfield(scriptCtClass, fieldName, Descriptor.of(classPool.get(fieldValue.getClass().getName()))); // set!
                     parameterIndex++;
                 }
+                constructorBytecode.addReturn(null); // return
                 ctConstructor.getMethodInfo().setCodeAttribute(constructorBytecode.toCodeAttribute());
+                ctConstructor.getMethodInfo().getCodeAttribute().computeMaxStack();
+                ctConstructor.getMethodInfo().getCodeAttribute().setMaxLocals(constructorParameterCtTypes.length + 1);
                 scriptCtClass.addConstructor(ctConstructor);
             }
 

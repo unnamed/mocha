@@ -29,6 +29,8 @@ import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.ast.*;
+import team.unnamed.mocha.runtime.ExpressionEvaluator;
+import team.unnamed.mocha.runtime.binding.ValueConversions;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -55,6 +57,13 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
     @Override
     public CompileVisitResult visitBinary(final @NotNull BinaryExpression expression) {
+        if (!expression.visit(new RequiresContextVisitor())) {
+            // can be evaluated in compile-time
+            final double result = ValueConversions.asDouble(expression.visit(ExpressionEvaluator.evaluator()));
+            bytecode.addLdc2w(result);
+            return new CompileVisitResult(CtClass.doubleType);
+        }
+
         expression.left().visit(this);   // pushes lhs value to stack
         expression.right().visit(this);  // pushes rhs value to stack
 
@@ -107,7 +116,14 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
     @Override
     public CompileVisitResult visitDouble(final @NotNull DoubleExpression expression) {
-        bytecode.addLdc2w(expression.value());
+        final double value = expression.value();
+        if (value == 1.0D) {
+            bytecode.addOpcode(Bytecode.DCONST_1);
+        } else if (value == 0.0D) {
+            bytecode.addOpcode(Bytecode.DCONST_0);
+        } else {
+            bytecode.addLdc2w(value);
+        }
         return new CompileVisitResult(CtClass.doubleType);
     }
 
@@ -168,6 +184,17 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
     @Override
     public CompileVisitResult visitTernaryConditional(final @NotNull TernaryConditionalExpression expression) {
+        final Expression conditionExpr = expression.condition();
+        final Expression trueExpr = expression.trueExpression();
+        final Expression falseExpr = expression.falseExpression();
+
+        if (!conditionExpr.visit(new RequiresContextVisitor())) {
+            // condition can be evaluated in compile-time
+            final boolean condition = ValueConversions.asBoolean(conditionExpr.visit(ExpressionEvaluator.evaluator()));
+            final Expression resultExpr = condition ? trueExpr : falseExpr;
+            return resultExpr.visit(this);
+        }
+
         final CompileVisitResult conditionRes = expression.condition().visit(this); // push value to stack
         if (conditionRes.lastPushedType() != null && !conditionRes.is(CtClass.booleanType) && !conditionRes.is(CtClass.intType)) {
             bytecode.addConstZero(conditionRes.lastPushedType()); // push 0
@@ -185,10 +212,10 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
         bytecode.addOpcode(Bytecode.IFEQ); // if false skip
         bytecode.addIndex(7);
-        final CompileVisitResult trueRes = expression.trueExpression().visit(this); // push true value to stack
+        final CompileVisitResult trueRes = trueExpr.visit(this); // push true value to stack
         bytecode.addOpcode(Bytecode.GOTO); // skip pushing false value
         bytecode.addIndex(4);
-        final CompileVisitResult falseRes = expression.falseExpression().visit(this); // push false value to stack
+        final CompileVisitResult falseRes = falseExpr.visit(this); // push false value to stack
         return null;
     }
 

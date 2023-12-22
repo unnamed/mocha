@@ -93,7 +93,7 @@ public class CompareTest {
                                 (float) compileResult,
                                 () -> "Incorrect result for compiled expression: " + expression
                         );
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         throw new IllegalStateException("Error while compiling expression: " + expression, e);
                     }
                 }
