@@ -267,7 +267,7 @@ final class MolangCompilerImpl implements MolangCompiler {
                 scriptCtClass.addConstructor(ctConstructor);
             }
 
-            final Class<?> compiledClass = classPool.toClass(scriptCtClass, null, classLoader, null);
+            final Class<?> compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
 
             // find the constructor with the requirements
             final Class<?>[] constructorParameterTypes = new Class[requirements.size()];
