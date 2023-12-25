@@ -173,24 +173,31 @@ final class MolangParserImpl implements MolangParser {
             case EOF:
                 return left;
             case LPAREN: { // CALL EXPRESSION: "left("
-                lexer.next();
+                current = lexer.next();
                 final List<Expression> arguments = new ArrayList<>();
 
                 // start reading the arguments
-                while (true) {
-                    arguments.add(MolangParserImpl.parseCompoundExpression(lexer, 0));
-                    // update current character
-                    current = lexer.current();
-                    if (current.kind() == TokenKind.EOF) {
-                        throw new ParseException("Found EOF before closing RPAREN", null);
-                    } else if (current.kind() == TokenKind.RPAREN) {
-                        lexer.next();
-                        break;
-                    } else {
-                        if (current.kind() != TokenKind.COMMA) {
-                            throw new ParseException("Expected a comma", null);
+                if (current.kind() == TokenKind.EOF) {
+                    throw new ParseException("Found EOF before closing RPAREN", null);
+                } else if (current.kind() == TokenKind.RPAREN) {
+                    // immediately closed
+                    lexer.next();
+                } else {
+                    while (true) {
+                        arguments.add(MolangParserImpl.parseCompoundExpression(lexer, 0));
+                        // update current character
+                        current = lexer.current();
+                        if (current.kind() == TokenKind.EOF) {
+                            throw new ParseException("Found EOF before closing RPAREN", null);
+                        } else if (current.kind() == TokenKind.RPAREN) {
+                            lexer.next();
+                            break;
+                        } else {
+                            if (current.kind() != TokenKind.COMMA) {
+                                throw new ParseException("Expected a comma", null);
+                            }
+                            lexer.next();
                         }
-                        lexer.next();
                     }
                 }
 
