@@ -47,11 +47,14 @@ import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static java.util.Objects.requireNonNull;
 
 @ApiStatus.Internal
 public final class MolangCompiler {
+    private static final Random RANDOM = new Random();
+
     private final ClassLoader classLoader;
     private final ClassPool classPool;
 
@@ -118,7 +121,7 @@ public final class MolangCompiler {
         }
 
         final String scriptClassName = getClass().getPackage().getName() + ".MolangFunctionImpl_" + clazz.getSimpleName() + "_" + implementedMethod.getName()
-                + "_" + Long.toHexString(System.currentTimeMillis());
+                + "_" + Long.toHexString(System.currentTimeMillis()) + "_" + Integer.toHexString(RANDOM.nextInt(2024));
 
         try {
             CtClass scriptCtClass = classPool.makeClass(scriptClassName);
