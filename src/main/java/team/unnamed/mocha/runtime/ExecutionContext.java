@@ -31,4 +31,8 @@ public interface ExecutionContext<T> {
     T entity();
 
     @Nullable Object eval(final @NotNull Expression expression);
+
+    @Nullable Object flag();
+
+    void flag(final @Nullable Object flag);
 }

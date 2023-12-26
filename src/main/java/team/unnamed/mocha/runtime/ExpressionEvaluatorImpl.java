@@ -149,6 +149,16 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     @Override
+    public @Nullable Object flag() {
+        return flag;
+    }
+
+    @Override
+    public void flag(final @Nullable Object flag) {
+        this.flag = flag;
+    }
+
+    @Override
     public T entity() {
         return entity;
     }
@@ -204,13 +214,14 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                 // - double:           How many times should we loop
                 // - CallableBinding:  The looped expressions
                 int n = Math.round((float) args.next().eval().getAsNumber());
-                Object expr = args.next().eval();
+                Value expr = args.next().eval();
 
                 if (expr instanceof Function) {
                     final Function<T> callable = (Function<T>) expr;
                     for (int i = 0; i < n; i++) {
-                        Object value = callable.evaluate(this);
-                        if (value == StatementExpression.Op.BREAK) {
+                        final ExpressionEvaluator<T> evaluatorThisCall = createChild();
+                        callable.evaluate(evaluatorThisCall);
+                        if (evaluatorThisCall.flag() == StatementExpression.Op.BREAK) {
                             break;
                         }
                         // (not necessary, callable already exits when returnValue
@@ -283,16 +294,14 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     @Override
     public @NotNull Value visitExecutionScope(final @NotNull ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
-        ExpressionEvaluator<T> evaluatorForThisScope = createChild();
         return (Function<T>) (context, arguments) -> {
             for (Expression expression : expressions) {
                 // eval expression, ignore result
-                expression.visit(evaluatorForThisScope);
+                context.eval(expression);
 
                 // check for return values
-                final Value returnValue = evaluatorForThisScope.popReturnValue();
-                if (returnValue != null) {
-                    return returnValue;
+                if (context.flag() != null) {
+                    break;
                 }
             }
             return NumberValue.zero();
