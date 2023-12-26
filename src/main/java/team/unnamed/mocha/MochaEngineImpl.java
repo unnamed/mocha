@@ -66,7 +66,6 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         Value lastResult = NumberValue.zero();
 
         for (Expression expression : expressions) {
-            System.out.println(expression);
             lastResult = expression.visit(evaluator);
             Value returnValue = evaluator.popReturnValue();
             if (returnValue != null) {

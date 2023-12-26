@@ -434,7 +434,6 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         });
 
         if (!(functionValue instanceof Function<?>)) {
-            System.out.println("not a function: " + functionValue + " for " + functionExpr);
             // not a function, just add 0
             bytecode.addDconst(0D);
             return new CompileVisitResult(CtClass.doubleType);

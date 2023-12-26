@@ -30,10 +30,8 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
-import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
-import javassist.bytecode.Mnemonic;
 import javassist.bytecode.StackMapTable;
 import javassist.bytecode.stackmap.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
@@ -208,13 +206,13 @@ public final class MolangCompiler {
             method.setCodeAttribute(bytecode.toCodeAttribute());
 
             // print bytecode
-            final CodeIterator it = method.getCodeAttribute().iterator();
-            while (it.hasNext()) {
-                final int index = it.next();
-                final int opcode = it.byteAt(index);
-                final String opcodeName = Mnemonic.OPCODE[opcode];
-                System.out.println(index + " " + opcodeName);
-            }
+            // final CodeIterator it = method.getCodeAttribute().iterator();
+            // while (it.hasNext()) {
+            //    final int index = it.next();
+            //    final int opcode = it.byteAt(index);
+            //    final String opcodeName = Mnemonic.OPCODE[opcode];
+            //    System.out.println(index + " " + opcodeName);
+            // }
 
             method.getCodeAttribute().computeMaxStack();
 
