@@ -25,23 +25,31 @@ package team.unnamed.mocha.runtime;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-
-import java.io.InputStreamReader;
-import java.io.Reader;
+import team.unnamed.mocha.runtime.value.ArrayValue;
+import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.NumberValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ForEachTest {
     @Test
-    void test() throws Exception {
-        final MochaEngine<?> engine = MochaEngine.create();
-        engine.bindDefaults();
-        //engine.bindQueryFunction("list_people", (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
+    void test() {
+        final String code = String.join("\n",
+                "v.sum = 0;",
+                "for_each(v.age, query.list_ages(), {",
+                "    v.sum = v.sum + v.age;",
+                "});",
+                "return v.sum;");
 
-        Object result;
-        try (Reader reader = new InputStreamReader(ForEachTest.class.getClassLoader().getResourceAsStream("for_each.molang"))) {
-            result = engine.eval(reader);
-        }
-        assertEquals("Andre, John, Ian, Salva", result);
+        final MochaEngine<?> engine = MochaEngine.createStandard();
+        engine.scope().query().set("list_ages", (Function<?>) (ctx, args) -> ArrayValue.of(
+                NumberValue.of(18),
+                NumberValue.of(16),
+                NumberValue.of(40),
+                NumberValue.of(24)
+        ));
+
+        final double result = engine.eval(code);
+        assertEquals(98, result);
     }
 }
