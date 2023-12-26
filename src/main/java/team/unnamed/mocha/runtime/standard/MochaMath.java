@@ -26,7 +26,6 @@ package team.unnamed.mocha.runtime.standard;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.runtime.binding.BindExternalFunction;
 import team.unnamed.mocha.runtime.binding.Binding;
-import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
@@ -62,34 +61,34 @@ public final class MochaMath implements ObjectValue {
     private final Map<String, Value> entries = new HashMap<>();
 
     public MochaMath() {
-        bindFunction("abs", Math::abs);
-        bindFunction("acos", MochaMath::acos);
-        bindFunction("asin", MochaMath::asin);
-        bindFunction("atan", MochaMath::atan);
-        bindFunction("atan2", MochaMath::atan2);
-        bindFunction("ceil", Math::ceil);
-        bindFunction("clamp", MochaMath::clamp);
-        bindFunction("cos", MochaMath::cos);
-        bindFunction("die_roll", MochaMath::dieRoll);
-        bindFunction("die_roll_integer", MochaMath::dieRollInteger);
-        bindFunction("exp", Math::exp);
-        bindFunction("floor", Math::floor);
-        bindFunction("hermite_blend", MochaMath::hermiteBlend);
-        bindFunction("lerp", MochaMath::lerp);
-        bindFunction("lerprotate", MochaMath::lerpRotate);
-        bindFunction("ln", Math::log);
-        bindFunction("max", Math::max);
-        bindFunction("min", Math::min);
-        bindFunction("min_angle", MochaMath::minAngle);
-        bindFunction("mod", MochaMath::mod);
+        setFunction("abs", Math::abs);
+        setFunction("acos", MochaMath::acos);
+        setFunction("asin", MochaMath::asin);
+        setFunction("atan", MochaMath::atan);
+        setFunction("atan2", MochaMath::atan2);
+        setFunction("ceil", Math::ceil);
+        setFunction("clamp", MochaMath::clamp);
+        setFunction("cos", MochaMath::cos);
+        setFunction("die_roll", MochaMath::dieRoll);
+        setFunction("die_roll_integer", MochaMath::dieRollInteger);
+        setFunction("exp", Math::exp);
+        setFunction("floor", Math::floor);
+        setFunction("hermite_blend", MochaMath::hermiteBlend);
+        setFunction("lerp", MochaMath::lerp);
+        setFunction("lerprotate", MochaMath::lerpRotate);
+        setFunction("ln", Math::log);
+        setFunction("max", Math::max);
+        setFunction("min", Math::min);
+        setFunction("min_angle", MochaMath::minAngle);
+        setFunction("mod", MochaMath::mod);
         entries.put("pi", NumberValue.of(Math.PI));
-        bindFunction("pow", Math::pow);
-        bindFunction("random", MochaMath::random);
-        bindFunction("random_integer", MochaMath::randomInteger);
-        bindFunction("round", Math::round);
-        bindFunction("sin", MochaMath::sin);
-        bindFunction("sqrt", Math::sqrt);
-        bindFunction("trunc", MochaMath::trunc);
+        setFunction("pow", Math::pow);
+        setFunction("random", MochaMath::random);
+        setFunction("random_integer", MochaMath::randomInteger);
+        setFunction("round", Math::round);
+        setFunction("sin", MochaMath::sin);
+        setFunction("sqrt", Math::sqrt);
+        setFunction("trunc", MochaMath::trunc);
     }
 
     private static double radify(double n) {
@@ -213,29 +212,5 @@ public final class MochaMath implements ObjectValue {
     @Override
     public @NotNull Value get(final @NotNull String name) {
         return entries.getOrDefault(name, NumberValue.zero());
-    }
-
-    private void bindFunction(final @NotNull String name, final @NotNull DoubleFunction1 function) {
-        entries.put(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber())));
-    }
-
-    private void bindFunction(final @NotNull String name, final @NotNull DoubleFunction2 function) {
-        entries.put(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber(), args.next().eval().getAsNumber())));
-    }
-
-    private void bindFunction(final @NotNull String name, final @NotNull DoubleFunction3 function) {
-        entries.put(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber(), args.next().eval().getAsNumber(), args.next().eval().getAsNumber())));
-    }
-
-    interface DoubleFunction1 {
-        double apply(double n);
-    }
-
-    interface DoubleFunction2 {
-        double apply(double n1, double n2);
-    }
-
-    interface DoubleFunction3 {
-        double apply(double n1, double n2, double n3);
     }
 }

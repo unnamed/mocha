@@ -26,4 +26,9 @@ final class GlobalScopeImpl implements GlobalScope {
     public void forceSet(final @NotNull String name, final @NotNull Value value) {
         bindings.put(name, value);
     }
+
+    @Override
+    public @NotNull Map<String, Value> entries() {
+        return bindings;
+    }
 }
