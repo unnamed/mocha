@@ -26,21 +26,31 @@ package team.unnamed.mocha.runtime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
+import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.value.ObjectValue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.Reader;
+import java.util.StringJoiner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FibonacciTest {
 
     @Test
     @DisplayName("Test executing the fibonacci.molang code")
     public void test() throws IOException {
+        final String code = "v.x = 0;\n" +
+                "v.y = 1;\n" +
+                "loop(10, {\n" +
+                "    query.log(v.x);\n" +
+                "    t.x = v.x + v.y;\n" +
+                "    v.x = v.y;\n" +
+                "    v.y = t.x;\n" +
+                "});\n" +
+                "return v.y;";
 
         // generate the expected output
         // (we do this like this to ensure it's equal on every system,
@@ -66,25 +76,25 @@ public class FibonacciTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream stdout = new PrintStream(out);
 
-        MochaEngine<?> engine = MochaEngine.create();
-        engine.bindDefaults();
-        //engine.bindings().setProperty("query", StandardBindings.createQueryBinding(() -> stdout));
-        Object result;
+        MochaEngine<?> engine = MochaEngine.createDefault();
+        engine.scope().forceSet("query", (ObjectValue) name -> {
+            if (name.equalsIgnoreCase("log")) {
+                return (Function<?>) (ctx, args) -> {
+                    int i = 0;
+                    final StringJoiner joiner = new StringJoiner(" ");
+                    while (i++ < args.length()) {
+                        joiner.add(args.next().eval().getAsString());
+                    }
+                    stdout.println(joiner);
+                    return NumberValue.zero();
+                };
+            }
+            return NumberValue.zero();
+        });
+        final double result = engine.eval(code);
 
-        try (Reader reader = new InputStreamReader(FibonacciTest.class.getClassLoader().getResourceAsStream("fibonacci.molang"))) {
-            result = engine.eval(reader);
-        }
-
-        // now check the output
-        assertEquals(
-                expected,
-                out.toString()
-        );
-        assertTrue(result instanceof Number);
-        assertEquals(
-                89.0F,
-                ((Number) result).floatValue()
-        );
+        assertEquals(expected, out.toString());
+        assertEquals(89D, result);
     }
 
 }

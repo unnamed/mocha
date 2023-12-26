@@ -1,9 +1,0 @@
-v.x = 0;
-v.y = 1;
-loop(10, {
-    query.print(v.x);
-    t.x = v.x + v.y;
-    v.x = v.y;
-    v.y = t.x;
-});
-return v.y;
