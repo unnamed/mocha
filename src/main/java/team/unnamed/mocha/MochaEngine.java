@@ -32,6 +32,7 @@ import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 import team.unnamed.mocha.runtime.standard.MochaMath;
 import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -127,6 +128,10 @@ public interface MochaEngine<T> {
      */
     default void bindDefaults() {
         scope().forceSet("math", JavaObjectBinding.of(MochaMath.class, new MochaMath()));
+
+        final MutableObjectBinding variableBinding = new MutableObjectBinding();
+        scope().forceSet("variable", variableBinding);
+        scope().forceSet("v", variableBinding);
     }
 
     void bindVariable(String key, Object binding);
