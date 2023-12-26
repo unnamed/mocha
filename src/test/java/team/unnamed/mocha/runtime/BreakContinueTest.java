@@ -21,29 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime.jvm;
+package team.unnamed.mocha.runtime;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
-import team.unnamed.mocha.runtime.compiled.Named;
 
-public class MolangCompilerTest {
-    @Test
-    void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
-    }
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BreakContinueTest {
 
     @Test
-    void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //compiler.registerStaticNatives(MolangCompilerTest.class);
-        System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
+    public void test_break() throws Exception {
+        Object value = MochaEngine.createDefault().eval(
+                "t.i = 0;" +
+                        "loop(10, {" +
+                        "t.i = t.i + 1;" +
+                        "(t.i >= 5) ? break;" +
+                        "});" +
+                        "return t.i;"
+        );
+        assertTrue(value instanceof Number, "Value must be a number!");
+        assertEquals(5.0D, ((Number) value).doubleValue());
     }
 
-    public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
+    @Test
+    public void test_continue() throws Exception {
+        Object value = MochaEngine.createDefault().eval(
+                "t.i = 0;" +
+                        "t.sum = 0;" +
+                        "loop(20, {" +
+                        "t.i = t.i + 1;" +
+                        "((t.i < 8) || (t.i > 17)) ? continue;" +
+                        "t.sum = t.sum + t.i;" +
+                        "});" +
+                        "return t.sum;"
+        );
+        assertTrue(value instanceof Number, "Value must be a number!");
+        assertEquals(125.0D, ((Number) value).doubleValue());
     }
+
 }

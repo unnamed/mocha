@@ -21,29 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime.jvm;
+package team.unnamed.mocha.runtime;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
-import team.unnamed.mocha.runtime.compiled.Named;
 
-public class MolangCompilerTest {
+import java.io.InputStreamReader;
+import java.io.Reader;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class ForEachTest {
     @Test
-    void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
-    }
+    void test() throws Exception {
+        final MochaEngine<?> engine = MochaEngine.create();
+        engine.bindDefaults();
+        //engine.bindQueryFunction("list_people", (ctx, args) -> Arrays.asList("Andre", "John", "Ian", "Salva"));
 
-    @Test
-    void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //compiler.registerStaticNatives(MolangCompilerTest.class);
-        System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
-    }
-
-    public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
+        Object result;
+        try (Reader reader = new InputStreamReader(ForEachTest.class.getClassLoader().getResourceAsStream("for_each.molang"))) {
+            result = engine.eval(reader);
+        }
+        assertEquals("Andre, John, Ian, Salva", result);
     }
 }

@@ -21,29 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime.jvm;
+package team.unnamed.mocha.runtime.arrow;
 
-import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
-import team.unnamed.mocha.runtime.compiled.Named;
-
-public class MolangCompilerTest {
-    @Test
-    void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
-    }
-
-    @Test
-    void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //compiler.registerStaticNatives(MolangCompilerTest.class);
-        System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
-    }
-
-    public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
-    }
+class World { // 1-dimensional world
+    Entity[] entities = new Entity[64];
 }

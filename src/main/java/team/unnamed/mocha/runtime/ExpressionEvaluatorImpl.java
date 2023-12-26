@@ -26,8 +26,13 @@ package team.unnamed.mocha.runtime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.*;
-import team.unnamed.mocha.runtime.binding.ObjectBinding;
-import team.unnamed.mocha.runtime.binding.ValueConversions;
+import team.unnamed.mocha.runtime.value.ArrayValue;
+import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.MutableObjectBinding;
+import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.value.ObjectValue;
+import team.unnamed.mocha.runtime.value.StringValue;
+import team.unnamed.mocha.runtime.value.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,12 +49,12 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
             compare((a, b) -> a.eval() > b.eval()),
             compare((a, b) -> a.eval() >= b.eval()),
             (evaluator, a, b) -> {
-                final Object aVal = a.visit(evaluator);
-                final Object bVal = b.visit(evaluator);
-                if (aVal instanceof String || bVal instanceof String) {
-                    return aVal + String.valueOf(bVal);
+                final Value aVal = a.visit(evaluator);
+                final Value bVal = b.visit(evaluator);
+                if (aVal.isString() || bVal.isString()) {
+                    return StringValue.of(aVal.getAsString() + bVal.getAsString());
                 } else {
-                    return ValueConversions.asFloat(aVal) + ValueConversions.asFloat(bVal);
+                    return NumberValue.of(aVal.getAsNumber() + bVal.getAsNumber());
                 }
             },
             arithmetic((a, b) -> a.eval() - b.eval()),
@@ -57,83 +62,90 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
             arithmetic((a, b) -> {
                 // Molang allows division by zero,
                 // which is always equal to 0
-                float dividend = a.eval();
-                float divisor = b.eval();
+                final double dividend = a.eval();
+                final double divisor = b.eval();
                 if (divisor == 0) return 0;
                 else return dividend / divisor;
             }),
             (evaluator, a, b) -> { // arrow
                 final Object val = a.visit(evaluator);
                 if (val == null) {
-                    return 0;
+                    return NumberValue.zero();
                 } else {
                     return b.visit(evaluator.createChild(val));
                 }
             },
             (evaluator, a, b) -> { // null coalesce
-                Object val = a.visit(evaluator);
-                if (val == null) {
-                    return b.visit(evaluator);
-                } else {
+                final Value val = a.visit(evaluator);
+                if (val.getAsBoolean()) {
                     return val;
+                } else {
+                    return b.visit(evaluator);
                 }
             },
             (evaluator, a, b) -> { // assignation
-                Object val = b.visit(evaluator);
+                final Value val = b.visit(evaluator);
+                // we can only assign to values that are accessed
+                // like:
+                //      temp.x = 1
+                //      t.location.world = 'world'
+                // but not:
+                //      x = 1
+                //      i = 2
                 if (a instanceof AccessExpression) {
-                    AccessExpression access = (AccessExpression) a;
-                    Object binding = access.object().visit(evaluator);
-                    if (binding instanceof ObjectBinding) {
-                        ((ObjectBinding) binding).setProperty(access.property(), val);
+                    final AccessExpression access = (AccessExpression) a;
+                    final Value objectValue = access.object().visit(evaluator);
+                    if (objectValue instanceof MutableObjectBinding) {
+                        ((MutableObjectBinding) objectValue).set(access.property(), val);
                     }
                 }
-                // TODO: (else case) This isn't fail-fast, we can only assign to access expressions
                 return val;
             },
             (evaluator, a, b) -> { // conditional
-                Object condition = a.visit(evaluator);
-                if (ValueConversions.asBoolean(condition)) {
-                    final Object predicateVal = b.visit(evaluator);
+                final Value conditionValue = a.visit(evaluator);
+                if (conditionValue.getAsBoolean()) {
+                    final Value predicateVal = b.visit(evaluator);
                     if (predicateVal instanceof Function) {
-                        return ((Function) predicateVal).evaluate(evaluator);
+                        return Value.of(((Function) predicateVal).evaluate(evaluator));
                     } else {
                         return predicateVal;
                     }
                 }
-                return 0;
+                return NumberValue.zero();
             },
             arithmetic((a, b) -> ((a.eval() == b.eval()) ? 1.0F : 0.0F)), // eq
             arithmetic((a, b) -> ((a.eval() != b.eval()) ? 1.0F : 0.0F))  // neq
     );
 
     private final T entity;
-    private final ObjectBinding bindings;
-    private @Nullable Object returnValue;
+    private final GlobalScope scope;
+    private @Nullable Object flag;
+    private @Nullable Value returnValue;
 
-    public ExpressionEvaluatorImpl(final @Nullable T entity, final @NotNull ObjectBinding bindings) {
+    public ExpressionEvaluatorImpl(final @Nullable T entity, final @NotNull GlobalScope scope) {
         this.entity = entity;
-        this.bindings = requireNonNull(bindings, "bindings");
+        this.scope = requireNonNull(scope, "scope");
     }
 
     private static Evaluator bool(BooleanOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asBoolean(a.visit(evaluator)),
-                () -> ValueConversions.asBoolean(b.visit(evaluator))
-        ) ? 1F : 0F;
+        return (evaluator, a, b) -> Value.of(op.operate(
+                () -> a.visit(evaluator).getAsBoolean(),
+                () -> b.visit(evaluator).getAsBoolean()
+        ));
     }
 
     private static Evaluator compare(Comparator comp) {
-        return (evaluator, a, b) -> comp.compare(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        ) ? 1F : 0F;
+        return (evaluator, a, b) -> Value.of(comp.compare(
+                () -> a.visit(evaluator).getAsNumber(),
+                () -> b.visit(evaluator).getAsNumber()
+        ));
     }
 
     private static Evaluator arithmetic(ArithmeticOperator op) {
-        return (evaluator, a, b) -> op.operate(
-                () -> ValueConversions.asFloat(a.visit(evaluator)),
-                () -> ValueConversions.asFloat(b.visit(evaluator))
-        );
+        return (evaluator, a, b) -> NumberValue.of(op.operate(
+                () -> a.visit(evaluator).getAsNumber(),
+                () -> b.visit(evaluator).getAsNumber()
+        ));
     }
 
     @Override
@@ -143,60 +155,133 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
 
     @Override
     public <R> @NotNull ExpressionEvaluator<R> createChild(final @Nullable R entity) {
-        return new ExpressionEvaluatorImpl<>(entity, this.bindings);
+        return new ExpressionEvaluatorImpl<>(entity, this.scope);
     }
 
     @Override
     public @NotNull ExpressionEvaluator<T> createChild() {
         // Note that it will have its own returnValue, but same bindings
         // (Should we create new bindings?)
-        return new ExpressionEvaluatorImpl<>(this.entity, this.bindings);
+        return new ExpressionEvaluatorImpl<>(this.entity, this.scope);
     }
 
     @Override
-    public @NotNull ObjectBinding bindings() {
-        return bindings;
+    public @NotNull GlobalScope bindings() {
+        return scope;
     }
 
     @Override
-    public @Nullable Object popReturnValue() {
-        Object val = this.returnValue;
+    public @Nullable Value popReturnValue() {
+        final Value val = this.returnValue;
         this.returnValue = null;
         return val;
     }
 
     @Override
-    public Object visitAccess(@NotNull AccessExpression expression) {
-        Object binding = expression.object().visit(this);
-        if (binding instanceof ObjectBinding) {
-            return ((ObjectBinding) binding).getProperty(expression.property());
+    public @NotNull Value visitAccess(final @NotNull AccessExpression expression) {
+        final Value objectValue = expression.object().visit(this);
+        if (objectValue instanceof ObjectValue) {
+            return ((ObjectValue) objectValue).get(expression.property());
         }
-        return null;
+        return NumberValue.zero();
     }
 
     @Override
-    public @Nullable Object visitCall(final @NotNull CallExpression expression) {
-        final Object function = expression.function().visit(this);
-        if (!(function instanceof Function)) {
-            // TODO: This isn't fail-fast, check this in specification
-            return 0;
-        }
-
+    public @NotNull Value visitCall(final @NotNull CallExpression expression) {
         final List<Expression> argumentsExpressions = expression.arguments();
         final Function.Argument[] arguments = new Function.Argument[argumentsExpressions.size()];
         for (int i = 0; i < argumentsExpressions.size(); i++) {
             arguments[i] = new FunctionArgumentImpl(argumentsExpressions.get(i));
         }
-        return ((Function<T>) function).evaluate(this, new FunctionArguments(arguments));
+        final Function.Arguments args = new FunctionArguments(arguments);
+
+        final Expression functionExpr = expression.function();
+        if (functionExpr instanceof IdentifierExpression) {
+            final String identifierName = ((IdentifierExpression) functionExpr).name();
+            if ("loop".equals(identifierName)) {
+                // loop built-in function
+                // Parameters:
+                // - double:           How many times should we loop
+                // - CallableBinding:  The looped expressions
+                int n = Math.round((float) args.next().eval().getAsNumber());
+                Object expr = args.next().eval();
+
+                if (expr instanceof Function) {
+                    final Function<T> callable = (Function<T>) expr;
+                    for (int i = 0; i < n; i++) {
+                        Object value = callable.evaluate(this);
+                        if (value == StatementExpression.Op.BREAK) {
+                            break;
+                        }
+                        // (not necessary, callable already exits when returnValue
+                        //  is set to any non-null value)
+                        // if (value == StatementExpression.Op.CONTINUE) continue;
+                    }
+                }
+                return NumberValue.zero();
+            } else if ("for_each".equals(identifierName)) {
+                // for each built-in function
+                // Parameters:
+                // - any:              Variable
+                // - array:            Any array
+                // - CallableBinding:  The looped expressions
+                final Expression variableExpr = args.next().expression();
+                if (!(variableExpr instanceof AccessExpression)) {
+                    // first argument must be an access expression,
+                    // e.g. 'variable.test', 'v.pig', 't.entity' or
+                    // 't.entity.location.world'
+                    return NumberValue.zero();
+                }
+                final AccessExpression variableAccess = (AccessExpression) variableExpr;
+                final Expression objectExpr = variableAccess.object();
+                final String propertyName = variableAccess.property();
+
+                final Value array = args.next().eval();
+                final Iterable<Value> arrayIterable;
+                if (array instanceof ArrayValue) {
+                    arrayIterable = Arrays.asList(((ArrayValue) array).values());
+                } else {
+                    // second argument must be an array or iterable
+                    return NumberValue.zero();
+                }
+
+                final Object expr = args.next().eval();
+
+                if (expr instanceof Function) {
+                    final Function callable = (Function) expr;
+                    for (final Value val : arrayIterable) {
+                        // set 'val' as current value
+                        // eval (objectExpr.propertyName = val)
+                        final Object evaluatedObjectValue = this.eval(objectExpr);
+                        if (evaluatedObjectValue instanceof MutableObjectBinding) {
+                            ((MutableObjectBinding) evaluatedObjectValue).set(propertyName, val);
+                        }
+                        final Object returnValue = callable.evaluate(this);
+
+                        if (returnValue == StatementExpression.Op.BREAK) {
+                            break;
+                        }
+                    }
+                }
+                return NumberValue.zero();
+            }
+        }
+
+        final Object function = expression.function().visit(this);
+        if (!(function instanceof Function)) {
+            return NumberValue.zero();
+        }
+
+        return ((Function<T>) function).evaluate(this, args);
     }
 
     @Override
-    public Object visitDouble(@NotNull DoubleExpression expression) {
-        return expression.value();
+    public @NotNull Value visitDouble(final @NotNull DoubleExpression expression) {
+        return NumberValue.of(expression.value());
     }
 
     @Override
-    public Object visitExecutionScope(@NotNull ExecutionScopeExpression executionScope) {
+    public @NotNull Value visitExecutionScope(final @NotNull ExecutionScopeExpression executionScope) {
         List<Expression> expressions = executionScope.expressions();
         ExpressionEvaluator<T> evaluatorForThisScope = createChild();
         return (Function<T>) (context, arguments) -> {
@@ -205,22 +290,22 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                 expression.visit(evaluatorForThisScope);
 
                 // check for return values
-                Object returnValue = evaluatorForThisScope.popReturnValue();
+                final Value returnValue = evaluatorForThisScope.popReturnValue();
                 if (returnValue != null) {
                     return returnValue;
                 }
             }
-            return 0;
+            return NumberValue.zero();
         };
     }
 
     @Override
-    public Object visitIdentifier(@NotNull IdentifierExpression expression) {
-        return bindings.getProperty(expression.name());
+    public @NotNull Value visitIdentifier(final @NotNull IdentifierExpression expression) {
+        return scope.get(expression.name());
     }
 
     @Override
-    public Object visitBinary(@NotNull BinaryExpression expression) {
+    public @NotNull Value visitBinary(@NotNull BinaryExpression expression) {
         return BINARY_EVALUATORS.get(expression.op().ordinal()).eval(
                 this,
                 expression.left(),
@@ -229,16 +314,16 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     @Override
-    public Object visitUnary(@NotNull UnaryExpression expression) {
-        Object value = expression.expression().visit(this);
+    public @NotNull Value visitUnary(final @NotNull UnaryExpression expression) {
+        final Value value = expression.expression().visit(this);
         switch (expression.op()) {
             case LOGICAL_NEGATION:
-                return !ValueConversions.asBoolean(value);
+                return Value.of(!value.getAsBoolean());
             case ARITHMETICAL_NEGATION:
-                return -ValueConversions.asFloat(value);
+                return NumberValue.of(-value.getAsNumber());
             case RETURN: {
                 this.returnValue = value;
-                return 0D;
+                return NumberValue.zero();
             }
             default:
                 throw new IllegalStateException("Unknown operation");
@@ -246,40 +331,40 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     @Override
-    public Object visitStatement(@NotNull StatementExpression expression) {
+    public @NotNull Value visitStatement(final @NotNull StatementExpression expression) {
         switch (expression.op()) {
             case BREAK: {
-                this.returnValue = StatementExpression.Op.BREAK;
+                this.flag = StatementExpression.Op.BREAK;
                 break;
             }
             case CONTINUE: {
-                this.returnValue = StatementExpression.Op.CONTINUE;
+                this.flag = StatementExpression.Op.CONTINUE;
                 break;
             }
         }
-        return 0;
+        return NumberValue.zero();
     }
 
     @Override
-    public Object visitString(@NotNull StringExpression expression) {
-        return expression.value();
+    public @NotNull Value visitString(final @NotNull StringExpression expression) {
+        return StringValue.of(expression.value());
     }
 
     @Override
-    public Object visitTernaryConditional(@NotNull TernaryConditionalExpression expression) {
-        Object obj = expression.condition().visit(this);
-        return ValueConversions.asBoolean(obj)
+    public @NotNull Value visitTernaryConditional(@NotNull TernaryConditionalExpression expression) {
+        final Value conditionResult = expression.condition().visit(this);
+        return conditionResult.getAsBoolean()
                 ? expression.trueExpression().visit(this)
                 : expression.falseExpression().visit(this);
     }
 
     @Override
-    public Object visit(@NotNull Expression expression) {
+    public Value visit(final @NotNull Expression expression) {
         throw new UnsupportedOperationException("Unsupported expression type: " + expression);
     }
 
     private interface Evaluator {
-        Object eval(ExpressionEvaluator<?> evaluator, Expression a, Expression b);
+        @NotNull Value eval(ExpressionEvaluator<?> evaluator, Expression a, Expression b);
     }
 
     private interface BooleanOperator {
@@ -290,17 +375,17 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         boolean eval();
     }
 
-    interface LazyEvaluableFloat {
-        float eval();
+    interface LazyEvaluableDouble {
+        double eval();
     }
 
     private interface Comparator {
-        boolean compare(LazyEvaluableFloat a, LazyEvaluableFloat b);
+        boolean compare(LazyEvaluableDouble a, LazyEvaluableDouble b);
 
     }
 
     private interface ArithmeticOperator {
-        float operate(LazyEvaluableFloat a, LazyEvaluableFloat b);
+        double operate(LazyEvaluableDouble a, LazyEvaluableDouble b);
     }
 
     public static class FunctionArguments implements Function.Arguments {
@@ -337,8 +422,8 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         }
 
         @Override
-        public @Nullable Object eval() {
-            return null;
+        public @Nullable Value eval() {
+            return NumberValue.zero();
         }
     }
 
@@ -355,7 +440,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
         }
 
         @Override
-        public @Nullable Object eval() {
+        public @Nullable Value eval() {
             return expression.visit(ExpressionEvaluatorImpl.this);
         }
     }

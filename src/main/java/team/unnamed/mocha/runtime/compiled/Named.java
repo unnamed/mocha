@@ -21,29 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime.jvm;
+package team.unnamed.mocha.runtime.compiled;
 
-import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
-import team.unnamed.mocha.runtime.compiled.Named;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class MolangCompilerTest {
-    @Test
-    void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
-    }
-
-    @Test
-    void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //compiler.registerStaticNatives(MolangCompilerTest.class);
-        System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
-    }
-
-    public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
-    }
+@Documented
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Named {
+    String value();
 }

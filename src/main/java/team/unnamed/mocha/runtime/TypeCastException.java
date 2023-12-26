@@ -21,29 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime.jvm;
+package team.unnamed.mocha.runtime;
 
-import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
-import team.unnamed.mocha.runtime.compiled.Named;
+import java.io.Serial;
 
-public class MolangCompilerTest {
-    @Test
-    void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
+/**
+ * Thrown to indicate that the code has attempted to cast a type
+ * to another type, and they were not compatible.
+ */
+public final class TypeCastException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = -1289858918925812801L;
+
+    public TypeCastException() {
     }
 
-    @Test
-    void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
-        //compiler.registerStaticNatives(MolangCompilerTest.class);
-        System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
-    }
-
-    public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
+    public TypeCastException(final String message) {
+        super(message);
     }
 }

@@ -25,34 +25,35 @@ package team.unnamed.mocha.runtime;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.parser.ast.ExpressionVisitor;
-import team.unnamed.mocha.runtime.binding.ObjectBinding;
+import team.unnamed.mocha.runtime.value.Value;
 
 /**
  * An {@link ExpressionVisitor} implementation that evaluates
  * (interprets) the expressions it visits and returns a single
  * value, commonly, a double value.
  *
- * <p>It is recommended to use {@link team.unnamed.mocha.MolangEngine}
+ * <p>It is recommended to use {@link MochaEngine}
  * evaluation instead of this. While this interface's evaluation may return
- * non-numerical values, the {@link team.unnamed.mocha.MolangEngine} will
+ * non-numerical values, the {@link MochaEngine} will
  * ensure them to be numerical, to comply with the Molang specification.</p>
  *
  * @since 3.0.0
  */
-public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvaluatorImpl */ extends ExecutionContext<T>, ExpressionVisitor<Object> {
+public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvaluatorImpl */ extends ExecutionContext<T>, ExpressionVisitor<Value> {
     /**
      * Creates a new {@link ExpressionEvaluator} instance with
      * the given bindings.
      *
-     * @param entity   The entity object
-     * @param bindings The bindings to use.
+     * @param entity The entity object
+     * @param scope  The global scope
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @Nullable T entity, final @NotNull ObjectBinding bindings) {
-        return new ExpressionEvaluatorImpl<>(entity, bindings);
+    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @Nullable T entity, final @NotNull GlobalScope scope) {
+        return new ExpressionEvaluatorImpl<>(entity, scope);
     }
 
     /**
@@ -63,7 +64,7 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @return The created expression evaluator.
      * @since 3.0.0
      */
-    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @NotNull ObjectBinding bindings) {
+    static <T> @NotNull ExpressionEvaluator<T> evaluator(final @NotNull GlobalScope bindings) {
         return evaluator(null, bindings);
     }
 
@@ -75,11 +76,11 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @since 3.0.0
      */
     static <T> @NotNull ExpressionEvaluator<T> evaluator() {
-        return evaluator(ObjectBinding.EMPTY);
+        return evaluator(GlobalScope.create());
     }
 
     @Override
-    default @Nullable Object eval(final @NotNull Expression expression) {
+    default @Nullable Value eval(final @NotNull Expression expression) {
         return expression.visit(this);
     }
 
@@ -89,7 +90,7 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * @return The evaluator bindings.
      * @since 3.0.0
      */
-    @NotNull ObjectBinding bindings();
+    @NotNull GlobalScope bindings();
 
     /**
      * Creates a new, child, expression evaluator.
@@ -126,6 +127,6 @@ public /* sealed */ interface ExpressionEvaluator<T> /* permits ExpressionEvalua
      * expression is found.
      * @since 3.0.0
      */
-    @Nullable Object popReturnValue();
+    @Nullable Value popReturnValue();
 
 }
