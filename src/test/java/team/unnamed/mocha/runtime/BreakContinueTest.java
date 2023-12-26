@@ -27,27 +27,24 @@ import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BreakContinueTest {
-
+class BreakContinueTest {
     @Test
-    public void test_break() throws Exception {
-        Object value = MochaEngine.createStandard().eval(
-                "t.i = 0;" +
-                        "loop(10, {" +
-                        "t.i = t.i + 1;" +
-                        "(t.i >= 5) ? break;" +
-                        "});" +
-                        "return t.i;"
-        );
-        assertTrue(value instanceof Number, "Value must be a number!");
-        assertEquals(5.0D, ((Number) value).doubleValue());
+    void test_break() {
+        final double value = MochaEngine.createStandard().eval(String.join("\n",
+                "t.i = 0;",
+                "loop(10, {",
+                "    t.i = t.i + 1;",
+                "    (t.i >= 5) ? break;",
+                "});",
+                "return t.i;"
+        ));
+        assertEquals(5.0D, value);
     }
 
     @Test
-    public void test_continue() throws Exception {
-        Object value = MochaEngine.createStandard().eval(
+    void test_continue() {
+        final double value = MochaEngine.createStandard().eval(
                 "t.i = 0;" +
                         "t.sum = 0;" +
                         "loop(20, {" +
@@ -57,8 +54,6 @@ public class BreakContinueTest {
                         "});" +
                         "return t.sum;"
         );
-        assertTrue(value instanceof Number, "Value must be a number!");
-        assertEquals(125.0D, ((Number) value).doubleValue());
+        assertEquals(125.0D, value);
     }
-
 }
