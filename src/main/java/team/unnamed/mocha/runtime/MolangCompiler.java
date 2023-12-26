@@ -44,8 +44,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,7 +262,7 @@ public final class MolangCompiler {
             }
 
             // write class
-            Files.write(Paths.get("test.class"), scriptCtClass.toBytecode());
+            // Files.write(Paths.get("test.class"), scriptCtClass.toBytecode());
             final Class<?> compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
 
             // find the constructor with the requirements
