@@ -113,7 +113,16 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             case OR:
             case LT:
             case LTE:
-            case GT:
+            case GT: {
+                bytecode.addOpcode(Bytecode.DCMPL);
+                bytecode.addOpcode(Bytecode.IFLE);
+                bytecode.addIndex(7);
+                bytecode.addDconst(1D);
+                bytecode.addOpcode(Bytecode.GOTO);
+                bytecode.addIndex(4);
+                bytecode.addDconst(0D);
+                return new CompileVisitResult(CtClass.doubleType);
+            }
             case GTE: {
                 // not implemented
                 return new CompileVisitResult(CtClass.doubleType);
@@ -244,7 +253,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         }
 
         final CompileVisitResult conditionRes = expression.condition().visit(this); // push value to stack
-        if (conditionRes.lastPushedType() != null && !conditionRes.is(CtClass.booleanType) && !conditionRes.is(CtClass.intType)) {
+        if (conditionRes != null && conditionRes.lastPushedType() != null && !conditionRes.is(CtClass.booleanType) && !conditionRes.is(CtClass.intType)) {
             bytecode.addConstZero(conditionRes.lastPushedType()); // push 0
             // compare
             if (conditionRes.is(CtClass.doubleType)) {
