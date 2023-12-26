@@ -48,6 +48,25 @@ import java.util.List;
 import java.util.Map;
 
 final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResult> {
+    private static final int[] OPCODES_BY_BINARY_EXPRESSION_OP = new int[]{
+            -1, // AND(300),
+            -1, //        OR(200),
+            Bytecode.IFLT, //        LT(700),
+            Bytecode.IFLE, //        LTE(700),
+            Bytecode.IFGT, //        GT(700),
+            Bytecode.IFGE, //        GTE(700),
+            Bytecode.DADD, //        ADD(900),
+            Bytecode.DSUB, //        SUB(900),
+            Bytecode.DMUL, //        MUL(1000),
+            Bytecode.DDIV, //        DIV(1000),
+            -1, //        ARROW(2000),
+            -1, //        NULL_COALESCE(2),
+            -1, //        ASSIGN(1),
+            -1, //        CONDITIONAL(1),
+            Bytecode.IFEQ, //        EQ(500),
+            Bytecode.IFNE //        NEQ(500);
+    };
+
     private final ClassPool classPool;
     private final Bytecode bytecode;
     private final Method method;
@@ -111,52 +130,33 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         switch (op) {
             case AND:
             case OR:
-            case LT:
-            case LTE:
-            case GT: {
-                bytecode.addOpcode(Bytecode.DCMPL);
-                bytecode.addOpcode(Bytecode.IFLE);
-                bytecode.addIndex(7);
-                bytecode.addDconst(1D);
-                bytecode.addOpcode(Bytecode.GOTO);
-                bytecode.addIndex(4);
-                bytecode.addDconst(0D);
-                return new CompileVisitResult(CtClass.doubleType);
-            }
-            case GTE: {
                 // not implemented
                 return new CompileVisitResult(CtClass.doubleType);
-            }
-            case ADD: {
-                bytecode.addOpcode(Bytecode.DADD);
+            case EQ:
+            case NEQ:
+            case LT:
+            case LTE:
+            case GT:
+            case GTE: {
+                bytecode.addOpcode(Bytecode.DCMPL); // compare both numbers
+                bytecode.addOpcode(OPCODES_BY_BINARY_EXPRESSION_OP[op.ordinal()]); // branch
+                bytecode.addIndex(7);
+                bytecode.addDconst(0D);
+                bytecode.addOpcode(Bytecode.GOTO);
+                bytecode.addIndex(4);
+                bytecode.addDconst(1D);
                 return new CompileVisitResult(CtClass.doubleType);
             }
-            case SUB: {
-                bytecode.addOpcode(Bytecode.DSUB);
-                return new CompileVisitResult(CtClass.doubleType);
-            }
-            case MUL: {
-                bytecode.addOpcode(Bytecode.DMUL);
-                return new CompileVisitResult(CtClass.doubleType);
-            }
+            case ADD:
+            case SUB:
+            case MUL:
             case DIV: {
-                bytecode.addOpcode(Bytecode.DDIV);
+                bytecode.addOpcode(OPCODES_BY_BINARY_EXPRESSION_OP[op.ordinal()]);
                 return new CompileVisitResult(CtClass.doubleType);
             }
             case ARROW:
             case NULL_COALESCE:
             case CONDITIONAL:
-                break;
-            case EQ:
-                bytecode.addOpcode(Bytecode.DCMPL);
-                bytecode.addOpcode(Bytecode.IFEQ);
-                bytecode.addIndex(7);
-                bytecode.addDconst(0D);
-                bytecode.addOpcode(Bytecode.GOTO);
-                bytecode.addIndex(4);
-                bytecode.addDconst(1D);
-                break;
-            case NEQ:
                 break;
         }
         //@formatter:on

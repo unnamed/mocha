@@ -48,6 +48,11 @@ public class MolangCompilerTest {
         assertEquals(10, script3.eval(10, 5));
         assertEquals(50, script3.eval(50, -20));
         assertEquals(3, script3.eval(3D, 3D));
+
+        final ScriptType script4 = engine.compile("(a < b) ? a : b", ScriptType.class);
+        assertEquals(5, script4.eval(10, 5));
+        assertEquals(-20, script4.eval(50, -20));
+        assertEquals(3, script4.eval(3D, 3D));
     }
 
     @Test
