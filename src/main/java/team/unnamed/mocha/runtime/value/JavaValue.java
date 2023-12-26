@@ -6,4 +6,8 @@ public final class JavaValue implements Value {
     public JavaValue(Object value) {
         this.value = value;
     }
+
+    public Object value() {
+        return value;
+    }
 }

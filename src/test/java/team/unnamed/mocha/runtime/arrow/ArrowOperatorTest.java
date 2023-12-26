@@ -26,8 +26,9 @@ package team.unnamed.mocha.runtime.arrow;
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.runtime.value.ArrayValue;
+import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.JavaValue;
-import team.unnamed.mocha.runtime.value.StringValue;
+import team.unnamed.mocha.runtime.value.NumberValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,9 @@ class ArrowOperatorTest {
 
         final MochaEngine<Entity> engine = MochaEngine.create(self);
         engine.bindDefaults();
-        engine.bindVariable("self", self);
-        engine.bindQueryFunction("get_name", (ctx, args) -> StringValue.of(ctx.entity().name));
-        engine.bindQueryFunction("get_nearby_entities", (ctx, args) -> {
+        engine.scope().forceSet("self", new JavaValue(self));
+        engine.scope().query().set("get_location", (Function<Entity>) (ctx, args) -> NumberValue.of(ctx.entity().location));
+        engine.scope().query().set("get_nearby_entities", (Function<Entity>) (ctx, args) -> {
             final Entity entity = ctx.entity();
             final double distance = args.next().eval().getAsNumber();
 
@@ -64,33 +65,23 @@ class ArrowOperatorTest {
             return ArrayValue.of(found.toArray(JavaValue[]::new));
         });
 
-        final Object result = engine.eval(
-                "t.first = 1;\n"
-                        + "v.result = '';\n"
-                        + "for_each(t.nearby, v.self->q.get_nearby_entities(5), {\n"
-                        + "    (!t.first) ? {\n"
-                        + "        v.result = v.result + ', ';\n"
-                        + "    };\n"
-                        + "    v.result = v.result + t.nearby->q.get_name();\n"
-                        + "    t.first = 0;\n"
+        final double result = engine.eval(
+                "v.result = 0;\n"
+                        + "for_each(t.nearby, self->q.get_nearby_entities(5), {\n"
+                        + "    v.result = v.result + t.nearby->q.get_location();\n"
                         + "});\n"
                         + "return v.result;"
         );
-        assertEquals("Steve, Pig", result);
+        assertEquals(17D, result);
 
 
-        final Object result2 = engine.eval(
-                "t.first = 1;\n"
-                        + "v.result = '';\n"
-                        + "for_each(t.nearby, v.self->q.get_nearby_entities(500), {\n" // Same code but 500 instead of 5
-                        + "    (!t.first) ? {\n"
-                        + "        v.result = v.result + ', ';\n"
-                        + "    };\n"
-                        + "    v.result = v.result + t.nearby->q.get_name();\n"
-                        + "    t.first = 0;\n"
+        final double result2 = engine.eval(
+                "v.result = 0;\n"
+                        + "for_each(t.nearby, self->q.get_nearby_entities(500), {\n" // Same code but 500 instead of 5
+                        + "    v.result = v.result + t.nearby->q.get_location();\n"
                         + "});\n"
                         + "return v.result;"
         );
-        assertEquals("Zombie, Steve, Pig, Chicken", result2);
+        assertEquals(32D, result2);
     }
 }

@@ -20,6 +20,7 @@ public interface GlobalScope extends ObjectValue {
         } else {
             final MutableObjectBinding query = new MutableObjectBinding();
             forceSet("query", query);
+            forceSet("q", query);
             return query;
         }
     }

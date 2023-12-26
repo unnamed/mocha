@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.*;
 import team.unnamed.mocha.runtime.value.ArrayValue;
 import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.JavaValue;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.ObjectValue;
@@ -68,11 +69,11 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                 else return dividend / divisor;
             }),
             (evaluator, a, b) -> { // arrow
-                final Object val = a.visit(evaluator);
-                if (val == null) {
+                final Value val = a.visit(evaluator);
+                if (!(val instanceof JavaValue)) {
                     return NumberValue.zero();
                 } else {
-                    return b.visit(evaluator.createChild(val));
+                    return b.visit(evaluator.createChild(((JavaValue) val).value()));
                 }
             },
             (evaluator, a, b) -> { // null coalesce
@@ -256,7 +257,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                     return NumberValue.zero();
                 }
 
-                final Object expr = args.next().eval();
+                final Value expr = args.next().eval();
 
                 if (expr instanceof Function) {
                     final Function callable = (Function) expr;
