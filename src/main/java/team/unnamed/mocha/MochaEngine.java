@@ -23,6 +23,7 @@
  */
 package team.unnamed.mocha;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.lexer.Cursor;
 import team.unnamed.mocha.parser.ParseException;
@@ -54,7 +55,15 @@ public interface MochaEngine<T> {
         return new MochaEngineImpl<>(null);
     }
 
-    static MochaEngine<?> createDefault() {
+    /**
+     * Creates a new, clean and empty {@link MochaEngine} instance
+     * with the standard, default bindings.
+     *
+     * @return The created {@link MochaEngine} instance.
+     * @since 3.0.0
+     */
+    @Contract("-> new")
+    static @NotNull MochaEngine<?> createStandard() {
         final MochaEngine<?> engine = create();
         engine.bindDefaults();
         return engine;

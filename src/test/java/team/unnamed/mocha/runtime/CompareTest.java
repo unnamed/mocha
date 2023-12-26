@@ -38,7 +38,7 @@ import java.io.InputStreamReader;
  */
 public class CompareTest {
 
-    private static final MochaEngine<?> ENGINE = MochaEngine.createDefault();
+    private static final MochaEngine<?> ENGINE = MochaEngine.createStandard();
 
     //#region Helper code
     private static BufferedReader createResourceReader(String name) {

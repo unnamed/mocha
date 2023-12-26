@@ -33,7 +33,7 @@ public class BreakContinueTest {
 
     @Test
     public void test_break() throws Exception {
-        Object value = MochaEngine.createDefault().eval(
+        Object value = MochaEngine.createStandard().eval(
                 "t.i = 0;" +
                         "loop(10, {" +
                         "t.i = t.i + 1;" +
@@ -47,7 +47,7 @@ public class BreakContinueTest {
 
     @Test
     public void test_continue() throws Exception {
-        Object value = MochaEngine.createDefault().eval(
+        Object value = MochaEngine.createStandard().eval(
                 "t.i = 0;" +
                         "t.sum = 0;" +
                         "loop(20, {" +

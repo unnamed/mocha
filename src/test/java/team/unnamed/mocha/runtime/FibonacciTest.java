@@ -76,7 +76,7 @@ public class FibonacciTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream stdout = new PrintStream(out);
 
-        MochaEngine<?> engine = MochaEngine.createDefault();
+        MochaEngine<?> engine = MochaEngine.createStandard();
         engine.scope().forceSet("query", (ObjectValue) name -> {
             if (name.equalsIgnoreCase("log")) {
                 return (Function<?>) (ctx, args) -> {

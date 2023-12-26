@@ -31,14 +31,14 @@ import team.unnamed.mocha.runtime.compiled.Named;
 public class MolangCompilerTest {
     @Test
     void test() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
+        final MochaEngine<?> engine = MochaEngine.createStandard();
         //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
         //System.out.println(script.eval(1, 2));
     }
 
     @Test
     void test_native() {
-        final MochaEngine<?> engine = MochaEngine.createDefault();
+        final MochaEngine<?> engine = MochaEngine.createStandard();
         //compiler.registerStaticNatives(MolangCompilerTest.class);
         System.out.println(engine.compile("3 * math.abs(5 * 5 * -1) + 1").evaluate());
     }
