@@ -29,14 +29,15 @@ import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.ExpressionEvaluator;
 import team.unnamed.mocha.runtime.GlobalScope;
-import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.MolangCompiler;
+import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.Value;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.List;
 
 final class MochaEngineImpl<T> implements MochaEngine<T> {
@@ -92,14 +93,16 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     }
 
     @Override
-    public @NotNull MochaFunction compile(final @NotNull String script) {
-        final List<Expression> parsed;
+    public <F extends MochaCompiledFunction> @NotNull F compile(final @NotNull Reader reader, final @NotNull Class<F> interfaceType) {
+        List<Expression> parsed;
         try {
-            parsed = parse(script);
-        } catch (ParseException e) {
-            return () -> 0;
+            parsed = parse(reader);
+        } catch (final ParseException e) {
+            parsed = Collections.emptyList();
+        } catch (final IOException e) {
+            throw new RuntimeException("Failed to read from given reader", e);
         }
-        return compiler.compile(parsed, MochaFunction.class);
+        return compiler.compile(parsed, interfaceType);
     }
 
     @Override

@@ -31,6 +31,7 @@ import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.GlobalScope;
 import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
+import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.standard.MochaMath;
 import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
@@ -109,15 +110,63 @@ public interface MochaEngine<T> {
         }
     }
 
+    // COMPILING API
+
     /**
-     * Compiles the given script into a Molang function
-     * with no arguments.
+     * Compiles the given code into a Molang function
+     * that can take arguments.
      *
-     * @param script The script to compile.
+     * @param reader        The code to compile.
+     * @param interfaceType The interface to implement, must
+     *                      have a single method.
      * @return The compiled function.
      * @since 3.0.0
      */
-    @NotNull MochaFunction compile(final @NotNull String script);
+    <F extends MochaCompiledFunction> @NotNull F compile(final @NotNull Reader reader, final @NotNull Class<F> interfaceType);
+
+    /**
+     * Compiles the given code into a Molang function
+     * that can take arguments.
+     *
+     * @param code          The code to compile.
+     * @param interfaceType The interface to implement, must
+     *                      have a single method.
+     * @return The compiled function.
+     * @since 3.0.0
+     */
+    default <F extends MochaCompiledFunction> @NotNull F compile(final @NotNull String code, final @NotNull Class<F> interfaceType) {
+        try (final StringReader reader = new StringReader(code)) {
+            return compile(reader, interfaceType);
+        }
+    }
+
+    /**
+     * Compiles the given code into a Molang function
+     * that takes no arguments.
+     *
+     * @param reader The code to compile.
+     * @return The compiled function.
+     * @since 3.0.0
+     */
+    default @NotNull MochaFunction compile(final @NotNull Reader reader) {
+        return compile(reader, MochaFunction.class);
+    }
+
+    /**
+     * Compiles the given code into a Molang function
+     * that takes no arguments.
+     *
+     * @param code The code to compile.
+     * @return The compiled function.
+     * @since 3.0.0
+     */
+    default @NotNull MochaFunction compile(final @NotNull String code) {
+        try (final StringReader reader = new StringReader(code)) {
+            return compile(reader);
+        }
+    }
+
+    // END COMPILING API
 
     /**
      * Returns the bindings for this Molang engine
