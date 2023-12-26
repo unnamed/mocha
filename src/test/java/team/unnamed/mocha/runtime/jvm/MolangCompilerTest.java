@@ -28,12 +28,26 @@ import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.compiled.Named;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MolangCompilerTest {
     @Test
     void test() {
         final MochaEngine<?> engine = MochaEngine.createStandard();
-        //ScriptType script = engine.compile("false ? a : b", ScriptType.class);
-        //System.out.println(script.eval(1, 2));
+        final ScriptType script = engine.compile("false ? a : b", ScriptType.class);
+        assertEquals(2, script.eval(1, 2));
+        assertEquals(50, script.eval(20, 50));
+        assertEquals(200, script.eval(50, 200));
+
+        final ScriptType script2 = engine.compile("a + (b - a) * 0.5", ScriptType.class);
+        assertEquals(5, script2.eval(1, 10));
+        assertEquals(20, script2.eval(20, 20));
+        assertEquals(50, script2.eval(-50, 150));
+
+        final ScriptType script3 = engine.compile("(a > b) ? a : b", ScriptType.class);
+        assertEquals(10, script3.eval(10, 5));
+        assertEquals(50, script3.eval(50, -20));
+        assertEquals(3, script3.eval(3D, 3D));
     }
 
     @Test
