@@ -160,6 +160,7 @@ public final class MolangCompiler {
             if (expressions.isEmpty()) {
                 // add only a "return 0", "return" or "return null" instruction
                 bytecode.addConstZero(returnCtType);
+                bytecode.addReturn(returnCtType);
             } else {
                 final MolangCompilingVisitor visitor = new MolangCompilingVisitor(compileState);
                 CompileVisitResult lastVisitResult = null;
