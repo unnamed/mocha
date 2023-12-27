@@ -442,7 +442,11 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             return resultExpr.visit(this);
         }
 
-        final CompileVisitResult conditionRes = expression.condition().visit(this); // push value to stack
+        final CtClass currentExpectedType = expectedType;
+        expectedType = CtClass.booleanType;
+        final CompileVisitResult conditionRes = expression.condition().visit(this); // push boolean value to stack
+        expectedType = currentExpectedType;
+
         if (conditionRes != null && conditionRes.lastPushedType() != null && !conditionRes.is(CtClass.booleanType) && !conditionRes.is(CtClass.intType)) {
             bytecode.addConstZero(conditionRes.lastPushedType()); // push 0
             // compare
@@ -458,12 +462,18 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         }
 
         bytecode.addOpcode(Bytecode.IFEQ); // if false skip
-        bytecode.addIndex(7);
-        final CompileVisitResult trueRes = trueExpr.visit(this); // push true value to stack
+        final int indexPc = bytecode.currentPc();
+        bytecode.addGap(2);
+        trueExpr.visit(this); // push true value to stack
         bytecode.addOpcode(Bytecode.GOTO); // skip pushing false value
-        bytecode.addIndex(4);
-        final CompileVisitResult falseRes = falseExpr.visit(this); // push false value to stack
-        return null;
+        final int indexPc2 = bytecode.currentPc();
+        bytecode.addGap(2);
+        // jump here if false
+        bytecode.write16bit(indexPc, bytecode.currentPc() - indexPc + 1);
+        falseExpr.visit(this); // push false value to stack
+        // jump here if true
+        bytecode.write16bit(indexPc2, bytecode.currentPc() - indexPc2 + 1);
+        return new CompileVisitResult(currentExpectedType);
     }
 
     @Override
