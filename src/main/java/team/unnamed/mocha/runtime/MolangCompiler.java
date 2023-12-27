@@ -206,7 +206,16 @@ public final class MolangCompiler {
                     final int index = it.next();
                     final int opcode = it.byteAt(index);
                     final String opcodeName = Mnemonic.OPCODE[opcode];
-                    System.out.println(index + " " + opcodeName);
+                    String params = "";
+                    switch (opcode) {
+                        case Bytecode.IFEQ:
+                        case Bytecode.GOTO: {
+                            final int plus = it.s16bitAt(index + 1);
+                            params += " +" + plus + " (" + (index + plus) + ")";
+                            break;
+                        }
+                    }
+                    System.out.println(index + ": " + opcodeName + "       " + params);
                 }
                 System.out.println("[end instructions]\n");
             }
