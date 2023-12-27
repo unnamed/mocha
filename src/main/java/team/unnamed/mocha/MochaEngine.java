@@ -25,7 +25,6 @@ package team.unnamed.mocha;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.mocha.lexer.Cursor;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.GlobalScope;
@@ -39,6 +38,7 @@ import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 /**
@@ -91,12 +91,12 @@ public interface MochaEngine<T> {
      * @throws ParseException If parsing fails
      */
     default List<Expression> parse(String string) throws ParseException {
-        try (Reader reader = new StringReader(string)) {
+        try (final StringReader reader = new StringReader(string)) {
             return parse(reader);
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             throw e;
-        } catch (IOException e) {
-            throw new ParseException("Failed to close string reader", e, new Cursor(0, 0));
+        } catch (final IOException e) {
+            throw new UncheckedIOException("Error occurred reading the source code: '" + string + "'", e);
         }
     }
 
