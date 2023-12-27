@@ -61,6 +61,18 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
         return bool ? NumberValue.of(1D) : NumberValue.zero();
     }
 
+    static @NotNull Value of(final double _double) {
+        return NumberValue.of(_double);
+    }
+
+    static @NotNull Value of(final @NotNull String string) {
+        return StringValue.of(string);
+    }
+
+    static @NotNull Value nil() {
+        return NumberValue.zero();
+    }
+
     default double getAsNumber() {
         if (this instanceof NumberValue) {
             return ((NumberValue) this).value();
