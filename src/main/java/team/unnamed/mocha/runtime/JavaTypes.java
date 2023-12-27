@@ -99,6 +99,11 @@ public final class JavaTypes {
         return WRAPPER_TYPE_NAMES.contains(type.getName());
     }
 
+    public static boolean isPrimitiveOrWrapper(final @NotNull CtClass type) {
+        requireNonNull(type, "type");
+        return type.isPrimitive() || isWrapper(type);
+    }
+
     public static void addCast(final @NotNull Bytecode bytecode, final @NotNull CtClass from, final @NotNull CtClass to) {
         requireNonNull(bytecode, "bytecode");
         requireNonNull(from, "from");

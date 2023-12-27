@@ -30,8 +30,10 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
+import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
+import javassist.bytecode.Mnemonic;
 import javassist.bytecode.StackMapTable;
 import javassist.bytecode.stackmap.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
@@ -44,6 +46,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +58,7 @@ import static java.util.Objects.requireNonNull;
 @ApiStatus.Internal
 public final class MolangCompiler {
     private static final Random RANDOM = new Random();
-
+    public static boolean debug = true;
     private final ClassLoader classLoader;
     private final ClassPool classPool;
 
@@ -169,24 +173,12 @@ public final class MolangCompiler {
                 }
 
                 if (lastVisitResult == null || !lastVisitResult.returned()) {
-                    if (returnType.equals(int.class)) {
-                        bytecode.addOpcode(Bytecode.D2I);
-                    } else if (returnType.equals(float.class)) {
-                        bytecode.addOpcode(Bytecode.D2F);
-                    } else if (returnType.equals(long.class)) {
-                        bytecode.addOpcode(Bytecode.D2L);
-                    } else if (returnType.equals(short.class)) {
-                        bytecode.addOpcode(Bytecode.D2I);
-                        bytecode.addOpcode(Bytecode.I2S);
-                    } else if (returnType.equals(byte.class)) {
-                        bytecode.addOpcode(Bytecode.D2I);
-                        bytecode.addOpcode(Bytecode.I2B);
-                    } else if (returnType.equals(char.class)) {
-                        bytecode.addOpcode(Bytecode.D2I);
-                        bytecode.addOpcode(Bytecode.I2C);
-                    } else if (returnType.equals(boolean.class)) {
-                        bytecode.addOpcode(Bytecode.D2I);
-                        bytecode.addOpcode(Bytecode.I2B);
+                    if (lastVisitResult == null || lastVisitResult.lastPushedType() != returnCtType) {
+                        JavaTypes.addCast(
+                                bytecode,
+                                lastVisitResult == null ? CtClass.doubleType : lastVisitResult.lastPushedType(),
+                                returnCtType
+                        );
                     }
 
                     visitor.endVisit();
@@ -207,13 +199,17 @@ public final class MolangCompiler {
             method.setCodeAttribute(bytecode.toCodeAttribute());
 
             // print bytecode
-            // final CodeIterator it = method.getCodeAttribute().iterator();
-            // while (it.hasNext()) {
-            //    final int index = it.next();
-            //    final int opcode = it.byteAt(index);
-            //    final String opcodeName = Mnemonic.OPCODE[opcode];
-            //    System.out.println(index + " " + opcodeName);
-            // }
+            if (debug) {
+                System.out.println("\n[instructions for " + expressions + "]");
+                final CodeIterator it = method.getCodeAttribute().iterator();
+                while (it.hasNext()) {
+                    final int index = it.next();
+                    final int opcode = it.byteAt(index);
+                    final String opcodeName = Mnemonic.OPCODE[opcode];
+                    System.out.println(index + " " + opcodeName);
+                }
+                System.out.println("[end instructions]\n");
+            }
 
             method.getCodeAttribute().computeMaxStack();
 
@@ -265,7 +261,9 @@ public final class MolangCompiler {
             }
 
             // write class
-            // Files.write(Paths.get("test.class"), scriptCtClass.toBytecode());
+            if (debug) {
+                Files.write(Paths.get("build/generated/" + scriptClassName + ".class"), scriptCtClass.toBytecode());
+            }
             final Class<?> compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
 
             // find the constructor with the requirements
