@@ -110,7 +110,7 @@ public interface MochaEngine<T> {
         }
     }
 
-    // COMPILING API
+    //#region COMPILING API
 
     /**
      * Compiles the given code into a Molang function
@@ -166,7 +166,7 @@ public interface MochaEngine<T> {
         }
     }
 
-    // END COMPILING API
+    //#endregion END COMPILING API
 
     /**
      * Returns the bindings for this Molang engine
