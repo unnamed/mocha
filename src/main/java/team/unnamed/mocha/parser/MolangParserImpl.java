@@ -128,7 +128,12 @@ final class MolangParserImpl implements MolangParser {
                 return expr;
             case SUB:
                 lexer.next();
-                return new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, parseSingle(lexer));
+                final Expression operatedExpression = parseSingle(lexer);
+                if (operatedExpression instanceof DoubleExpression) {
+                    // NEGATE(A) is just parsed as (-A)
+                    return new DoubleExpression(-((DoubleExpression) operatedExpression).value());
+                }
+                return new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, operatedExpression);
             case BANG:
                 lexer.next();
                 return new UnaryExpression(UnaryExpression.Op.LOGICAL_NEGATION, parseSingle(lexer));
