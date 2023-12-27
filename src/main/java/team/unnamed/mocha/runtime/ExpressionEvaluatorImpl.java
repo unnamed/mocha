@@ -189,6 +189,19 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     @Override
+    public @NotNull Value visitArrayAccess(final @NotNull ArrayAccessExpression expression) {
+        final Value array = expression.array().visit(this);
+        final Value index = expression.index().visit(this);
+        if (!(array instanceof ArrayValue)) {
+            return Value.nil();
+        } else {
+            final Value[] values = ((ArrayValue) array).values();
+            final int validIndex = Math.max(0, (int) index.getAsNumber()) % values.length;
+            return values[validIndex];
+        }
+    }
+
+    @Override
     public @NotNull Value visitAccess(final @NotNull AccessExpression expression) {
         final Value objectValue = expression.object().visit(this);
         if (objectValue instanceof ObjectValue) {

@@ -6,6 +6,7 @@ import team.unnamed.mocha.parser.ast.Expression;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -55,5 +56,16 @@ public final class MochaAssertions {
         } catch (final ParseException e) {
             assertEquals(column, e.cursor().column(), "Expected parse error at column " + column + " for expression: '" + expr + "'");
         }
+    }
+
+    public static void assertEvaluates(final double expected, final @NotNull String expr, final @NotNull UnaryOperator<MochaEngine<?>> configurer) {
+        MochaEngine<?> engine = MochaEngine.createStandard();
+        engine = configurer.apply(engine);
+        final double result = engine.eval(expr);
+        assertEquals(expected, result, 0.0001, () -> "Expression: '" + expr + "' evaluated to " + result + ", expected " + expected);
+    }
+
+    public static void assertEvaluates(final double expected, final @NotNull String expr) {
+        assertEvaluates(expected, expr, engine -> engine);
     }
 }
