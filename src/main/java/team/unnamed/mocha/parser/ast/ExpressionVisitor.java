@@ -55,6 +55,17 @@ public interface ExpressionVisitor<R> {
     R visit(final @NotNull Expression expression);
 
     /**
+     * Evaluate for array access expression.
+     *
+     * @param expression The expression.
+     * @return The result.
+     * @since 3.0.0
+     */
+    default R visitArrayAccess(final @NotNull ArrayAccessExpression expression) {
+        return visit(expression);
+    }
+
+    /**
      * Evaluate for double expression.
      *
      * @param expression The expression.

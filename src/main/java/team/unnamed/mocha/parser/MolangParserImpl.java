@@ -172,6 +172,26 @@ final class MolangParserImpl implements MolangParser {
             case RPAREN:
             case EOF:
                 return left;
+            case LBRACKET: { // ARRAY ACCESS EXPRESSION: "left["
+                current = lexer.next();
+                if (current.kind() == TokenKind.RBRACKET) {
+                    throw new ParseException("Expected a expression, got RBRACKET", lexer.cursor());
+                } else if (current.kind() == TokenKind.EOF) {
+                    throw new ParseException("Found EOF before closing RBRACKET", lexer.cursor());
+                }
+
+                final Expression index = parseCompoundExpression(lexer, 0);
+
+                current = lexer.current();
+                if (current.kind() == TokenKind.EOF) {
+                    throw new ParseException("Found EOF before closing RBRACKET", lexer.cursor());
+                } else if (current.kind() != TokenKind.RBRACKET) {
+                    throw new ParseException("Expected a closing RBRACKET, found " + current, lexer.cursor());
+                }
+
+                lexer.next();
+                return new ArrayAccessExpression(left, index);
+            }
             case LPAREN: { // CALL EXPRESSION: "left("
                 current = lexer.next();
                 final List<Expression> arguments = new ArrayList<>();

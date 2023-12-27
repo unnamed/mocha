@@ -32,22 +32,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static team.unnamed.mocha.MochaAssertions.assertCreateSameTree;
 
 class HierarchyTest {
-    private static void assertCreateSameTree(String expr1, String expr2) throws Exception {
-        MochaEngine<?> engine = MochaEngine.createStandard();
-        List<Expression> expressions1 = engine.parse(expr1);
-        List<Expression> expressions2 = engine.parse(expr2);
-        assertEquals(expressions1, expressions2, () -> "Expressions:\n\t- " +
-                expr1 +
-                "\n\t- " +
-                expr2 +
-                "\nGenerated different syntax trees:\n\t- " +
-                expressions1 +
-                "\n\t- " +
-                expressions2);
-    }
-
     @Test
     void test_logical_hierarchy() throws Exception {
         List<Expression> expressions = MochaEngine.createStandard().parse("age <= 5 || age >= 70");
