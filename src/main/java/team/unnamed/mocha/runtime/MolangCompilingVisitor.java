@@ -116,7 +116,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             }
         }
 
-        if (!RequiresContextVisitor.test(expression)) {
+        if (IsConstantExpression.test(expression)) {
             // can be evaluated in compile-time
             final double result = expression.visit(ExpressionEvaluator.evaluator()).getAsNumber();
             bytecode.addLdc2w(result);
@@ -245,7 +245,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         final Expression trueExpr = expression.trueExpression();
         final Expression falseExpr = expression.falseExpression();
 
-        if (!RequiresContextVisitor.test(conditionExpr)) {
+        if (IsConstantExpression.test(conditionExpr)) {
             // condition can be evaluated in compile-time
             final boolean condition = conditionExpr.visit(ExpressionEvaluator.evaluator()).getAsBoolean();
             final Expression resultExpr = condition ? trueExpr : falseExpr;
