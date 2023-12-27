@@ -28,8 +28,7 @@ import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.compiled.Named;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ArithmeticCompiledRuntimeTest {
     @Test
@@ -125,9 +124,30 @@ class ArithmeticCompiledRuntimeTest {
             assertTrue(neq.compare(-50, -20));
             assertFalse(neq.compare(3D, 3D));
         }
+
+        // requiring casting
+        {
+            // 0: dload_1
+            // 1: dload_3
+            // 2: dcmpl
+            // 3: ifgt        10
+            // 6: lconst_0
+            // 7: goto        11
+            // 10: lconst_1
+            // 11: lreturn
+            final StupidLongComparisonFunction gt = engine.compile("a > b", StupidLongComparisonFunction.class);
+            assertEquals(1L, gt.compare(10, 5));
+            assertEquals(0L, gt.compare(-50, -20));
+            assertEquals(0L, gt.compare(3D, 3D));
+        }
     }
 
     public interface ComparisonFunction extends MochaCompiledFunction {
         boolean compare(@Named("a") double a, @Named("b") double b);
+    }
+
+    // like why would someone need long?
+    public interface StupidLongComparisonFunction extends MochaCompiledFunction {
+        long compare(@Named("a") double a, @Named("b") double b);
     }
 }

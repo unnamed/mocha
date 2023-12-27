@@ -102,6 +102,8 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         } catch (final NotFoundException e) {
             throw new IllegalStateException("Couldn't find CtClass for standard classes", e);
         }
+
+        expectedType = methodReturnType;
     }
 
     @Override
