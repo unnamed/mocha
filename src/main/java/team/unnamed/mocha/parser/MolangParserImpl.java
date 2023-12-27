@@ -198,7 +198,7 @@ final class MolangParserImpl implements MolangParser {
 
                 // start reading the arguments
                 if (current.kind() == TokenKind.EOF) {
-                    throw new ParseException("Found EOF before closing RPAREN", null);
+                    throw new ParseException("Found EOF before closing RPAREN", lexer.cursor());
                 } else if (current.kind() == TokenKind.RPAREN) {
                     // immediately closed
                     lexer.next();
@@ -208,13 +208,13 @@ final class MolangParserImpl implements MolangParser {
                         // update current character
                         current = lexer.current();
                         if (current.kind() == TokenKind.EOF) {
-                            throw new ParseException("Found EOF before closing RPAREN", null);
+                            throw new ParseException("Found EOF before closing RPAREN", lexer.cursor());
                         } else if (current.kind() == TokenKind.RPAREN) {
                             lexer.next();
                             break;
                         } else {
                             if (current.kind() != TokenKind.COMMA) {
-                                throw new ParseException("Expected a comma", null);
+                                throw new ParseException("Expected a comma, got " + current.kind(), lexer.cursor());
                             }
                             lexer.next();
                         }
