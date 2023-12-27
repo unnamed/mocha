@@ -65,8 +65,8 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
         return NumberValue.of(_double);
     }
 
-    static @NotNull Value of(final @NotNull String string) {
-        return StringValue.of(string);
+    static @NotNull Value of(final @Nullable String string) {
+        return string == null ? nil() : StringValue.of(string);
     }
 
     static @NotNull Value nil() {
