@@ -33,8 +33,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HierarchyTest {
-
+class HierarchyTest {
     private static void assertCreateSameTree(String expr1, String expr2) throws Exception {
         MochaEngine<?> engine = MochaEngine.createStandard();
         List<Expression> expressions1 = engine.parse(expr1);
@@ -50,7 +49,7 @@ public class HierarchyTest {
     }
 
     @Test
-    public void test_logical_hierarchy() throws Exception {
+    void test_logical_hierarchy() throws Exception {
         List<Expression> expressions = MochaEngine.createStandard().parse("age <= 5 || age >= 70");
         assertEquals(1, expressions.size(), "Size must be 1: " + expressions);
 
@@ -81,7 +80,7 @@ public class HierarchyTest {
     }
 
     @Test
-    public void test_logical_hierarchy_2() throws Exception {
+    void test_logical_hierarchy_2() throws Exception {
         // OR, LTE, GTE
         assertCreateSameTree("((age) <= 5) || ((age) >= 70)", "age <= 5 || age >= 70");
         // access, LT, OR, GT
@@ -105,5 +104,4 @@ public class HierarchyTest {
         // eq, neq
         assertCreateSameTree("(((true) && (false == false)) || (true))", "true && false == false || true");
     }
-
 }
