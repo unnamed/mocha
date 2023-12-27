@@ -182,9 +182,41 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                 expectedType = currentExpectedType;
                 return new CompileVisitResult(currentExpectedType);
             }
-            case OR:
-                // not implemented
-                return new CompileVisitResult(CtClass.doubleType);
+            case OR: {
+                final int const_0;
+                final int const_1;
+
+                if (expectedType == CtClass.doubleType) {
+                    const_0 = Bytecode.DCONST_0;
+                    const_1 = Bytecode.DCONST_1;
+                } else if (expectedType == CtClass.floatType) {
+                    const_0 = Bytecode.FCONST_0;
+                    const_1 = Bytecode.FCONST_1;
+                } else if (expectedType == CtClass.longType) {
+                    const_0 = Bytecode.LCONST_0;
+                    const_1 = Bytecode.LCONST_1;
+                } else {
+                    const_0 = Bytecode.ICONST_0;
+                    const_1 = Bytecode.ICONST_1;
+                }
+
+                expectedType = CtClass.booleanType;
+                expression.left().visit(this); // pushes lhs value to stack as boolean
+                bytecode.addOpcode(Bytecode.IFNE); // if lhs is false set to zero
+                final int indexPc = bytecode.currentPc();
+                bytecode.addGap(2); // index1, index2 (we don't know how many bytes the next instruction will take)
+                expression.right().visit(this); // pushes rhs value to stack as boolean
+                bytecode.addOpcode(Bytecode.IFEQ); // if rhs is false set to zero
+                bytecode.addIndex(7); // index1, index2, const_1, goto, index1, index2, const_0
+                // jump here!
+                bytecode.write16bit(indexPc, bytecode.currentPc() - indexPc + 1);
+                bytecode.addOpcode(const_1);
+                bytecode.addOpcode(Bytecode.GOTO);
+                bytecode.addIndex(4); // index1, index2, const_0, ((?))
+                bytecode.addOpcode(const_0);
+                expectedType = currentExpectedType;
+                return new CompileVisitResult(currentExpectedType);
+            }
             case EQ:
             case NEQ:
             case LT:

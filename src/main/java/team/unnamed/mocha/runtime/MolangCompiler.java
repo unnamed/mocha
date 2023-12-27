@@ -209,6 +209,7 @@ public final class MolangCompiler {
                     String params = "";
                     switch (opcode) {
                         case Bytecode.IFEQ:
+                        case Bytecode.IFNE:
                         case Bytecode.GOTO: {
                             final int plus = it.s16bitAt(index + 1);
                             params += " +" + plus + " (" + (index + plus) + ")";

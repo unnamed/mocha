@@ -37,11 +37,35 @@ class LogicalCompiledRuntimeTest {
         final MochaEngine<?> engine = MochaEngine.createStandard();
 
         {
+            // 0: iload_1
+            // 1: ifeq        +11 (12)
+            // 4: iload_2
+            // 5: ifeq        +7 (12)
+            // 8: iconst_1
+            // 9: goto        +4 (13)
+            // 12: iconst_0
+            // 13: ireturn
             final LogicalFunction and = engine.compile("a && b", LogicalFunction.class);
             assertTrue(and.apply(true, true));
             assertFalse(and.apply(true, false));
             assertFalse(and.apply(false, true));
             assertFalse(and.apply(false, false));
+        }
+
+        {
+            // 0: iload_1
+            // 1: ifne        +7 (8)
+            // 4: iload_2
+            // 5: ifeq        +7 (12)
+            // 8: iconst_1
+            // 9: goto        +4 (13)
+            // 12: iconst_0
+            // 13: ireturn
+            final LogicalFunction or = engine.compile("a || b", LogicalFunction.class);
+            assertTrue(or.apply(true, true));
+            assertTrue(or.apply(true, false));
+            assertTrue(or.apply(false, true));
+            assertFalse(or.apply(false, false));
         }
     }
 
