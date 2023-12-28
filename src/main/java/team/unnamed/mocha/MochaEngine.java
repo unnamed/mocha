@@ -41,6 +41,8 @@ import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The engine's entry class. Provides methods to evaluate
  * and parse Molang code from strings and readers.
@@ -70,6 +72,8 @@ public interface MochaEngine<T> {
         return engine;
     }
 
+    //#region PARSING API
+
     /**
      * Parses the data from the given {@code reader}
      * to a {@link List} of {@link Expression}
@@ -77,10 +81,13 @@ public interface MochaEngine<T> {
      * <strong>Note that this method won't close
      * the given {@code reader}</strong>
      *
+     * @param reader The reader to read the data from
+     * @return The list of parsed expressions
      * @throws ParseException If read failed or there
      *                        are syntax errors in the script
+     * @since 3.0.0
      */
-    List<Expression> parse(Reader reader) throws IOException;
+    @NotNull List<Expression> parse(final @NotNull Reader reader) throws IOException;
 
     /**
      * Parses the given {@code string} to a list of
@@ -90,7 +97,7 @@ public interface MochaEngine<T> {
      * @return The list of parsed expressions
      * @throws ParseException If parsing fails
      */
-    default List<Expression> parse(String string) throws ParseException {
+    default @NotNull List<Expression> parse(final @NotNull String string) throws ParseException {
         try (final StringReader reader = new StringReader(string)) {
             return parse(reader);
         } catch (final ParseException e) {
@@ -100,15 +107,96 @@ public interface MochaEngine<T> {
         }
     }
 
-    double eval(List<Expression> expressions);
+    //#endregion END PARSING API
 
-    double eval(Reader reader);
+    //#region INTERPRETER API
 
-    default double eval(String script) {
-        try (StringReader reader = new StringReader(script)) {
+    /**
+     * Evaluates the given {@code expressions}, these expressions
+     * are already parsed and are interpreted as fast as possible.
+     *
+     * @param expressions The expressions to evaluate.
+     * @return The result of the evaluation.
+     * @since 3.0.0
+     */
+    double eval(final @NotNull List<Expression> expressions);
+
+    /**
+     * Parses and evaluates the given Molang source.
+     *
+     * <p>Note that the engine instance is not responsible
+     * for caching parsed expressions, so if you want to
+     * re-use parsed expressions, you should use the
+     * {@link #parse(Reader)} and {@link #eval(List)}
+     * methods.</p>
+     *
+     * @param source The source to evaluate.
+     * @return The result of the evaluation.
+     * @see #parse(Reader)
+     * @see #eval(List)
+     * @since 3.0.0
+     */
+    double eval(final @NotNull Reader source);
+
+    /**
+     * Parses and evaluates the given Molang source.
+     *
+     * <p>Note that the engine instance is not responsible
+     * for caching parsed expressions, so if you want to
+     * re-use parsed expressions, you should use the
+     * {@link #parse(String)} and {@link #eval(List)}
+     * methods.</p>
+     *
+     * @param source The source to evaluate.
+     * @return The result of the evaluation.
+     * @see #parse(String)
+     * @see #eval(List)
+     * @since 3.0.0
+     */
+    default double eval(final @NotNull String source) {
+        requireNonNull(source, "script");
+        try (final StringReader reader = new StringReader(source)) {
             return eval(reader);
         }
     }
+
+    /**
+     * Parses the data from the given {@code reader} and
+     * returns a cached, interpretable {@link MochaFunction}.
+     *
+     * <pre><strong>Note that this method won't close the given
+     * {@code reader}</strong></pre>
+     *
+     * <p>This approach is the same as parsing to a List of
+     * expressions, caching them and then evaluating using
+     * {@link #eval(List)}, but easier, since it already keeps
+     * this {@link MochaEngine} instance.</p>
+     *
+     * @param reader The reader to read the data from
+     * @return The cached, interpretable function
+     * @since 3.0.0
+     */
+    @NotNull MochaFunction prepareEval(final @NotNull Reader reader);
+
+    /**
+     * Parses the given {@code string} and returns a cached,
+     * interpretable {@link MochaFunction}.
+     *
+     * <p>This approach is the same as parsing to a List of
+     * expressions, caching them and then evaluating using
+     * {@link #eval(List)}, but easier, since it already keeps
+     * this {@link MochaEngine} instance.</p>
+     *
+     * @param string The MoLang string
+     * @return The cached, interpretable function
+     * @since 3.0.0
+     */
+    default @NotNull MochaFunction prepareEval(final @NotNull String string) {
+        try (final StringReader reader = new StringReader(string)) {
+            return prepareEval(reader);
+        }
+    }
+    //#endregion END INTERPRETER API
 
     //#region COMPILING API
 
@@ -135,6 +223,7 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     default <F extends MochaCompiledFunction> @NotNull F compile(final @NotNull String code, final @NotNull Class<F> interfaceType) {
+        requireNonNull(code, "code");
         try (final StringReader reader = new StringReader(code)) {
             return compile(reader, interfaceType);
         }
@@ -161,6 +250,7 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     default @NotNull MochaFunction compile(final @NotNull String code) {
+        requireNonNull(code, "code");
         try (final StringReader reader = new StringReader(code)) {
             return compile(reader);
         }
