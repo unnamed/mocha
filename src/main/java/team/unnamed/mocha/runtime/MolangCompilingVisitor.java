@@ -537,7 +537,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         }
 
         final GlobalScope scope = functionCompileState.scope();
-        final Value objectValue = objectExpr.visit(new ExpressionVisitor<>() {
+        final Value objectValue = objectExpr.visit(new ExpressionVisitor<Value>() {
             @Override
             public @NotNull Value visitIdentifier(final @NotNull IdentifierExpression expression) {
                 final String name = expression.name();
@@ -595,7 +595,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         final Expression functionExpr = expression.function();
         final GlobalScope scope = functionCompileState.scope();
 
-        final Value functionValue = functionExpr.visit(new ExpressionVisitor<>() {
+        final Value functionValue = functionExpr.visit(new ExpressionVisitor<Value>() {
             @Override
             public @NotNull Value visitIdentifier(final @NotNull IdentifierExpression expression) {
                 final String name = expression.name();

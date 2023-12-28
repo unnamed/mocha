@@ -36,6 +36,14 @@ tasks {
         useJUnitPlatform()
         dependsOn("generateExpectations")
     }
+    compileJmhJava {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+    compileJava {
+        sourceCompatibility = "8"
+        targetCompatibility = "8"
+    }
 }
 
 license {

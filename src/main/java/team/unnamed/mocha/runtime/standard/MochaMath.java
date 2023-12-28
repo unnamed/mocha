@@ -145,8 +145,8 @@ public final class MochaMath implements ObjectValue {
 
     @Binding("hermite_blend")
     public static double hermiteBlend(final double t) {
-        final var t2 = t * t;
-        final var t3 = t2 * t;
+        final double t2 = t * t;
+        final double t3 = t2 * t;
         return 3 * t2 - 2 * t3;
     }
 
