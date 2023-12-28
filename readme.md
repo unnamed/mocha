@@ -4,9 +4,9 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](license.txt)
 [![Discord](https://img.shields.io/discord/683899335405994062)](https://discord.gg/xbba2fy)
 
-`mocha`, a lightweight, fast and efficient Molang parser and interpreter for Java 8+. Molang is a
-simple **expression-based** language designed for fast and **data-driven** calculation of
-values at run-time.
+`mocha` is a lightweight, fast and efficient Molang lexer, parser, interpreter and compiler
+for Java 8+. Molang is a simple **expression-based** language designed for fast and **data-driven**
+calculation of values at run-time.
 
 Its focus is to enable low-level systems like animation to support flexible data-driven
 behavior, while staying highly performant.
