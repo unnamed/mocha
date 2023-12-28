@@ -91,4 +91,13 @@ public final class MochaAssertions {
     public static void assertEvaluates(final double expected, final @NotNull String expr) {
         assertEvaluates(expected, expr, engine -> engine);
     }
+
+    public static void assertEvaluatesAndCompiles(final double expected, final @NotNull String expr) {
+        final MochaEngine<?> engine = MochaEngine.createStandard();
+        final double result = engine.eval(expr);
+        assertEquals(expected, result, 0.0001, () -> "(Interpreted) expression: '" + expr + "' evaluated to " + result + ", expected " + expected);
+
+        final double compiledResult = engine.compile(expr).evaluate();
+        assertEquals(expected, compiledResult, 0.0001, () -> "(Compiled) expression: '" + expr + "' evaluated to " + compiledResult + ", expected " + expected);
+    }
 }
