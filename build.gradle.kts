@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    signing
     id("org.cadixdev.licenser") version "0.6.1"
     id("me.champeau.jmh") version "0.7.2"
 }
@@ -79,6 +80,34 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            pom {
+                name.set("Mocha")
+                description.set(project.description)
+                url.set("https://github.com/unnamed/mocha")
+                packaging = "jar"
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/mit/")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("yusshu")
+                        name.set("Andre Roldan")
+                        email.set("andre@unnamed.team")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/unnamed/mocha.git")
+                    developerConnection.set("scm:git:ssh://github.com/unnamed/mocha.git")
+                    url.set("https://github.com/unnamed/mocha")
+                }
+            }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["maven"])
 }
