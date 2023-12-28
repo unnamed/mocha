@@ -74,6 +74,12 @@ public final class MolangCompiler {
         requireNonNull(expressions, "expressions");
         requireNonNull(clazz, "clazz");
 
+        if (clazz == MochaFunction.class && expressions.isEmpty()) {
+            // no expressions and the target type is MochaFunction,
+            // we know the NOP function
+            return clazz.cast(MochaFunction.nop());
+        }
+
         if (!clazz.isInterface()) {
             throw new IllegalArgumentException("Target type must be an interface: " + clazz.getName());
         }
