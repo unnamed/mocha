@@ -52,11 +52,12 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
             (evaluator, a, b) -> {
                 final Value aVal = a.visit(evaluator);
                 final Value bVal = b.visit(evaluator);
-                if (aVal.isString() || bVal.isString()) {
-                    return StringValue.of(aVal.getAsString() + bVal.getAsString());
-                } else {
-                    return NumberValue.of(aVal.getAsNumber() + bVal.getAsNumber());
-                }
+                // string concatenation is not supported in molang
+                // if (aVal.isString() || bVal.isString()) {
+                //     return StringValue.of(aVal.getAsString() + bVal.getAsString());
+                // } else {
+                return NumberValue.of(aVal.getAsNumber() + bVal.getAsNumber());
+                // }
             },
             arithmetic((a, b) -> a.eval() - b.eval()),
             arithmetic((a, b) -> a.eval() * b.eval()),
@@ -205,7 +206,14 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     public @NotNull Value visitAccess(final @NotNull AccessExpression expression) {
         final Value objectValue = expression.object().visit(this);
         if (objectValue instanceof ObjectValue) {
-            return ((ObjectValue) objectValue).get(expression.property());
+            Value val = ((ObjectValue) objectValue).get(expression.property());
+            if (val == null) {
+                System.out.println("nil");
+                System.out.println(objectValue);
+                System.out.println(expression.object());
+                System.out.println(expression.property());
+            }
+            return val;
         }
         return NumberValue.zero();
     }
