@@ -49,5 +49,8 @@ class CaseSensitivityTest {
         assertEvaluatesAndCompiles(50D, "math.CLAMP(10, 50, 100)");
 
         assertEvaluatesAndCompiles(108.1415, "MATH.ABS(-100) + Math.sqrt(25) + math.PI");
+
+        assertEvaluatesAndCompiles(1D, "tEMP.x = 1; return Temp.X;");
+        assertEvaluatesAndCompiles(1D, "temp.X = 2; tEMp.y = 3; return TEMP.Y - Temp.x;");
     }
 }
