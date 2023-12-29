@@ -30,6 +30,15 @@ import java.util.Collections;
 import java.util.Map;
 
 public interface ObjectValue extends Value {
+    /**
+     * Gets the value of the specified property,
+     * ignoring its casing. This method is
+     * CASE-INSENSITIVE.
+     *
+     * @param name The name of the property
+     * @return The value of the property
+     * @since 3.0.0
+     */
     @NotNull Value get(final @NotNull String name);
 
     default boolean set(final @NotNull String name, final @Nullable Value value) {
