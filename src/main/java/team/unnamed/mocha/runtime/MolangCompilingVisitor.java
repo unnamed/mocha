@@ -37,12 +37,12 @@ import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
     private final Map<String, Object> requirements;
     private final Map<String, Integer> argumentParameterIndexes;
 
-    private final Map<String, Integer> localsByName = new HashMap<>();
+    private final Map<String, Integer> localsByName = new CaseInsensitiveStringHashMap<>();
 
     private final CtClass stringCtType;
     /**

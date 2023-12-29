@@ -41,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.compiled.Named;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -48,7 +49,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -99,7 +99,7 @@ public final class MolangCompiler {
             throw new IllegalArgumentException("Target type must have a method to implement: " + clazz.getName());
         }
 
-        final Map<String, Integer> argumentParameterIndexes = new HashMap<>();
+        final Map<String, Integer> argumentParameterIndexes = new CaseInsensitiveStringHashMap<>();
         final CtClass[] ctParameters;
 
         // check method parameter types

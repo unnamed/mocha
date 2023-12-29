@@ -27,9 +27,9 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.bytecode.Bytecode;
 import org.jetbrains.annotations.NotNull;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -42,10 +42,9 @@ final class FunctionCompileState {
     private final Bytecode bytecode;
     private final Method method;
 
-    private final Map<String, Object> requirements = new HashMap<>();
+    private final Map<String, Object> requirements = new CaseInsensitiveStringHashMap<>();
     private final GlobalScope scope;
     private final Map<String, Integer> argumentParameterIndexes;
-    private final Map<String, Integer> localsByName = new HashMap<>();
     private int maxLocals = 0;
 
     FunctionCompileState(
@@ -99,9 +98,5 @@ final class FunctionCompileState {
 
     public void maxLocals(int maxLocals) {
         this.maxLocals = maxLocals;
-    }
-
-    public Map<String, Integer> getLocalsByName() {
-        return localsByName;
     }
 }
