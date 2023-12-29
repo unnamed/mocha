@@ -29,17 +29,17 @@ import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 @ApiStatus.Internal
 public final class JavaObjectBinding implements ObjectValue {
-    private final Map<String, Object> entries = new HashMap<>();
+    private final Map<String, Object> entries = new CaseInsensitiveStringHashMap<>();
 
     private static <T extends Value> T getBacking(final @Nullable Map<String, Value> backingProperties, final @NotNull String functionName, final Class<T> valueType) {
         if (backingProperties != null) {
@@ -83,7 +83,7 @@ public final class JavaObjectBinding implements ObjectValue {
                         }
                     }
 
-                    object.entries.put(functionName.toLowerCase(), new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
+                    object.entries.put(functionName, new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
                 }
             }
         }
@@ -96,7 +96,7 @@ public final class JavaObjectBinding implements ObjectValue {
 
             final String propertyName = annotation.value();
             final Value backingValue = getBacking(backingProperties, propertyName, Value.class);
-            object.entries.put(propertyName.toLowerCase(), new JavaFieldBinding(
+            object.entries.put(propertyName, new JavaFieldBinding(
                     instance,
                     field,
                     backingValue == null ? null : () -> backingValue
@@ -114,14 +114,14 @@ public final class JavaObjectBinding implements ObjectValue {
             }
 
             final String functionName = annotation.value();
-            object.entries.put(functionName.toLowerCase(), new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
+            object.entries.put(functionName, new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
         }
 
         return object;
     }
 
     public @Nullable JavaFieldBinding getField(final @NotNull String name) {
-        final Object value = entries.get(name.toLowerCase());
+        final Object value = entries.get(name);
         if (value instanceof JavaFieldBinding) {
             return (JavaFieldBinding) value;
         } else {
@@ -131,7 +131,7 @@ public final class JavaObjectBinding implements ObjectValue {
 
     @Override
     public @NotNull Value get(final @NotNull String name) {
-        final Object value = entries.get(name.toLowerCase());
+        final Object value = entries.get(name);
         if (value == null) {
             return Value.nil();
         } else if (value instanceof JavaFieldBinding) {

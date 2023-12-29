@@ -25,8 +25,8 @@ package team.unnamed.mocha.runtime.value;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -38,16 +38,8 @@ import static java.util.Objects.requireNonNull;
  * sometimes written
  */
 public class MutableObjectBinding implements ObjectValue {
-    private final Map<String, Value> properties;
+    private final Map<String, Value> properties = new CaseInsensitiveStringHashMap<>();
     private boolean blocked = false;
-
-    protected MutableObjectBinding(Map<String, Value> propertiesMap) {
-        this.properties = propertiesMap;
-    }
-
-    public MutableObjectBinding() {
-        this(new HashMap<>());
-    }
 
     /**
      * Gets the property value in this

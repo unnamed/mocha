@@ -26,12 +26,12 @@ package team.unnamed.mocha.runtime;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.Value;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 final class GlobalScopeImpl implements GlobalScope {
-    private final Map<String, Value> bindings = new HashMap<>();
+    private final Map<String, Value> bindings = new CaseInsensitiveStringHashMap<>();
 
     @Override
     public @NotNull Value get(final @NotNull String name) {

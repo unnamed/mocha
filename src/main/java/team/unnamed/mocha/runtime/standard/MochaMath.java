@@ -29,8 +29,8 @@ import team.unnamed.mocha.runtime.binding.Binding;
 import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
+import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -58,7 +58,7 @@ public final class MochaMath implements ObjectValue {
     private static final Random RANDOM = new Random();
     private static final int DECIMAL_PART = 4;
 
-    private final Map<String, Value> entries = new HashMap<>();
+    private final Map<String, Value> entries = new CaseInsensitiveStringHashMap<>();
 
     public MochaMath() {
         setFunction("abs", Math::abs);
