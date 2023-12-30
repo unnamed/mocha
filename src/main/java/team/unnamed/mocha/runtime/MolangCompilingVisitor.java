@@ -668,36 +668,41 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                 it.next().visit(this);
             }
 
+            final CtClass nativeMethodDeclaringCtClass;
+            final CtClass ctReturnType;
+
+            try {
+                nativeMethodDeclaringCtClass = classPool.get(nativeMethod.getDeclaringClass().getName());
+                ctReturnType = classPool.get(nativeMethod.getReturnType().getName());
+            } catch (final NotFoundException e) {
+                throw new IllegalStateException("Return type not found", e);
+            }
+
             if (Modifier.isStatic(nativeMethod.getModifiers())) {
                 // invoke static
-                try {
-                    final CtClass ctReturnType = classPool.get(nativeMethod.getReturnType().getName());
-                    bytecode.addInvokestatic(
-                            classPool.get(nativeMethod.getDeclaringClass().getName()),
-                            nativeMethod.getName(),
-                            ctReturnType,
-                            ctParameters
-                    );
-
-                    if (nativeMethod.getReturnType() == void.class) {
-                        bytecode.addDconst(0D);
-                    } else if (nativeMethod.getReturnType() != double.class) {
-                        JavaTypes.addCast(bytecode, ctReturnType, CtClass.doubleType);
-                    }
-                } catch (final NotFoundException e) {
-                    throw new IllegalStateException("Method not found", e);
-                }
+                bytecode.addInvokestatic(nativeMethodDeclaringCtClass, nativeMethod.getName(), ctReturnType, ctParameters);
             } else {
-                throw new UnsupportedOperationException("Instance calls are not supported yet (" + nativeMethod + ")");
-                // requirements.put(_native.objectName(), object);
+                final String fieldName = object.getClass().getSimpleName().toLowerCase() + Integer.toHexString(object.hashCode());
+                requirements.put(fieldName, object);
+
+                final CtClass requirementType;
+
+                try {
+                    requirementType = classPool.get(object.getClass().getName());
+                } catch (final NotFoundException e) {
+                    throw new IllegalStateException("Field not found", e);
+                }
 
                 // we must load object
-                // bytecode.addAload(0);
-                // bytecode.addGetfield(
-                //classPool.get(method.getDeclaringClass().getName()),
-                //_native.objectName(),
-                //Descriptor.of(classPool.get(object.getClass().getName()))
-                //);
+                bytecode.addAload(0);
+                bytecode.addGetfield(functionCompileState.type(), fieldName, Descriptor.of(requirementType));
+                bytecode.addInvokevirtual(nativeMethodDeclaringCtClass, nativeMethod.getName(), ctReturnType, ctParameters);
+            }
+
+            if (nativeMethod.getReturnType() == void.class) {
+                bytecode.addDconst(0D);
+            } else if (nativeMethod.getReturnType() != double.class) {
+                JavaTypes.addCast(bytecode, ctReturnType, CtClass.doubleType);
             }
         }
         return null;
