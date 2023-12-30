@@ -28,16 +28,16 @@ import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
 
-public interface GlobalScope extends ObjectValue {
-    static @NotNull GlobalScope create() {
-        return new GlobalScopeImpl();
+public interface Scope extends ObjectValue {
+    static @NotNull Scope create() {
+        return new ScopeImpl();
     }
 
     static @NotNull Builder builder() {
-        return new GlobalScopeImpl.BuilderImpl();
+        return new ScopeImpl.BuilderImpl();
     }
 
-    @NotNull GlobalScope copy();
+    @NotNull Scope copy();
 
     void forceSet(final @NotNull String name, final @NotNull Value value);
 
@@ -55,6 +55,6 @@ public interface GlobalScope extends ObjectValue {
     interface Builder {
         Builder set(final @NotNull String name, final @NotNull Value value);
 
-        GlobalScope build();
+        Scope build();
     }
 }

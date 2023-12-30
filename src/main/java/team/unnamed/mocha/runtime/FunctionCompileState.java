@@ -43,7 +43,7 @@ final class FunctionCompileState {
     private final Method method;
 
     private final Map<String, Object> requirements = new CaseInsensitiveStringHashMap<>();
-    private final GlobalScope scope;
+    private final Scope scope;
     private final Map<String, Integer> argumentParameterIndexes;
     private int maxLocals = 0;
 
@@ -52,7 +52,7 @@ final class FunctionCompileState {
             ClassPool classPool,
             CtClass ctClass, Bytecode bytecode,
             Method method,
-            GlobalScope scope,
+            Scope scope,
             Map<String, Integer> argumentParameterIndexes
     ) {
         this.compiler = requireNonNull(compiler, "compiler");
@@ -84,7 +84,7 @@ final class FunctionCompileState {
         return requirements;
     }
 
-    public @NotNull GlobalScope scope() {
+    public @NotNull Scope scope() {
         return scope;
     }
 

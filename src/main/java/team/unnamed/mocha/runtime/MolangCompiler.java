@@ -62,9 +62,9 @@ public final class MolangCompiler {
     private final ClassLoader classLoader;
     private final ClassPool classPool;
 
-    private final GlobalScope scope;
+    private final Scope scope;
 
-    public MolangCompiler(final @NotNull ClassLoader classLoader, final @NotNull GlobalScope scope) {
+    public MolangCompiler(final @NotNull ClassLoader classLoader, final @NotNull Scope scope) {
         this.classLoader = requireNonNull(classLoader, "classLoader");
         this.classPool = ClassPool.getDefault();
         this.scope = requireNonNull(scope, "scope");

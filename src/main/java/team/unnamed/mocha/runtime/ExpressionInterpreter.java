@@ -121,11 +121,11 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
     );
 
     private final T entity;
-    private final GlobalScope scope;
+    private final Scope scope;
     private @Nullable Object flag;
     private @Nullable Value returnValue;
 
-    public ExpressionInterpreter(final @Nullable T entity, final @NotNull GlobalScope scope) {
+    public ExpressionInterpreter(final @Nullable T entity, final @NotNull Scope scope) {
         this.entity = entity;
         this.scope = requireNonNull(scope, "scope");
     }
@@ -181,7 +181,7 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
         return new ExpressionInterpreter<>(this.entity, this.scope);
     }
 
-    public @NotNull GlobalScope bindings() {
+    public @NotNull Scope bindings() {
         return scope;
     }
 

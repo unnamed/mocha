@@ -31,7 +31,7 @@ import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.util.Map;
 
-final class GlobalScopeImpl implements GlobalScope {
+final class ScopeImpl implements Scope {
     private final Map<String, ObjectProperty> bindings = new CaseInsensitiveStringHashMap<>();
 
     @Override
@@ -40,8 +40,8 @@ final class GlobalScopeImpl implements GlobalScope {
     }
 
     @Override
-    public @NotNull GlobalScope copy() {
-        final GlobalScopeImpl copy = new GlobalScopeImpl();
+    public @NotNull Scope copy() {
+        final ScopeImpl copy = new ScopeImpl();
         copy.bindings.putAll(this.bindings);
         return copy;
     }
@@ -66,8 +66,8 @@ final class GlobalScopeImpl implements GlobalScope {
         }
 
         @Override
-        public GlobalScope build() {
-            GlobalScopeImpl impl = new GlobalScopeImpl();
+        public Scope build() {
+            ScopeImpl impl = new ScopeImpl();
             impl.bindings.putAll(properties);
             return impl;
         }

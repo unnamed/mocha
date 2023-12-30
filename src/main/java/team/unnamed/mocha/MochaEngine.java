@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
-import team.unnamed.mocha.runtime.GlobalScope;
 import team.unnamed.mocha.runtime.MochaFunction;
+import team.unnamed.mocha.runtime.Scope;
 import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.standard.MochaMath;
@@ -56,7 +56,7 @@ public interface MochaEngine<T> {
         });
     }
 
-    static <T> MochaEngine<T> create(T entity, Consumer<GlobalScope.Builder> scopeBuilder) {
+    static <T> MochaEngine<T> create(T entity, Consumer<Scope.Builder> scopeBuilder) {
         return new MochaEngineImpl<>(entity, scopeBuilder);
     }
 
@@ -287,7 +287,7 @@ public interface MochaEngine<T> {
      * @return This engine's bindings
      * @since 3.0.0
      */
-    @NotNull GlobalScope scope();
+    @NotNull Scope scope();
 
     void bindVariable(String key, Object binding);
 

@@ -28,9 +28,9 @@ import team.unnamed.mocha.parser.MolangParser;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.ExpressionInterpreter;
-import team.unnamed.mocha.runtime.GlobalScope;
 import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.MolangCompiler;
+import team.unnamed.mocha.runtime.Scope;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import team.unnamed.mocha.runtime.value.NumberValue;
@@ -44,12 +44,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 final class MochaEngineImpl<T> implements MochaEngine<T> {
-    private final GlobalScope scope;
+    private final Scope scope;
     private final T entity;
     private final MolangCompiler compiler;
 
-    public MochaEngineImpl(final T entity, final Consumer<GlobalScope.Builder> scopeBuilder) {
-        GlobalScope.Builder builder = GlobalScope.builder();
+    public MochaEngineImpl(final T entity, final Consumer<Scope.Builder> scopeBuilder) {
+        Scope.Builder builder = Scope.builder();
         scopeBuilder.accept(builder);
         this.scope = builder.build();
         this.entity = entity;
@@ -60,7 +60,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     @Override
     public double eval(final @NotNull List<Expression> expressions) {
         // create bindings that just apply for this evaluation
-        final GlobalScope localBindings = scope.copy();
+        final Scope localBindings = scope.copy();
         //localBindings.setAllFrom(this.bindings);
         {
             // create temp bindings
@@ -169,7 +169,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     }
 
     @Override
-    public @NotNull GlobalScope scope() {
+    public @NotNull Scope scope() {
         return scope;
     }
 

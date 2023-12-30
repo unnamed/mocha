@@ -35,9 +35,9 @@ import static java.util.Objects.requireNonNull;
 
 final class ExpressionInliner implements ExpressionVisitor<@NotNull Expression> {
     private final ExpressionInterpreter<?> interpreter;
-    private final GlobalScope scope;
+    private final Scope scope;
 
-    ExpressionInliner(final @NotNull ExpressionInterpreter<?> interpreter, final @NotNull GlobalScope scope) {
+    ExpressionInliner(final @NotNull ExpressionInterpreter<?> interpreter, final @NotNull Scope scope) {
         this.interpreter = requireNonNull(interpreter, "interpreter");
         this.scope = requireNonNull(scope, "scope");
     }

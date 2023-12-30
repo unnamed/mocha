@@ -43,7 +43,7 @@ public final class IsConstantExpression implements ExpressionVisitor<@NotNull Bo
     private final ExpressionInterpreter<?> evaluator;
     private final ObjectValue scope;
 
-    private IsConstantExpression(final @Nullable GlobalScope scope) {
+    private IsConstantExpression(final @Nullable Scope scope) {
         this.evaluator = scope == null ? null : new ExpressionInterpreter<>(null, scope);
         this.scope = scope;
     }
@@ -52,7 +52,7 @@ public final class IsConstantExpression implements ExpressionVisitor<@NotNull Bo
         return expression.visit(INSTANCE);
     }
 
-    public static boolean test(final @NotNull Expression expression, final @NotNull GlobalScope scope) {
+    public static boolean test(final @NotNull Expression expression, final @NotNull Scope scope) {
         return expression.visit(new IsConstantExpression(scope));
     }
 
