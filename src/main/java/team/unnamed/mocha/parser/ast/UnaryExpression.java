@@ -39,14 +39,10 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class UnaryExpression implements Expression {
-
     private final Op op;
-    private final Expression expression;
+    private Expression expression;
 
-    public UnaryExpression(
-            final @NotNull Op op,
-            final @NotNull Expression expression
-    ) {
+    public UnaryExpression(final @NotNull Op op, final @NotNull Expression expression) {
         this.op = requireNonNull(op, "op");
         this.expression = requireNonNull(expression, "expression");
     }
@@ -69,6 +65,16 @@ public final class UnaryExpression implements Expression {
      */
     public @NotNull Expression expression() {
         return expression;
+    }
+
+    /**
+     * Sets the operated expression.
+     *
+     * @param expression The operated expression.
+     * @since 3.0.0
+     */
+    public void expression(final @NotNull Expression expression) {
+        this.expression = requireNonNull(expression, "expression");
     }
 
     @Override

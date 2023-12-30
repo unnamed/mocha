@@ -60,7 +60,7 @@ public final class JavaFieldBinding implements RegisteredBinding {
     private final Object object;
     private final Field field;
     private Supplier<Value> value;
-    private boolean canBeInlined;
+    private boolean constant;
 
     JavaFieldBinding(final @Nullable Object object, final @Nullable Field field, final @Nullable Supplier<Value> value) {
         this.object = object;
@@ -86,7 +86,7 @@ public final class JavaFieldBinding implements RegisteredBinding {
                     && INLINEABLE_TYPES.contains(type)) {
                 final Value val = getFromField();
                 this.value = () -> val;
-                this.canBeInlined = true;
+                this.constant = true;
             }
         }
     }
@@ -95,8 +95,8 @@ public final class JavaFieldBinding implements RegisteredBinding {
         return field;
     }
 
-    public boolean canBeInlined() {
-        return canBeInlined;
+    public boolean constant() {
+        return constant;
     }
 
     public @NotNull Value get() {

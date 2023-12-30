@@ -33,6 +33,10 @@ public interface GlobalScope extends ObjectValue {
         return new GlobalScopeImpl();
     }
 
+    static @NotNull Builder builder() {
+        return new GlobalScopeImpl.BuilderImpl();
+    }
+
     @NotNull GlobalScope copy();
 
     void forceSet(final @NotNull String name, final @NotNull Value value);
@@ -46,5 +50,11 @@ public interface GlobalScope extends ObjectValue {
             forceSet("q", query);
             return query;
         }
+    }
+
+    interface Builder {
+        Builder set(final @NotNull String name, final @NotNull Value value);
+
+        GlobalScope build();
     }
 }

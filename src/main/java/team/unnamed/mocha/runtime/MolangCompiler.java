@@ -175,7 +175,7 @@ public final class MolangCompiler {
                 CompileVisitResult lastVisitResult = null;
 
                 for (final Expression expression : expressions) {
-                    lastVisitResult = expression.visit(visitor);
+                    lastVisitResult = expression.visit(new ExpressionInliner(new ExpressionInterpreter<>(null, scope), scope)).visit(visitor);
                 }
 
                 if (lastVisitResult == null || !lastVisitResult.returned()) {

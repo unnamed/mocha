@@ -38,13 +38,10 @@ import static java.util.Objects.requireNonNull;
  */
 public final class AccessExpression implements Expression {
 
-    private final Expression object;
     private final String property;
+    private Expression object;
 
-    public AccessExpression(
-            final @NotNull Expression object,
-            final @NotNull String property
-    ) {
+    public AccessExpression(final @NotNull Expression object, final @NotNull String property) {
         this.object = requireNonNull(object, "object");
         this.property = requireNonNull(property, "property");
     }
@@ -58,6 +55,17 @@ public final class AccessExpression implements Expression {
      */
     public @NotNull Expression object() {
         return object;
+    }
+
+    /**
+     * Sets the "object" expression, the property is
+     * evaluated on this expression's result.
+     *
+     * @param object The object expression.
+     * @since 3.0.0
+     */
+    public void object(final @NotNull Expression object) {
+        this.object = requireNonNull(object, "object");
     }
 
     /**

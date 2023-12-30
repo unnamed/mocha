@@ -44,8 +44,7 @@ class ArrowOperatorTest {
         new Entity(world, 15, "Chicken");
         new Entity(world, 0, "Zombie");
 
-        final MochaEngine<Entity> engine = MochaEngine.create(self);
-        engine.bindDefaults();
+        final MochaEngine<Entity> engine = MochaEngine.createStandard(self);
         engine.scope().forceSet("self", new JavaValue(self));
         engine.scope().query().set("get_location", (Function<Entity>) (ctx, args) -> NumberValue.of(ctx.entity().location));
         engine.scope().query().set("get_nearby_entities", (Function<Entity>) (ctx, args) -> {

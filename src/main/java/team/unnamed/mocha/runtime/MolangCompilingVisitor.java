@@ -67,6 +67,8 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             Bytecode.IFNE //        NEQ(500);
     };
 
+    private final ExpressionInterpreter<?> interpreter;
+
     private final ClassPool classPool;
     private final Bytecode bytecode;
     private final Method method;
@@ -89,6 +91,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
     private CtClass expectedType = null;
 
     MolangCompilingVisitor(final @NotNull FunctionCompileState compileState) {
+        this.interpreter = new ExpressionInterpreter<>(null, compileState.scope());
         this.functionCompileState = compileState;
         this.classPool = compileState.classPool();
         this.bytecode = compileState.bytecode();
@@ -134,13 +137,6 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                     }
                 }
             }
-        }
-
-        if (IsConstantExpression.test(expression)) {
-            // can be evaluated in compile-time
-            final double result = expression.visit(ExpressionEvaluator.evaluator()).getAsNumber();
-            bytecode.addLdc2w(result);
-            return new CompileVisitResult(CtClass.doubleType);
         }
 
         final CtClass currentExpectedType = expectedType;
@@ -435,13 +431,6 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         final Expression trueExpr = expression.trueExpression();
         final Expression falseExpr = expression.falseExpression();
 
-        if (IsConstantExpression.test(conditionExpr)) {
-            // condition can be evaluated in compile-time
-            final boolean condition = conditionExpr.visit(ExpressionEvaluator.evaluator()).getAsBoolean();
-            final Expression resultExpr = condition ? trueExpr : falseExpr;
-            return resultExpr.visit(this);
-        }
-
         final CtClass currentExpectedType = expectedType;
         expectedType = CtClass.booleanType;
         final CompileVisitResult conditionRes = expression.condition().visit(this); // push boolean value to stack
@@ -567,7 +556,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                 if (javaFieldBinding == null) {
                     // push zero only
                     bytecode.addDconst(0D);
-                } else if (javaFieldBinding.canBeInlined()) {
+                } else if (javaFieldBinding.constant()) {
                     // inline const
                     bytecode.addDconst(javaFieldBinding.get().getAsNumber());
                 } else {
@@ -592,8 +581,8 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
 
     @Override
     public CompileVisitResult visitCall(final @NotNull CallExpression expression) {
-        final Expression functionExpr = expression.function();
         final GlobalScope scope = functionCompileState.scope();
+        final Expression functionExpr = expression.function();
 
         final Value functionValue = functionExpr.visit(new ExpressionVisitor<Value>() {
             @Override

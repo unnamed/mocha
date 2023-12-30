@@ -112,10 +112,10 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
             }
             return joiner.toString();
         } else if (this instanceof ObjectValue) {
-            final Map<String, Value> values = ((ObjectValue) this).entries();
+            final Map<String, ObjectProperty> values = ((ObjectValue) this).entries();
             final StringJoiner joiner = new StringJoiner(", ", "{", "}");
-            for (final Map.Entry<String, Value> entry : values.entrySet()) {
-                joiner.add(entry.getKey() + ": " + entry.getValue().getAsString());
+            for (final Map.Entry<String, ObjectProperty> entry : values.entrySet()) {
+                joiner.add(entry.getKey() + ": " + entry.getValue().value().getAsString());
             }
             return joiner.toString();
         } else if (this instanceof Function<?>) {

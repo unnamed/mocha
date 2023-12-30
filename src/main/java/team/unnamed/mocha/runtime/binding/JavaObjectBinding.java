@@ -27,6 +27,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.ObjectProperty;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
 import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
@@ -41,11 +42,11 @@ import java.util.Map;
 public final class JavaObjectBinding implements ObjectValue {
     private final Map<String, Object> entries = new CaseInsensitiveStringHashMap<>();
 
-    private static <T extends Value> T getBacking(final @Nullable Map<String, Value> backingProperties, final @NotNull String functionName, final Class<T> valueType) {
+    private static <T extends Value> T getBacking(final @Nullable Map<String, ObjectProperty> backingProperties, final @NotNull String functionName, final Class<T> valueType) {
         if (backingProperties != null) {
-            final Value removed = backingProperties.get(functionName);
-            if (valueType.isInstance(removed)) {
-                return valueType.cast(removed);
+            final ObjectProperty property = backingProperties.get(functionName);
+            if (property != null && valueType.isInstance(property.value())) {
+                return valueType.cast(property.value());
             }
         }
         return null;
@@ -53,7 +54,7 @@ public final class JavaObjectBinding implements ObjectValue {
 
     public static <T> @NotNull JavaObjectBinding of(final @NotNull Class<T> clazz, final @Nullable T instance) {
         final JavaObjectBinding object = new JavaObjectBinding();
-        final Map<String, Value> backingProperties = instance instanceof ObjectValue ? ((ObjectValue) instance).entries() : null;
+        final Map<String, ObjectProperty> backingProperties = instance instanceof ObjectValue ? ((ObjectValue) instance).entries() : null;
 
         {
             // check external bindings
@@ -83,7 +84,14 @@ public final class JavaObjectBinding implements ObjectValue {
                         }
                     }
 
-                    object.entries.put(functionName, new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
+                    final Function backing = getBacking(backingProperties, functionName, Function.class);
+                    final boolean pure = externalFunctionBinding.pure();
+
+                    if (backing != null && backing.pure() != pure) {
+                        throw new IllegalStateException("Different 'pure' values for interface and Java functions for function " + functionName);
+                    }
+
+                    object.entries.put(functionName, new JavaFunction<>(instance, method, backing, pure));
                 }
             }
         }
@@ -114,7 +122,14 @@ public final class JavaObjectBinding implements ObjectValue {
             }
 
             final String functionName = annotation.value();
-            object.entries.put(functionName, new JavaFunction<>(instance, method, getBacking(backingProperties, functionName, Function.class)));
+            final Function backing = getBacking(backingProperties, functionName, Function.class);
+            final boolean pure = annotation.pure();
+
+            if (backing != null && backing.pure() != pure) {
+                throw new IllegalStateException("Different 'pure' values for interface and Java functions for function " + functionName);
+            }
+
+            object.entries.put(functionName, new JavaFunction<>(instance, method, backing, pure));
         }
 
         return object;
@@ -130,15 +145,17 @@ public final class JavaObjectBinding implements ObjectValue {
     }
 
     @Override
-    public @NotNull Value get(final @NotNull String name) {
+    public @Nullable ObjectProperty getProperty(final @NotNull String name) {
         final Object value = entries.get(name);
         if (value == null) {
-            return Value.nil();
+            return null;
         } else if (value instanceof JavaFieldBinding) {
-            // todo:
-            return ((JavaFieldBinding) value).get();
+            return ObjectProperty.property(
+                    ((JavaFieldBinding) value).get(),
+                    ((JavaFieldBinding) value).constant()
+            );
         } else {
-            return (Value) value;
+            return ObjectProperty.property((Value) value, true);
         }
     }
 

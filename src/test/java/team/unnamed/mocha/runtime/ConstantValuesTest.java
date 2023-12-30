@@ -23,17 +23,12 @@
  */
 package team.unnamed.mocha.runtime;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import team.unnamed.mocha.parser.ast.Expression;
-import team.unnamed.mocha.runtime.value.Value;
+import org.junit.jupiter.api.Test;
+import team.unnamed.mocha.MochaEngine;
 
-public interface ExecutionContext<T> {
-    T entity();
-
-    @Nullable Value eval(final @NotNull Expression expression);
-
-    @Nullable Object flag();
-
-    void flag(final @Nullable Object flag);
+class ConstantValuesTest {
+    @Test
+    void test() {
+        MochaEngine.createStandard().compile("math.abs(-5) + math.abs(5) + math.sqrt(25)");
+    }
 }

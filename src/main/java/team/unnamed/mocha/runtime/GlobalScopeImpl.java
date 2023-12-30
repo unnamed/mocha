@@ -24,18 +24,19 @@
 package team.unnamed.mocha.runtime;
 
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.mocha.runtime.value.NumberValue;
+import org.jetbrains.annotations.Nullable;
+import team.unnamed.mocha.runtime.value.ObjectProperty;
 import team.unnamed.mocha.runtime.value.Value;
 import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.util.Map;
 
 final class GlobalScopeImpl implements GlobalScope {
-    private final Map<String, Value> bindings = new CaseInsensitiveStringHashMap<>();
+    private final Map<String, ObjectProperty> bindings = new CaseInsensitiveStringHashMap<>();
 
     @Override
-    public @NotNull Value get(final @NotNull String name) {
-        return bindings.getOrDefault(name, NumberValue.zero());
+    public @Nullable ObjectProperty getProperty(final @NotNull String name) {
+        return bindings.get(name);
     }
 
     @Override
@@ -47,11 +48,28 @@ final class GlobalScopeImpl implements GlobalScope {
 
     @Override
     public void forceSet(final @NotNull String name, final @NotNull Value value) {
-        bindings.put(name, value);
+        bindings.put(name, ObjectProperty.property(value, false));
     }
 
     @Override
-    public @NotNull Map<String, Value> entries() {
+    public @NotNull Map<String, ObjectProperty> entries() {
         return bindings;
+    }
+
+    static final class BuilderImpl implements Builder {
+        private final Map<String, ObjectProperty> properties = new CaseInsensitiveStringHashMap<>();
+
+        @Override
+        public Builder set(@NotNull String name, @NotNull Value value) {
+            properties.put(name, ObjectProperty.property(value, true));
+            return this;
+        }
+
+        @Override
+        public GlobalScope build() {
+            GlobalScopeImpl impl = new GlobalScopeImpl();
+            impl.bindings.putAll(properties);
+            return impl;
+        }
     }
 }

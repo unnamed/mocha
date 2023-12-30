@@ -24,7 +24,12 @@
 package team.unnamed.mocha.runtime;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.*;
+import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.value.ObjectProperty;
+import team.unnamed.mocha.runtime.value.ObjectValue;
+import team.unnamed.mocha.runtime.value.Value;
 
 /**
  * A {@link ExpressionVisitor} that determines whether an expression is
@@ -33,13 +38,22 @@ import team.unnamed.mocha.parser.ast.*;
  * @since 3.0.0
  */
 public final class IsConstantExpression implements ExpressionVisitor<@NotNull Boolean> {
-    private static final ExpressionVisitor<Boolean> INSTANCE = new IsConstantExpression();
+    private static final ExpressionVisitor<Boolean> INSTANCE = new IsConstantExpression(null);
 
-    private IsConstantExpression() {
+    private final ExpressionInterpreter<?> evaluator;
+    private final ObjectValue scope;
+
+    private IsConstantExpression(final @Nullable GlobalScope scope) {
+        this.evaluator = scope == null ? null : new ExpressionInterpreter<>(null, scope);
+        this.scope = scope;
     }
 
     public static boolean test(final @NotNull Expression expression) {
         return expression.visit(INSTANCE);
+    }
+
+    public static boolean test(final @NotNull Expression expression, final @NotNull GlobalScope scope) {
+        return expression.visit(new IsConstantExpression(scope));
     }
 
     @Override
@@ -62,8 +76,19 @@ public final class IsConstantExpression implements ExpressionVisitor<@NotNull Bo
 
     @Override
     public @NotNull Boolean visitIdentifier(final @NotNull IdentifierExpression expression) {
-        // identifiers are not constants
-        return false;
+        if (scope == null) {
+            // scope not given, can't know if it's constant or not
+            return false;
+        }
+
+        final ObjectProperty property = scope.getProperty(expression.name());
+        if (property == null) {
+            // property not found, can't know if it's constant or not
+            return false;
+        }
+
+        // property is constant if it's constant (duh) (copilot wrote this)
+        return property.constant();
     }
 
     @Override
@@ -99,15 +124,73 @@ public final class IsConstantExpression implements ExpressionVisitor<@NotNull Bo
 
     @Override
     public @NotNull Boolean visitAccess(final @NotNull AccessExpression expression) {
-        // access expressions are constant if their object is constant
-        return expression.object().visit(this); // 'string'.length may not require context
+        final Expression objectExpr = expression.object();
+
+        if (!objectExpr.visit(this)) {
+            // object is not constant, accessing won't be constant either
+            return false;
+        }
+
+        if (evaluator == null) {
+            // can't evaluate the value of our object, can't know if accessing a
+            // property will be constant or not
+            return false;
+        }
+
+        final Value objectValue = objectExpr.visit(evaluator);
+        if (!(objectValue instanceof ObjectValue)) {
+            // it's not an object, accessing it will always give zero, so it is constant
+            return true;
+        }
+
+        final ObjectProperty property = ((ObjectValue) objectValue).getProperty(expression.property());
+        if (property == null) {
+            // property not found, can't know if it's constant or not
+            return false;
+        }
+        return property.constant();
     }
 
     @Override
     public @NotNull Boolean visitCall(final @NotNull CallExpression expression) {
-        // calls are never constant
-        // todo: they may be, e.g. math.min(1, 2) is always 1
-        return false;
+        for (final Expression argument : expression.arguments()) {
+            if (!argument.visit(this)) {
+                // non-constant argument indicates non-constant call
+                return false;
+            }
+        }
+
+        final Expression functionExpr = expression.function();
+
+        // check for built-in functions
+        if (functionExpr instanceof IdentifierExpression) {
+            final String name = ((IdentifierExpression) functionExpr).name();
+            if (name.equalsIgnoreCase("loop") || name.equalsIgnoreCase("for_each")) {
+                return true;
+            }
+        }
+
+        if (!functionExpr.visit(this)) {
+            // function is not constant (reference to this function may variate,
+            //   this doesn't indicate if the function is pure/inlineable)
+            return false;
+        }
+
+        if (evaluator == null) {
+            // can't evaluate the value of our function, can't know if calling it will
+            // be constant or not
+            return false;
+        }
+
+        final Value function = functionExpr.visit(evaluator);
+        if (!(function instanceof Function<?>)) {
+            // trying to call this function (which is not a function) will always result
+            // in an error (zero), which is constant
+            return true;
+        }
+
+        // function call is constant if function is pure
+        return ((Function<?>) function).pure();
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.ExecutionContext;
-import team.unnamed.mocha.runtime.ExpressionEvaluatorImpl;
+import team.unnamed.mocha.runtime.ExpressionInterpreter;
 
 /**
  * Represents a Molang function. Receives a certain amount of
@@ -64,13 +64,34 @@ public interface Function<T> extends Value {
     }
 
     /**
+     * Determines if this function is pure or not.
+     *
+     * <p>A pure function is a function that has the following properties:</p>
+     * <ol>
+     *     <li>The function return values are <b>identical for identical
+     *     arguments</b>, and</li>
+     *     <li>The function has <b>no side effects</b></li>
+     * </ol>
+     *
+     * <p>The compiler or interpreter may pre-evaluate these functions ahead
+     * of time. In case of compiling, the function may be called during compile
+     * time, to use the function's result instead.</p>
+     *
+     * @return If this function is pure or not.
+     * @since 3.0.0
+     */
+    default boolean pure() {
+        return false;
+    }
+
+    /**
      * Represents a collection of {@link Function} {@link Argument}s.
      *
      * @since 3.0.0
      */
     interface Arguments {
         static @NotNull Arguments empty() {
-            return ExpressionEvaluatorImpl.FunctionArguments.EMPTY;
+            return ExpressionInterpreter.FunctionArguments.EMPTY;
         }
 
         /**

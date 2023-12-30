@@ -24,11 +24,12 @@
 package team.unnamed.mocha.runtime.standard;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.runtime.binding.BindExternalFunction;
 import team.unnamed.mocha.runtime.binding.Binding;
 import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.value.ObjectProperty;
 import team.unnamed.mocha.runtime.value.ObjectValue;
-import team.unnamed.mocha.runtime.value.Value;
 import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.util.Map;
@@ -39,16 +40,16 @@ import java.util.Random;
  * binding, commonly named 'math'
  */
 @Binding("math")
-@BindExternalFunction(at = Math.class, name = "abs", args = {double.class})
-@BindExternalFunction(at = Math.class, name = "log", args = {double.class}, as = "ln")
-@BindExternalFunction(at = Math.class, name = "max", args = {double.class, double.class})
-@BindExternalFunction(at = Math.class, name = "min", args = {double.class, double.class})
-@BindExternalFunction(at = Math.class, name = "round", args = {double.class})
-@BindExternalFunction(at = Math.class, name = "sqrt", args = {double.class})
-@BindExternalFunction(at = Math.class, name = "pow", args = {double.class, double.class})
-@BindExternalFunction(at = Math.class, name = "exp", args = {double.class})
-@BindExternalFunction(at = Math.class, name = "floor", args = {double.class})
-@BindExternalFunction(at = Math.class, name = "ceil", args = {double.class})
+@BindExternalFunction(at = Math.class, name = "abs", args = {double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "log", args = {double.class}, as = "ln", pure = true)
+@BindExternalFunction(at = Math.class, name = "max", args = {double.class, double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "min", args = {double.class, double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "round", args = {double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "sqrt", args = {double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "pow", args = {double.class, double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "exp", args = {double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "floor", args = {double.class}, pure = true)
+@BindExternalFunction(at = Math.class, name = "ceil", args = {double.class}, pure = true)
 public final class MochaMath implements ObjectValue {
     @Binding("pi")
     public static final double PI = Math.PI;
@@ -58,7 +59,7 @@ public final class MochaMath implements ObjectValue {
     private static final Random RANDOM = new Random();
     private static final int DECIMAL_PART = 4;
 
-    private final Map<String, Value> entries = new CaseInsensitiveStringHashMap<>();
+    private final Map<String, ObjectProperty> entries = new CaseInsensitiveStringHashMap<>();
 
     public MochaMath() {
         setFunction("abs", Math::abs);
@@ -81,7 +82,7 @@ public final class MochaMath implements ObjectValue {
         setFunction("min", Math::min);
         setFunction("min_angle", MochaMath::minAngle);
         setFunction("mod", MochaMath::mod);
-        entries.put("pi", NumberValue.of(Math.PI));
+        entries.put("pi", ObjectProperty.property(NumberValue.of(Math.PI), true));
         setFunction("pow", Math::pow);
         setFunction("random", MochaMath::random);
         setFunction("random_integer", MochaMath::randomInteger);
@@ -89,38 +90,41 @@ public final class MochaMath implements ObjectValue {
         setFunction("sin", MochaMath::sin);
         setFunction("sqrt", Math::sqrt);
         setFunction("trunc", MochaMath::trunc);
+
+        // all of our properties are constant
+        entries.replaceAll((key, property) -> ObjectProperty.property(property.value(), true));
     }
 
     private static double radify(double n) {
         return (((n + 180) % 360) + 180) % 360;
     }
 
-    @Binding(value = "acos", skipChecking = true)
+    @Binding(value = "acos", skipChecking = true, pure = true)
     public static double acos(final double value) {
         return NumberValue.normalize(Math.acos(value) / RADIAN);
     }
 
-    @Binding(value = "asin", skipChecking = true)
+    @Binding(value = "asin", skipChecking = true, pure = true)
     public static double asin(final double value) {
         return NumberValue.normalize(Math.asin(value) / RADIAN);
     }
 
-    @Binding("atan")
+    @Binding(value = "atan", pure = true)
     public static double atan(final double value) {
         return Math.atan(value) / RADIAN;
     }
 
-    @Binding("atan2")
+    @Binding(value = "atan2", pure = true)
     public static double atan2(final double y, final double x) {
         return Math.atan2(y, x) / RADIAN;
     }
 
-    @Binding("clamp")
+    @Binding(value = "clamp", pure = true)
     public static double clamp(final double value, final double min, final double max) {
         return Math.max(Math.min(value, max), min);
     }
 
-    @Binding("cos")
+    @Binding(value = "cos", pure = true)
     public static double cos(final double value) {
         return Math.cos(value * RADIAN);
     }
@@ -143,19 +147,19 @@ public final class MochaMath implements ObjectValue {
         return result;
     }
 
-    @Binding("hermite_blend")
+    @Binding(value = "hermite_blend", pure = true)
     public static double hermiteBlend(final double t) {
         final double t2 = t * t;
         final double t3 = t2 * t;
         return 3 * t2 - 2 * t3;
     }
 
-    @Binding("lerp")
+    @Binding(value = "lerp", pure = true)
     public static double lerp(final double start, final double end, final double lerp) {
         return start + lerp * (end - start);
     }
 
-    @Binding("lerprotate")
+    @Binding(value = "lerprotate", pure = true)
     public static double lerpRotate(double start, double end, double lerp) {
         start = radify(start);
         end = radify(end);
@@ -175,7 +179,7 @@ public final class MochaMath implements ObjectValue {
         }
     }
 
-    @Binding("min_angle")
+    @Binding(value = "min_angle", pure = true)
     public static double minAngle(double angle) {
         while (angle > 180)
             angle -= 360;
@@ -184,7 +188,7 @@ public final class MochaMath implements ObjectValue {
         return angle;
     }
 
-    @Binding("mod")
+    @Binding(value = "mod", pure = true)
     public static double mod(final double a, final double b) {
         return a % b;
     }
@@ -199,18 +203,18 @@ public final class MochaMath implements ObjectValue {
         return RANDOM.nextInt((int) min, (int) max);
     }
 
-    @Binding("sin")
+    @Binding(value = "sin", pure = true)
     public static double sin(final double value) {
         return Math.sin(value * RADIAN);
     }
 
-    @Binding("trunc")
+    @Binding(value = "trunc", pure = true)
     public static double trunc(final double value) {
         return value - value % 1;
     }
 
     @Override
-    public @NotNull Value get(final @NotNull String name) {
-        return entries.getOrDefault(name, NumberValue.zero());
+    public @Nullable ObjectProperty getProperty(final @NotNull String name) {
+        return entries.get(name);
     }
 }

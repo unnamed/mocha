@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.Map;
 
 public interface ObjectValue extends Value {
+    @Nullable ObjectProperty getProperty(final @NotNull String name);
+
     /**
      * Gets the value of the specified property,
      * ignoring its casing. This method is
@@ -39,13 +41,20 @@ public interface ObjectValue extends Value {
      * @return The value of the property
      * @since 3.0.0
      */
-    @NotNull Value get(final @NotNull String name);
+    default @NotNull Value get(final @NotNull String name) {
+        final ObjectProperty property = getProperty(name);
+        if (property == null) {
+            return Value.nil();
+        } else {
+            return property.value();
+        }
+    }
 
     default boolean set(final @NotNull String name, final @Nullable Value value) {
         return false;
     }
 
-    default @NotNull Map<String, Value> entries() {
+    default @NotNull Map<String, ObjectProperty> entries() {
         return Collections.emptyMap();
     }
 

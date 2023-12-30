@@ -39,14 +39,10 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class CallExpression implements Expression {
-
-    private final Expression function;
     private final List<Expression> arguments;
+    private Expression function;
 
-    public CallExpression(
-            final @NotNull Expression function,
-            final @NotNull List<Expression> arguments
-    ) {
+    public CallExpression(final @NotNull Expression function, final @NotNull List<Expression> arguments) {
         this.function = requireNonNull(function, "function");
         this.arguments = requireNonNull(arguments, "arguments");
     }
@@ -58,6 +54,15 @@ public final class CallExpression implements Expression {
      */
     public @NotNull Expression function() {
         return function;
+    }
+
+    /**
+     * Sets the function expression.
+     *
+     * @since 3.0.0
+     */
+    public void function(final @NotNull Expression function) {
+        this.function = requireNonNull(function, "function");
     }
 
     /**

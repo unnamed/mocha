@@ -36,12 +36,14 @@ import java.lang.reflect.Method;
 public final class JavaFunction<T> implements Function<T> {
     private final Object object;
     private final Method method;
+    private final boolean pure;
     private Function<T> function;
 
-    JavaFunction(final @Nullable Object object, final @Nullable Method method, final @Nullable Function<T> function) {
+    JavaFunction(final @Nullable Object object, final @Nullable Method method, final @Nullable Function<T> function, final boolean pure) {
         this.object = object;
         this.method = method;
         this.function = function;
+        this.pure = pure;
         evaluate();
     }
 
@@ -67,5 +69,10 @@ public final class JavaFunction<T> implements Function<T> {
     @Override
     public @Nullable Value evaluate(final @NotNull ExecutionContext<T> context, final @NotNull Arguments arguments) {
         return function.evaluate(context, arguments);
+    }
+
+    @Override
+    public boolean pure() {
+        return pure;
     }
 }

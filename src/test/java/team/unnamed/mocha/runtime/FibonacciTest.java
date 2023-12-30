@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.value.ObjectProperty;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 
 import java.io.ByteArrayOutputStream;
@@ -79,7 +80,7 @@ public class FibonacciTest {
         MochaEngine<?> engine = MochaEngine.createStandard();
         engine.scope().forceSet("query", (ObjectValue) name -> {
             if (name.equalsIgnoreCase("log")) {
-                return (Function<?>) (ctx, args) -> {
+                return ObjectProperty.property((Function<?>) (ctx, args) -> {
                     int i = 0;
                     final StringJoiner joiner = new StringJoiner(" ");
                     while (i++ < args.length()) {
@@ -87,9 +88,9 @@ public class FibonacciTest {
                     }
                     stdout.println(joiner);
                     return NumberValue.zero();
-                };
+                }, true);
             }
-            return NumberValue.zero();
+            return null;
         });
         final double result = engine.eval(code);
 

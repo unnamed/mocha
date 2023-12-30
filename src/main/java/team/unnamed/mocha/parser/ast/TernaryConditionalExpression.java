@@ -43,16 +43,11 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class TernaryConditionalExpression implements Expression {
+    private Expression conditional;
+    private Expression trueExpression;
+    private Expression falseExpression;
 
-    private final Expression conditional;
-    private final Expression trueExpression;
-    private final Expression falseExpression;
-
-    public TernaryConditionalExpression(
-            final @NotNull Expression conditional,
-            final @NotNull Expression trueExpression,
-            final @NotNull Expression falseExpression
-    ) {
+    public TernaryConditionalExpression(final @NotNull Expression conditional, final @NotNull Expression trueExpression, final @NotNull Expression falseExpression) {
         this.conditional = requireNonNull(conditional, "conditional");
         this.trueExpression = requireNonNull(trueExpression, "trueExpression");
         this.falseExpression = requireNonNull(falseExpression, "falseExpression");
@@ -68,6 +63,16 @@ public final class TernaryConditionalExpression implements Expression {
     }
 
     /**
+     * Sets the expression condition.
+     *
+     * @param condition The condition
+     * @since 3.0.0
+     */
+    public void condition(final @NotNull Expression condition) {
+        this.conditional = requireNonNull(condition, "condition");
+    }
+
+    /**
      * Gets the expression that should be used when
      * condition is evaluated as a truthy value.
      *
@@ -77,6 +82,16 @@ public final class TernaryConditionalExpression implements Expression {
         return trueExpression;
     }
 
+    /**
+     * Sets the expression that should be used when
+     * condition is evaluated as a truthy value.
+     *
+     * @param trueExpression The true expression
+     * @since 3.0.0
+     */
+    public void trueExpression(final @NotNull Expression trueExpression) {
+        this.trueExpression = requireNonNull(trueExpression, "trueExpression");
+    }
 
     /**
      * Gets the expression that should be used when
@@ -86,6 +101,17 @@ public final class TernaryConditionalExpression implements Expression {
      */
     public @NotNull Expression falseExpression() {
         return falseExpression;
+    }
+
+    /**
+     * Sets the expression that should be used when
+     * condition is evaluated as a falsy value.
+     *
+     * @param falseExpression The false expression
+     * @since 3.0.0
+     */
+    public void falseExpression(final @NotNull Expression falseExpression) {
+        this.falseExpression = requireNonNull(falseExpression, "falseExpression");
     }
 
     @Override

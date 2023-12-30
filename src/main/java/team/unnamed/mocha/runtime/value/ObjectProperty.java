@@ -21,19 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime;
+package team.unnamed.mocha.runtime.value;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import team.unnamed.mocha.parser.ast.Expression;
-import team.unnamed.mocha.runtime.value.Value;
 
-public interface ExecutionContext<T> {
-    T entity();
+/**
+ * Represents a {@link ObjectValue} property.
+ *
+ * @since 3.0.0
+ */
+public interface ObjectProperty {
+    /**
+     * Creates a new {@link ObjectProperty} with the given
+     * {@link Value} and constant flag.
+     *
+     * @param value    The value of the property
+     * @param constant Whether the property is constant or not
+     * @return The created property
+     * @since 3.0.0
+     */
+    static @NotNull ObjectProperty property(final @NotNull Value value, final boolean constant) {
+        return new ObjectPropertyImpl(value, constant);
+    }
+    
+    /**
+     * Returns the value of this property.
+     *
+     * @return The value of this property
+     * @since 3.0.0
+     */
+    @NotNull Value value();
 
-    @Nullable Value eval(final @NotNull Expression expression);
-
-    @Nullable Object flag();
-
-    void flag(final @Nullable Object flag);
+    /**
+     * Determines whether this property is constant and cannot
+     * be changed in runtime.
+     *
+     * @return Whether this property is constant or not
+     * @since 3.0.0
+     */
+    boolean constant();
 }

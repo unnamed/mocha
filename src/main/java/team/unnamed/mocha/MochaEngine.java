@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,11 +52,34 @@ import static java.util.Objects.requireNonNull;
  */
 public interface MochaEngine<T> {
     static <T> MochaEngine<T> create(T entity) {
-        return new MochaEngineImpl<>(entity);
+        return new MochaEngineImpl<>(entity, b -> {
+        });
+    }
+
+    static <T> MochaEngine<T> create(T entity, Consumer<GlobalScope.Builder> scopeBuilder) {
+        return new MochaEngineImpl<>(entity, scopeBuilder);
     }
 
     static MochaEngine<?> create() {
-        return new MochaEngineImpl<>(null);
+        return new MochaEngineImpl<>(null, b -> {
+        });
+    }
+
+    /**
+     * Creates a new, clean and empty {@link MochaEngine} instance
+     * with the standard, default bindings.
+     *
+     * @return The created {@link MochaEngine} instance.
+     * @since 3.0.0
+     */
+    @Contract("_ -> new")
+    static <T> @NotNull MochaEngine<T> createStandard(T entity) {
+        return create(entity, builder -> {
+            builder.set("math", JavaObjectBinding.of(MochaMath.class, new MochaMath()));
+            final MutableObjectBinding variableBinding = new MutableObjectBinding();
+            builder.set("variable", variableBinding);
+            builder.set("v", variableBinding);
+        });
     }
 
     /**
@@ -67,9 +91,7 @@ public interface MochaEngine<T> {
      */
     @Contract("-> new")
     static @NotNull MochaEngine<?> createStandard() {
-        final MochaEngine<?> engine = create();
-        engine.bindDefaults();
-        return engine;
+        return createStandard(null);
     }
 
     //#region PARSING API
@@ -266,21 +288,6 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     @NotNull GlobalScope scope();
-
-    /**
-     * Makes this engine use the default bindings.
-     *
-     * <p>Default bindings include math and query bindings.</p>
-     *
-     * @since 3.0.0
-     */
-    default void bindDefaults() {
-        scope().forceSet("math", JavaObjectBinding.of(MochaMath.class, new MochaMath()));
-
-        final MutableObjectBinding variableBinding = new MutableObjectBinding();
-        scope().forceSet("variable", variableBinding);
-        scope().forceSet("v", variableBinding);
-    }
 
     void bindVariable(String key, Object binding);
 

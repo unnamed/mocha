@@ -38,16 +38,12 @@ import static java.util.Objects.requireNonNull;
  * sometimes written
  */
 public class MutableObjectBinding implements ObjectValue {
-    private final Map<String, Value> properties = new CaseInsensitiveStringHashMap<>();
+    private final Map<String, ObjectProperty> properties = new CaseInsensitiveStringHashMap<>();
     private boolean blocked = false;
 
-    /**
-     * Gets the property value in this
-     * object with the given {@code name}
-     */
     @Override
-    public @NotNull Value get(final @NotNull String name) {
-        return properties.getOrDefault(name, NumberValue.zero());
+    public @Nullable ObjectProperty getProperty(final @NotNull String name) {
+        return properties.get(name);
     }
 
     /**
@@ -63,7 +59,7 @@ public class MutableObjectBinding implements ObjectValue {
         if (value == null) {
             properties.remove(name);
         } else {
-            properties.put(name, value);
+            properties.put(name, ObjectProperty.property(value, false));
         }
         return true;
     }

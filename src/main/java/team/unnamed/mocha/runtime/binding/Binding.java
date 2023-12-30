@@ -94,4 +94,23 @@ public @interface Binding {
      * @since 3.0.0
      */
     boolean skipChecking() default false;
+
+    /**
+     * (For methods only) Determines if this method is pure or not.
+     *
+     * <p>A pure method is a method that has the following properties:</p>
+     * <ol>
+     *     <li>The method return values are <b>identical for identical
+     *     arguments</b>, and</li>
+     *     <li>The method has <b>no side effects</b></li>
+     * </ol>
+     *
+     * <p>The compiler or interpreter may pre-evaluate these functions ahead
+     * of time. In case of compiling, the function may be called during compile
+     * time, to use the function's result instead.</p>
+     *
+     * @return If this function is pure or not.
+     * @since 3.0.0
+     */
+    boolean pure() default false;
 }

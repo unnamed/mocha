@@ -23,6 +23,7 @@
  */
 package team.unnamed.mocha.runtime;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.*;
@@ -40,8 +41,8 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> {
-
+@ApiStatus.Internal
+public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>, ExecutionContext<T> {
     private static final List<Evaluator> BINARY_EVALUATORS = Arrays.asList(
             bool((a, b) -> a.eval() && b.eval()),
             bool((a, b) -> a.eval() || b.eval()),
@@ -124,7 +125,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     private @Nullable Object flag;
     private @Nullable Value returnValue;
 
-    public ExpressionEvaluatorImpl(final @Nullable T entity, final @NotNull GlobalScope scope) {
+    public ExpressionInterpreter(final @Nullable T entity, final @NotNull GlobalScope scope) {
         this.entity = entity;
         this.scope = requireNonNull(scope, "scope");
     }
@@ -166,23 +167,24 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     @Override
-    public <R> @NotNull ExpressionEvaluator<R> createChild(final @Nullable R entity) {
-        return new ExpressionEvaluatorImpl<>(entity, this.scope);
+    public @NotNull Value eval(final @NotNull Expression expression) {
+        return expression.visit(this);
     }
 
-    @Override
-    public @NotNull ExpressionEvaluator<T> createChild() {
+    public <R> @NotNull ExpressionInterpreter<R> createChild(final @Nullable R entity) {
+        return new ExpressionInterpreter<>(entity, this.scope);
+    }
+
+    public @NotNull ExpressionInterpreter<T> createChild() {
         // Note that it will have its own returnValue, but same bindings
         // (Should we create new bindings?)
-        return new ExpressionEvaluatorImpl<>(this.entity, this.scope);
+        return new ExpressionInterpreter<>(this.entity, this.scope);
     }
 
-    @Override
     public @NotNull GlobalScope bindings() {
         return scope;
     }
 
-    @Override
     public @Nullable Value popReturnValue() {
         final Value val = this.returnValue;
         this.returnValue = null;
@@ -241,7 +243,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                 if (expr instanceof Function) {
                     final Function<T> callable = (Function<T>) expr;
                     for (int i = 0; i < n; i++) {
-                        final ExpressionEvaluator<T> evaluatorThisCall = createChild();
+                        final ExpressionInterpreter<T> evaluatorThisCall = createChild();
                         callable.evaluate(evaluatorThisCall);
                         if (evaluatorThisCall.flag() == StatementExpression.Op.BREAK) {
                             break;
@@ -285,7 +287,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
                     for (final Value val : arrayIterable) {
                         // set 'val' as current value
                         // eval (objectExpr.propertyName = val)
-                        final Object evaluatedObjectValue = this.eval(objectExpr);
+                        final Value evaluatedObjectValue = this.eval(objectExpr);
                         if (evaluatedObjectValue instanceof MutableObjectBinding) {
                             ((MutableObjectBinding) evaluatedObjectValue).set(propertyName, val);
                         }
@@ -395,7 +397,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
     }
 
     private interface Evaluator {
-        @NotNull Value eval(ExpressionEvaluator<?> evaluator, Expression a, Expression b);
+        @NotNull Value eval(ExpressionInterpreter<?> evaluator, Expression a, Expression b);
     }
 
     private interface BooleanOperator {
@@ -472,7 +474,7 @@ public final class ExpressionEvaluatorImpl<T> implements ExpressionEvaluator<T> 
 
         @Override
         public @Nullable Value eval() {
-            return expression.visit(ExpressionEvaluatorImpl.this);
+            return expression.visit(ExpressionInterpreter.this);
         }
     }
 }

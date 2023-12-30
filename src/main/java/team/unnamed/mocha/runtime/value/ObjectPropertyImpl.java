@@ -21,19 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package team.unnamed.mocha.runtime;
+package team.unnamed.mocha.runtime.value;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import team.unnamed.mocha.parser.ast.Expression;
-import team.unnamed.mocha.runtime.value.Value;
 
-public interface ExecutionContext<T> {
-    T entity();
+import static java.util.Objects.requireNonNull;
 
-    @Nullable Value eval(final @NotNull Expression expression);
+final class ObjectPropertyImpl implements ObjectProperty {
+    private final Value value;
+    private final boolean constant;
 
-    @Nullable Object flag();
+    ObjectPropertyImpl(final @NotNull Value value, final boolean constant) {
+        this.value = requireNonNull(value, "value");
+        this.constant = constant;
+    }
 
-    void flag(final @Nullable Object flag);
+    @Override
+    public @NotNull Value value() {
+        return value;
+    }
+
+    @Override
+    public boolean constant() {
+        return constant;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "ObjectProperty(" + value + "(" + (constant ? "constant" : "variable") + "))";
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final ObjectPropertyImpl that = (ObjectPropertyImpl) o;
+        if (constant != that.constant) return false;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value.hashCode();
+        result = 31 * result + (constant ? 1 : 0);
+        return result;
+    }
 }

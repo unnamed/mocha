@@ -38,8 +38,8 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class ArrayAccessExpression implements Expression {
-    private final Expression array;
-    private final Expression index;
+    private Expression array;
+    private Expression index;
 
     public ArrayAccessExpression(final @NotNull Expression array, final @NotNull Expression index) {
         this.array = requireNonNull(array, "array");
@@ -58,6 +58,17 @@ public final class ArrayAccessExpression implements Expression {
     }
 
     /**
+     * Sets the 'array' expression, the index is evaluated on this
+     * expression's result.
+     *
+     * @param array The new array expression.
+     * @since 3.0.0
+     */
+    public void array(final @NotNull Expression array) {
+        this.array = requireNonNull(array, "array");
+    }
+
+    /**
      * Gets the 'index' expression, the index is evaluated on this
      * expression's result.
      *
@@ -66,6 +77,17 @@ public final class ArrayAccessExpression implements Expression {
      */
     public @NotNull Expression index() {
         return index;
+    }
+
+    /**
+     * Sets the 'index' expression, the index is evaluated on this
+     * expression's result.
+     *
+     * @param index The new index expression.
+     * @since 3.0.0
+     */
+    public void index(final @NotNull Expression index) {
+        this.index = requireNonNull(index, "index");
     }
 
     @Override

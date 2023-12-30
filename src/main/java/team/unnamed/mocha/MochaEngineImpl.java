@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.MolangParser;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
-import team.unnamed.mocha.runtime.ExpressionEvaluator;
+import team.unnamed.mocha.runtime.ExpressionInterpreter;
 import team.unnamed.mocha.runtime.GlobalScope;
 import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.MolangCompiler;
@@ -41,13 +41,17 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 final class MochaEngineImpl<T> implements MochaEngine<T> {
-    private final GlobalScope scope = GlobalScope.create();
+    private final GlobalScope scope;
     private final T entity;
     private final MolangCompiler compiler;
 
-    public MochaEngineImpl(final T entity) {
+    public MochaEngineImpl(final T entity, final Consumer<GlobalScope.Builder> scopeBuilder) {
+        GlobalScope.Builder builder = GlobalScope.builder();
+        scopeBuilder.accept(builder);
+        this.scope = builder.build();
         this.entity = entity;
         this.compiler = new MolangCompiler(getClass().getClassLoader(), scope);
     }
@@ -64,7 +68,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             localBindings.forceSet("temp", temp);
             localBindings.forceSet("t", temp);
         }
-        ExpressionEvaluator<T> evaluator = ExpressionEvaluator.evaluator(entity, localBindings);
+        ExpressionInterpreter<T> evaluator = new ExpressionInterpreter<>(entity, localBindings);
         Value lastResult = NumberValue.zero();
 
         for (Expression expression : expressions) {

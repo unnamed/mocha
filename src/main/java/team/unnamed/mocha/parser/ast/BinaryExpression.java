@@ -38,16 +38,11 @@ import static java.util.Objects.requireNonNull;
  * @since 3.0.0
  */
 public final class BinaryExpression implements Expression {
-
     private final Op op;
-    private final Expression left;
-    private final Expression right;
+    private Expression left;
+    private Expression right;
 
-    public BinaryExpression(
-            final @NotNull Op op,
-            final @NotNull Expression left,
-            final @NotNull Expression right
-    ) {
+    public BinaryExpression(final @NotNull Op op, final @NotNull Expression left, final @NotNull Expression right) {
         this.op = requireNonNull(op, "op");
         this.left = requireNonNull(left, "left");
         this.right = requireNonNull(right, "right");
@@ -75,6 +70,17 @@ public final class BinaryExpression implements Expression {
     }
 
     /**
+     * Sets the left-hand expression for this
+     * binary expression.
+     *
+     * @param left The left-hand expression
+     * @since 3.0.0
+     */
+    public void left(final @NotNull Expression left) {
+        this.left = requireNonNull(left, "left");
+    }
+
+    /**
      * Gets the right-hand expression for this
      * binary expression.
      *
@@ -83,6 +89,17 @@ public final class BinaryExpression implements Expression {
      */
     public @NotNull Expression right() {
         return right;
+    }
+
+    /**
+     * Sets the right-hand expression for this
+     * binary expression.
+     *
+     * @param right The right-hand expression
+     * @since 3.0.0
+     */
+    public void right(final @NotNull Expression right) {
+        this.right = requireNonNull(right, "right");
     }
 
     @Override
