@@ -29,10 +29,10 @@ import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.Scope;
+import team.unnamed.mocha.runtime.binding.Binding;
 import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.standard.MochaMath;
-import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 
 import java.io.IOException;
@@ -280,6 +280,29 @@ public interface MochaEngine<T> {
 
     //#endregion END COMPILING API
 
+    //#region BINDING API
+
+    /**
+     * Binds the given {@code clazz} static fields and methods.
+     *
+     * <p>Fields and methods are bound in the following format:</p>
+     * <pre>
+     *     namespace.field
+     *     namespace.method()
+     *     namespace.method(arg1, arg2)
+     * </pre>
+     *
+     * <p>Where {@code namespace} is given by the given class'
+     * {@link Binding} annotation, and the field and method
+     * names are also given by {@link Binding} annotations.</p>
+     *
+     * @param clazz The class to bind.
+     * @see Binding
+     * @since 3.0.0
+     */
+    void bind(final @NotNull Class<?> clazz);
+    //#endregion
+
     /**
      * Returns the bindings for this Molang engine
      * instance.
@@ -288,12 +311,4 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     @NotNull Scope scope();
-
-    void bindVariable(String key, Object binding);
-
-    void bindQuery(String key, Object binding);
-
-    default void bindQueryFunction(String key, Function<T> function) {
-        bindQuery(key, function);
-    }
 }

@@ -38,6 +38,7 @@ import javassist.bytecode.StackMapTable;
 import javassist.bytecode.stackmap.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.compiled.Named;
@@ -59,15 +60,21 @@ import static java.util.Objects.requireNonNull;
 public final class MolangCompiler {
     private static final Random RANDOM = new Random();
     public static boolean debug = true;
+    private final Object entity;
     private final ClassLoader classLoader;
     private final ClassPool classPool;
 
     private final Scope scope;
 
-    public MolangCompiler(final @NotNull ClassLoader classLoader, final @NotNull Scope scope) {
+    public MolangCompiler(final @Nullable Object entity, final @NotNull ClassLoader classLoader, final @NotNull Scope scope) {
+        this.entity = entity;
         this.classLoader = requireNonNull(classLoader, "classLoader");
         this.classPool = ClassPool.getDefault();
         this.scope = requireNonNull(scope, "scope");
+    }
+
+    public @Nullable Object entity() {
+        return entity;
     }
 
     public <T extends MochaCompiledFunction> @NotNull T compile(final @NotNull List<Expression> expressions, final @NotNull Class<T> clazz) {

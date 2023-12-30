@@ -31,6 +31,7 @@ import team.unnamed.mocha.runtime.ExpressionInterpreter;
 import team.unnamed.mocha.runtime.MochaFunction;
 import team.unnamed.mocha.runtime.MolangCompiler;
 import team.unnamed.mocha.runtime.Scope;
+import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
 import team.unnamed.mocha.runtime.value.NumberValue;
@@ -53,7 +54,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         scopeBuilder.accept(builder);
         this.scope = builder.build();
         this.entity = entity;
-        this.compiler = new MolangCompiler(getClass().getClassLoader(), scope);
+        this.compiler = new MolangCompiler(entity, getClass().getClassLoader(), scope);
     }
 
 
@@ -174,11 +175,11 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     }
 
     @Override
-    public void bindVariable(String key, Object binding) {
-    }
-
-    @Override
-    public void bindQuery(String key, Object binding) {
+    public void bind(final @NotNull Class<?> clazz) {
+        final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, null);
+        for (final String name : javaObjectBinding.names()) {
+            scope.forceSet(name, javaObjectBinding);
+        }
     }
 
     @Override

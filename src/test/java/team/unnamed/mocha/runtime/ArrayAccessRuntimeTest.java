@@ -25,8 +25,7 @@ package team.unnamed.mocha.runtime;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.value.ArrayValue;
-import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.binding.Binding;
 
 import java.util.function.UnaryOperator;
 
@@ -36,11 +35,7 @@ class ArrayAccessRuntimeTest {
     @Test
     void test() {
         final UnaryOperator<MochaEngine<?>> configurer = engine -> {
-            engine.scope().query().set("values", ArrayValue.of(
-                    NumberValue.of(5D),
-                    NumberValue.of(10D),
-                    NumberValue.of(100D)
-            ));
+            engine.bind(QueryImpl.class);
             return engine;
         };
 
@@ -53,5 +48,11 @@ class ArrayAccessRuntimeTest {
         assertEvaluates(5D, "q.values[0.5]", configurer);
         assertEvaluates(10D, "q.values[0.5 + 0.5]", configurer);
         assertEvaluates(100D, "q.values[math.pi - 1]", configurer);
+    }
+
+    @Binding({"query", "q"})
+    public static class QueryImpl {
+        @Binding("values")
+        public static final double[] VALUES = {5D, 10D, 100D};
     }
 }

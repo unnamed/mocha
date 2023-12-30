@@ -38,9 +38,16 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 @ApiStatus.Internal
 public final class JavaObjectBinding implements ObjectValue {
+    private final String[] names;
     private final Map<String, Object> entries = new CaseInsensitiveStringHashMap<>();
+
+    JavaObjectBinding(final @NotNull String @NotNull [] names) {
+        this.names = requireNonNull(names, "names");
+    }
 
     private static <T extends Value> T getBacking(final @Nullable Map<String, ObjectProperty> backingProperties, final @NotNull String functionName, final Class<T> valueType) {
         if (backingProperties != null) {
@@ -53,7 +60,12 @@ public final class JavaObjectBinding implements ObjectValue {
     }
 
     public static <T> @NotNull JavaObjectBinding of(final @NotNull Class<T> clazz, final @Nullable T instance) {
-        final JavaObjectBinding object = new JavaObjectBinding();
+        final Binding binding = clazz.getDeclaredAnnotation(Binding.class);
+        if (binding == null) {
+            throw new IllegalArgumentException("Given " + clazz + " is not annotated with @Binding");
+        }
+
+        final JavaObjectBinding object = new JavaObjectBinding(binding.value());
         final Map<String, ObjectProperty> backingProperties = instance instanceof ObjectValue ? ((ObjectValue) instance).entries() : null;
 
         {
@@ -102,13 +114,15 @@ public final class JavaObjectBinding implements ObjectValue {
                 continue;
             }
 
-            final String propertyName = annotation.value();
-            final Value backingValue = getBacking(backingProperties, propertyName, Value.class);
-            object.entries.put(propertyName, new JavaFieldBinding(
-                    instance,
-                    field,
-                    backingValue == null ? null : () -> backingValue
-            ));
+            final String[] propertyNames = annotation.value();
+            if (propertyNames.length < 1) {
+                throw new IllegalArgumentException("No property names declared for field " + field);
+            }
+            final Value backingValue = getBacking(backingProperties, propertyNames[0], Value.class);
+            final JavaFieldBinding fieldBinding = new JavaFieldBinding(instance, field, backingValue == null ? null : () -> backingValue);
+            for (final String propertyName : propertyNames) {
+                object.entries.put(propertyName, fieldBinding);
+            }
         }
 
         for (final Method method : clazz.getDeclaredMethods()) {
@@ -121,18 +135,28 @@ public final class JavaObjectBinding implements ObjectValue {
                 continue;
             }
 
-            final String functionName = annotation.value();
-            final Function backing = getBacking(backingProperties, functionName, Function.class);
+            final String[] functionNames = annotation.value();
+            if (functionNames.length < 1) {
+                throw new IllegalArgumentException("No function names declared for method " + method);
+            }
+            final Function backing = getBacking(backingProperties, functionNames[0], Function.class);
             final boolean pure = annotation.pure();
 
             if (backing != null && backing.pure() != pure) {
-                throw new IllegalStateException("Different 'pure' values for interface and Java functions for function " + functionName);
+                throw new IllegalStateException("Different 'pure' values for interface and Java functions for function " + functionNames[0]);
             }
 
-            object.entries.put(functionName, new JavaFunction<>(instance, method, backing, pure));
+            final Function javaFunction = new JavaFunction(instance, method, backing, pure);
+            for (final String functionName : functionNames) {
+                object.entries.put(functionName, javaFunction);
+            }
         }
 
         return object;
+    }
+
+    public @NotNull String[] names() {
+        return names;
     }
 
     public @Nullable JavaFieldBinding getField(final @NotNull String name) {

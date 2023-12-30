@@ -64,6 +64,10 @@ final class FunctionCompileState {
         this.argumentParameterIndexes = requireNonNull(argumentParameterIndexes, "argumentParameterIndexes");
     }
 
+    public @NotNull MolangCompiler compiler() {
+        return compiler;
+    }
+
     public @NotNull ClassPool classPool() {
         return classPool;
     }

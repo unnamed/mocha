@@ -208,14 +208,7 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
     public @NotNull Value visitAccess(final @NotNull AccessExpression expression) {
         final Value objectValue = expression.object().visit(this);
         if (objectValue instanceof ObjectValue) {
-            Value val = ((ObjectValue) objectValue).get(expression.property());
-            if (val == null) {
-                System.out.println("nil");
-                System.out.println(objectValue);
-                System.out.println(expression.object());
-                System.out.println(expression.property());
-            }
-            return val;
+            return ((ObjectValue) objectValue).get(expression.property());
         }
         return NumberValue.zero();
     }

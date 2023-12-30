@@ -25,9 +25,7 @@ package team.unnamed.mocha.runtime;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.value.ArrayValue;
-import team.unnamed.mocha.runtime.value.Function;
-import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.binding.Binding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,14 +40,17 @@ class ForEachTest {
                 "return v.sum;");
 
         final MochaEngine<?> engine = MochaEngine.createStandard();
-        engine.scope().query().set("list_ages", (Function<?>) (ctx, args) -> ArrayValue.of(
-                NumberValue.of(18),
-                NumberValue.of(16),
-                NumberValue.of(40),
-                NumberValue.of(24)
-        ));
+        engine.bind(QueryImpl.class);
 
         final double result = engine.eval(code);
         assertEquals(98, result);
+    }
+
+    @Binding({"query", "q"})
+    public static final class QueryImpl {
+        @Binding("list_ages")
+        public static double[] listAges() {
+            return new double[]{18D, 16D, 40D, 24D};
+        }
     }
 }

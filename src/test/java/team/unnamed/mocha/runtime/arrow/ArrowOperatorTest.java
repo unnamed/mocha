@@ -25,10 +25,9 @@ package team.unnamed.mocha.runtime.arrow;
 
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
-import team.unnamed.mocha.runtime.value.ArrayValue;
-import team.unnamed.mocha.runtime.value.Function;
+import team.unnamed.mocha.runtime.binding.Binding;
+import team.unnamed.mocha.runtime.binding.Entity;
 import team.unnamed.mocha.runtime.value.JavaValue;
-import team.unnamed.mocha.runtime.value.NumberValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,32 +36,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ArrowOperatorTest {
     @Test
-    void test() throws Exception {
+    void test() {
         final World world = new World();
-        final Entity self = new Entity(world, 8, "Steve");
-        new Entity(world, 9, "Pig");
-        new Entity(world, 15, "Chicken");
-        new Entity(world, 0, "Zombie");
+        final Player self = new Player(world, 8, "Steve");
+        new Player(world, 9, "Pig");
+        new Player(world, 15, "Chicken");
+        new Player(world, 0, "Zombie");
 
-        final MochaEngine<Entity> engine = MochaEngine.createStandard(self);
+        final MochaEngine<Player> engine = MochaEngine.createStandard(self);
+        engine.bind(QueryImpl.class);
         engine.scope().forceSet("self", new JavaValue(self));
-        engine.scope().query().set("get_location", (Function<Entity>) (ctx, args) -> NumberValue.of(ctx.entity().location));
-        engine.scope().query().set("get_nearby_entities", (Function<Entity>) (ctx, args) -> {
-            final Entity entity = ctx.entity();
-            final double distance = args.next().eval().getAsNumber();
-
-            final int from = (int) Math.max(entity.location - distance, 0);
-            final int to = (int) Math.min(entity.location + distance, entity.world.entities.length);
-
-            List<JavaValue> found = new ArrayList<>();
-            for (int i = from; i < to; i++) {
-                final Entity nearby = entity.world.entities[i];
-                if (nearby != null) {
-                    found.add(new JavaValue(nearby));
-                }
-            }
-            return ArrayValue.of(found.toArray(JavaValue[]::new));
-        });
 
         final double result = engine.eval(
                 "v.result = 0;\n"
@@ -82,5 +65,28 @@ class ArrowOperatorTest {
                         + "return v.result;"
         );
         assertEquals(32D, result2);
+    }
+
+    @Binding({"query", "q"})
+    public static final class QueryImpl {
+        @Binding("get_location")
+        public static double getLocation(final @Entity Player player) {
+            return player.location;
+        }
+
+        @Binding("get_nearby_entities")
+        public static Player[] getNearbyEntities(final @Entity Player player, final double distance) {
+            final int from = (int) Math.max(player.location - distance, 0);
+            final int to = (int) Math.min(player.location + distance, player.world.entities.length);
+
+            List<Player> found = new ArrayList<>();
+            for (int i = from; i < to; i++) {
+                final Player nearby = player.world.entities[i];
+                if (nearby != null) {
+                    found.add(nearby);
+                }
+            }
+            return found.toArray(Player[]::new);
+        }
     }
 }

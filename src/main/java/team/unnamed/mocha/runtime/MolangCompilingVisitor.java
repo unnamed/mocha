@@ -30,6 +30,7 @@ import javassist.bytecode.Bytecode;
 import javassist.bytecode.Descriptor;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.ast.*;
+import team.unnamed.mocha.runtime.binding.Entity;
 import team.unnamed.mocha.runtime.binding.JavaFieldBinding;
 import team.unnamed.mocha.runtime.binding.JavaFunction;
 import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
@@ -637,6 +638,28 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             // load arguments
             final Iterator<Expression> it = arguments.iterator();
             for (int i = 0; i < parameters.length; i++) {
+                final Parameter parameter = parameters[i];
+
+                if (parameter.isAnnotationPresent(Entity.class)) {
+                    Object entity = functionCompileState.compiler().entity();
+                    if (entity == null || !parameter.getType().isInstance(entity)) {
+                        // load null
+                        bytecode.addConstZero(ctParameters[i]);
+                    } else {
+                        // add entity requirement
+                        requirements.put("__entity__", entity);
+
+                        // load entity requirement (field)
+                        bytecode.addAload(0); // load this
+                        bytecode.addGetfield(
+                                functionCompileState.type(),
+                                "__entity__",
+                                Descriptor.of(ctParameters[i])
+                        );
+                    }
+                    continue;
+                }
+
                 if (!it.hasNext()) {
                     bytecode.addConstZero(ctParameters[i]);
                     continue;
@@ -656,7 +679,9 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                             ctParameters
                     );
 
-                    if (nativeMethod.getReturnType() != double.class) {
+                    if (nativeMethod.getReturnType() == void.class) {
+                        bytecode.addDconst(0D);
+                    } else if (nativeMethod.getReturnType() != double.class) {
                         JavaTypes.addCast(bytecode, ctReturnType, CtClass.doubleType);
                     }
                 } catch (final NotFoundException e) {

@@ -72,12 +72,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Binding {
     /**
-     * Returns the name for this binding.
+     * Returns the names for this binding.
      *
-     * @return The name for this binding.
+     * @return The names for this binding.
      * @since 3.0.0
      */
-    @NotNull String value();
+    @NotNull String[] value();
 
     /**
      * Returns whether this binding should be skipped

@@ -30,6 +30,8 @@ import team.unnamed.mocha.runtime.JavaTypes;
 import team.unnamed.mocha.runtime.value.ArrayValue;
 import team.unnamed.mocha.runtime.value.Function;
 import team.unnamed.mocha.runtime.value.JavaValue;
+import team.unnamed.mocha.runtime.value.NumberValue;
+import team.unnamed.mocha.runtime.value.StringValue;
 import team.unnamed.mocha.runtime.value.Value;
 
 import java.lang.reflect.Array;
@@ -49,6 +51,33 @@ final class ReflectiveFunction<T> implements Function<T> {
     ReflectiveFunction(final @Nullable Object object, final @NotNull Method method) {
         this.object = object;
         this.method = requireNonNull(method, "method");
+    }
+
+    static @NotNull Value of(final @Nullable Object any) {
+        if (any instanceof Value) {
+            return (Value) any;
+        } else if (any instanceof Number) {
+            return NumberValue.of(((Number) any).doubleValue());
+        } else if (any instanceof String) {
+            return StringValue.of((String) any);
+        } else if (any instanceof Boolean) {
+            return (Boolean) any ? NumberValue.of(1D) : NumberValue.zero();
+        } else {
+            if (any != null && any.getClass().isArray()) {
+                // array types
+                final int length = Array.getLength(any);
+                final Value[] values = new Value[length];
+                for (int i = 0; i < length; i++) {
+                    values[i] = of(Array.get(any, i));
+                }
+                return ArrayValue.of(values);
+            } else if (any != null) {
+                // small change here, use javaValue
+                return new JavaValue(any);
+            } else {
+                return Value.nil();
+            }
+        }
     }
 
     @Override
@@ -105,20 +134,24 @@ final class ReflectiveFunction<T> implements Function<T> {
                 }
             } else if (parameterType == ExecutionContext.class) {
                 value = new JavaValue(context);
+            } else if (parameter.isAnnotationPresent(Entity.class)) {
+                value = new JavaValue(context.entity());
             } else {
                 final Argument argument = arguments.next();
                 value = argument.eval();
             }
 
             if (value == null) {
-                values[i] = new JavaValue(JavaTypes.getNullValueForType(parameterType));
+                values[i] = JavaTypes.getNullValueForType(parameterType);
+            } else if (parameter.isAnnotationPresent(Entity.class)) {
+                values[i] = ((JavaValue) value).value();
             } else {
                 values[i] = JavaTypes.convert(value, parameterType);
             }
         }
 
         try {
-            return Value.of(method.invoke(object, values));
+            return of(method.invoke(object, values));
         } catch (final Exception exception) {
             throw new RuntimeException(exception);
         }
