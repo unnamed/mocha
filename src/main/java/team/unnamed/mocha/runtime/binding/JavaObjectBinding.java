@@ -34,7 +34,6 @@ import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -131,7 +130,7 @@ public final class JavaObjectBinding implements ObjectValue {
                 continue;
             }
 
-            if (!Modifier.isStatic(method.getModifiers()) || method.isSynthetic()) {
+            if (method.isSynthetic()) {
                 continue;
             }
 

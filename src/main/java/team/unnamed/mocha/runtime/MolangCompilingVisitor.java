@@ -700,10 +700,14 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
             }
 
             if (nativeMethod.getReturnType() == void.class) {
-                bytecode.addDconst(0D);
-            } else if (nativeMethod.getReturnType() != double.class) {
-                JavaTypes.addCast(bytecode, ctReturnType, CtClass.doubleType);
+                if (expectedType != CtClass.voidType) {
+                    bytecode.addConstZero(expectedType);
+                }
+            } else if (!nativeMethod.getReturnType().getName().equals(expectedType.getName())) {
+                JavaTypes.addCast(bytecode, ctReturnType, expectedType);
             }
+        } else {
+            throw new UnsupportedOperationException("Not supporting non-Java functions yet");
         }
         return null;
     }
