@@ -61,19 +61,18 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         this.compiler = new MolangCompiler(entity, getClass().getClassLoader(), scope);
     }
 
-
     @Override
     public double eval(final @NotNull List<Expression> expressions) {
         // create bindings that just apply for this evaluation
-        final Scope localBindings = scope.copy();
-        //localBindings.setAllFrom(this.bindings);
+        final Scope local = scope.copy();
         {
             // create temp bindings
             MutableObjectBinding temp = new MutableObjectBinding();
-            localBindings.forceSet("temp", temp);
-            localBindings.forceSet("t", temp);
+            local.set("temp", temp);
+            local.set("t", temp);
         }
-        ExpressionInterpreter<T> evaluator = new ExpressionInterpreter<>(entity, localBindings);
+        local.readOnly(true);
+        ExpressionInterpreter<T> evaluator = new ExpressionInterpreter<>(entity, local);
         evaluator.warnOnReflectiveFunctionUsage(warnOnReflectiveFunctionUsage);
         Value lastResult = NumberValue.zero();
 
@@ -187,16 +186,16 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     public void bind(final @NotNull Class<?> clazz) {
         final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, null, null);
         for (final String name : javaObjectBinding.names()) {
-            scope.forceSet(name, javaObjectBinding);
+            scope.set(name, javaObjectBinding);
         }
     }
 
     @Override
     public <B> void bindInstance(final @NotNull Class<? super B> clazz, final @NotNull B instance, final @NotNull String name, final @NotNull String @NotNull ... aliases) {
         final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, instance, null);
-        scope.forceSet(name, javaObjectBinding);
+        scope.set(name, javaObjectBinding);
         for (final String alias : aliases) {
-            scope.forceSet(alias, javaObjectBinding);
+            scope.set(alias, javaObjectBinding);
         }
     }
 

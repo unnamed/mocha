@@ -27,6 +27,12 @@ import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
 
+/**
+ * Represents a scope, which is just a virtual object that
+ * contains bindings (properties) to values.
+ *
+ * @since 3.0.0
+ */
 public interface Scope extends ObjectValue {
     static @NotNull Scope create() {
         return new ScopeImpl();
@@ -36,9 +42,20 @@ public interface Scope extends ObjectValue {
         return new ScopeImpl.BuilderImpl();
     }
 
+    /**
+     * Creates a shallow copy of this scope. The copy will
+     * contain the same bindings as this scope, but it will
+     * be a different object, and changes (only) to the copy
+     * properties will not affect this scope.
+     *
+     * @return The shallow copy of this scope.
+     * @since 3.0.0
+     */
     @NotNull Scope copy();
 
-    void forceSet(final @NotNull String name, final @NotNull Value value);
+    void readOnly(final boolean readOnly);
+
+    boolean readOnly();
 
     interface Builder {
         Builder set(final @NotNull String name, final @NotNull Value value);

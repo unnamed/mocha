@@ -45,7 +45,7 @@ class ArrowOperatorTest {
 
         final MochaEngine<Player> engine = MochaEngine.createStandard(self);
         engine.bind(QueryImpl.class);
-        engine.scope().forceSet("self", new JavaValue(self));
+        engine.scope().set("self", new JavaValue(self));
 
         final double result = engine.eval(
                 "v.result = 0;\n"

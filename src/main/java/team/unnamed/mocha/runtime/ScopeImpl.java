@@ -33,6 +33,7 @@ import java.util.Map;
 
 final class ScopeImpl implements Scope {
     private final Map<String, ObjectProperty> bindings = new CaseInsensitiveStringHashMap<>();
+    private boolean readOnly;
 
     @Override
     public @Nullable ObjectProperty getProperty(final @NotNull String name) {
@@ -47,8 +48,26 @@ final class ScopeImpl implements Scope {
     }
 
     @Override
-    public void forceSet(final @NotNull String name, final @NotNull Value value) {
-        bindings.put(name, ObjectProperty.property(value, false));
+    public boolean set(final @NotNull String name, final @Nullable Value value) {
+        if (readOnly) {
+            return false;
+        }
+        if (value == null) {
+            bindings.remove(name);
+        } else {
+            bindings.put(name, ObjectProperty.property(value, false));
+        }
+        return true;
+    }
+
+    @Override
+    public void readOnly(final boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    @Override
+    public boolean readOnly() {
+        return readOnly;
     }
 
     @Override
