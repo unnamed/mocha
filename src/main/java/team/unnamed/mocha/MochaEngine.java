@@ -366,6 +366,21 @@ public interface MochaEngine<T> {
      */
     @Contract("_ -> this")
     @NotNull MochaEngine<T> handleParseExceptions(final @Nullable Consumer<@NotNull ParseException> exceptionHandler);
+
+    /**
+     * Sets the post-compile function, which is called after a script
+     * is compiled to a new class, and before it is loaded. The received
+     * argument is the class bytecode, which can be written to a file for
+     * debugging purposes.
+     *
+     * <p>By default this is set to null.</p>
+     *
+     * @param bytecodeConsumer The new post-compile function
+     * @return This engine instance
+     * @since 3.0.0
+     */
+    @Contract("_ -> this")
+    @NotNull MochaEngine<T> postCompile(final @Nullable Consumer<byte @NotNull []> bytecodeConsumer);
     //#endregion
 
     /**

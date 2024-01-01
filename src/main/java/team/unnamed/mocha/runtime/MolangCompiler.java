@@ -30,10 +30,8 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
-import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
-import javassist.bytecode.Mnemonic;
 import javassist.bytecode.StackMapTable;
 import javassist.bytecode.stackmap.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
@@ -48,23 +46,23 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
 @ApiStatus.Internal
 public final class MolangCompiler {
     private static final Random RANDOM = new Random();
-    public static boolean debug = true;
+
     private final Object entity;
     private final ClassLoader classLoader;
     private final ClassPool classPool;
 
     private final Scope scope;
+    private Consumer<byte @NotNull []> postCompile;
 
     public MolangCompiler(final @Nullable Object entity, final @NotNull ClassLoader classLoader, final @NotNull Scope scope) {
         this.entity = entity;
@@ -75,6 +73,10 @@ public final class MolangCompiler {
 
     public @Nullable Object entity() {
         return entity;
+    }
+
+    public void postCompile(final @Nullable Consumer<byte @NotNull []> postCompile) {
+        this.postCompile = postCompile;
     }
 
     public <T extends MochaCompiledFunction> @NotNull T compile(final @NotNull List<Expression> expressions, final @NotNull Class<T> clazz) {
@@ -210,31 +212,6 @@ public final class MolangCompiler {
             );
             method.setAccessFlags(Modifier.PUBLIC | Modifier.FINAL);
             method.setCodeAttribute(bytecode.toCodeAttribute());
-
-            // print bytecode
-            if (debug) {
-                System.out.println("\n[instructions for " + expressions + "]");
-                final CodeIterator it = method.getCodeAttribute().iterator();
-                while (it.hasNext()) {
-                    final int index = it.next();
-                    final int opcode = it.byteAt(index);
-                    final String opcodeName = Mnemonic.OPCODE[opcode];
-                    String params = "";
-                    switch (opcode) {
-                        case Bytecode.IFEQ:
-                        case Bytecode.IFNE:
-                        case Bytecode.IFGT:
-                        case Bytecode.GOTO: {
-                            final int plus = it.s16bitAt(index + 1);
-                            params += " +" + plus + " (" + (index + plus) + ")";
-                            break;
-                        }
-                    }
-                    System.out.println(index + ": " + opcodeName + "       " + params);
-                }
-                System.out.println("[end instructions]\n");
-            }
-
             method.getCodeAttribute().computeMaxStack();
 
             final StackMapTable stackMapTable = MapMaker.make(classPool, method);
@@ -284,9 +261,8 @@ public final class MolangCompiler {
                 scriptCtClass.addConstructor(ctConstructor);
             }
 
-            // write class
-            if (debug) {
-                Files.write(Paths.get("build/generated/" + scriptClassName + ".class"), scriptCtClass.toBytecode());
+            if (postCompile != null) {
+                postCompile.accept(scriptCtClass.toBytecode());
             }
             final Class<?> compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
 

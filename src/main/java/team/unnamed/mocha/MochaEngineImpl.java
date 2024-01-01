@@ -215,4 +215,10 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         this.parseExceptionHandler = exceptionHandler;
         return this;
     }
+
+    @Override
+    public @NotNull MochaEngine<T> postCompile(final @Nullable Consumer<byte @NotNull []> bytecodeConsumer) {
+        compiler.postCompile(bytecodeConsumer);
+        return this;
+    }
 }
