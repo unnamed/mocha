@@ -34,6 +34,7 @@ import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -58,14 +59,14 @@ public final class JavaObjectBinding implements ObjectValue {
         return null;
     }
 
-    public static <T> @NotNull JavaObjectBinding of(final @NotNull Class<T> clazz, final @Nullable T instance) {
+    public static <T> @NotNull JavaObjectBinding of(final @NotNull Class<T> clazz, final @Nullable T instance, final @Nullable ObjectValue backingObject) {
         final Binding binding = clazz.getDeclaredAnnotation(Binding.class);
         if (binding == null) {
             throw new IllegalArgumentException("Given " + clazz + " is not annotated with @Binding");
         }
 
         final JavaObjectBinding object = new JavaObjectBinding(binding.value());
-        final Map<String, ObjectProperty> backingProperties = instance instanceof ObjectValue ? ((ObjectValue) instance).entries() : null;
+        final Map<String, ObjectProperty> backingProperties = backingObject != null ? backingObject.entries() : null;
 
         {
             // check external bindings
@@ -113,6 +114,18 @@ public final class JavaObjectBinding implements ObjectValue {
                 continue;
             }
 
+            if (instance == null) {
+                // bind static only
+                if (!Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+            } else {
+                // bind non-static only
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+            }
+
             final String[] propertyNames = annotation.value();
             if (propertyNames.length < 1) {
                 throw new IllegalArgumentException("No property names declared for field " + field);
@@ -132,6 +145,18 @@ public final class JavaObjectBinding implements ObjectValue {
 
             if (method.isSynthetic()) {
                 continue;
+            }
+
+            if (instance == null) {
+                // bind static only
+                if (!Modifier.isStatic(method.getModifiers())) {
+                    continue;
+                }
+            } else {
+                // bind non-static only
+                if (Modifier.isStatic(method.getModifiers())) {
+                    continue;
+                }
             }
 
             final String[] functionNames = annotation.value();

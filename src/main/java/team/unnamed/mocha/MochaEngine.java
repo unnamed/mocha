@@ -75,7 +75,7 @@ public interface MochaEngine<T> {
     @Contract("_ -> new")
     static <T> @NotNull MochaEngine<T> createStandard(T entity) {
         return create(entity, builder -> {
-            builder.set("math", JavaObjectBinding.of(MochaMath.class, new MochaMath()));
+            builder.set("math", JavaObjectBinding.of(MochaMath.class, null, new MochaMath()));
             final MutableObjectBinding variableBinding = new MutableObjectBinding();
             builder.set("variable", variableBinding);
             builder.set("v", variableBinding);
@@ -301,6 +301,29 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     void bind(final @NotNull Class<?> clazz);
+
+    /**
+     * Binds the given {@code instance} non-static fields and methods.
+     *
+     * <p>Fields and methods are bound in the following format:</p>
+     * <pre>
+     *     name.field
+     *     name.method()
+     *     name.method(arg1, arg2)
+     * </pre>
+     *
+     * <p>Where {@code name} is given by the {@code name} parameter,
+     * and the field and method names are given by {@link Binding}
+     * annotations.</p>
+     *
+     * @param clazz    The instance's class (or interface) to use.
+     * @param instance The instance to bind.
+     * @param name     The name to bind the instance to.
+     * @param aliases  The aliases to bind the instance to.
+     * @param <B>      The instance's type.
+     * @since 3.0.0
+     */
+    <B> void bindInstance(final @NotNull Class<? super B> clazz, final @NotNull B instance, final @NotNull String name, final @NotNull String @NotNull ... aliases);
     //#endregion
 
     /**

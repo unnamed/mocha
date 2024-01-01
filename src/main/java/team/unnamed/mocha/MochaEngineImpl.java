@@ -176,9 +176,18 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
 
     @Override
     public void bind(final @NotNull Class<?> clazz) {
-        final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, null);
+        final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, null, null);
         for (final String name : javaObjectBinding.names()) {
             scope.forceSet(name, javaObjectBinding);
+        }
+    }
+
+    @Override
+    public <B> void bindInstance(final @NotNull Class<? super B> clazz, final @NotNull B instance, final @NotNull String name, final @NotNull String @NotNull ... aliases) {
+        final JavaObjectBinding javaObjectBinding = JavaObjectBinding.of(clazz, instance, null);
+        scope.forceSet(name, javaObjectBinding);
+        for (final String alias : aliases) {
+            scope.forceSet(alias, javaObjectBinding);
         }
     }
 
