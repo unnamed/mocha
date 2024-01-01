@@ -218,7 +218,9 @@ final class MolangParserImpl implements MolangParser {
                             lexer.next();
                             break;
                         } else {
-                            if (current.kind() != TokenKind.COMMA) {
+                            if (current.kind() == TokenKind.ERROR) {
+                                throw new ParseException("Found error token: " + current.value(), lexer.cursor());
+                            } else if (current.kind() != TokenKind.COMMA) {
                                 throw new ParseException("Expected a comma, got " + current.kind(), lexer.cursor());
                             }
                             lexer.next();

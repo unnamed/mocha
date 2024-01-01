@@ -260,6 +260,11 @@ final class MolangLexerImpl implements MolangLexer {
                 case ']': tokenKind = TokenKind.RBRACKET; break;
                 case ';': tokenKind = TokenKind.SEMICOLON; break;
                 //@formatter:on
+                case '"': {
+                    tokenKind = TokenKind.ERROR;
+                    value = "Unexpected token '\"', expected single quote (') to start a string literal";
+                    break;
+                }
                 default: {
                     // "c" is something we don't know about!
                     tokenKind = TokenKind.ERROR;
