@@ -26,18 +26,16 @@ package team.unnamed.mocha.runtime;
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.MochaEngine;
 import team.unnamed.mocha.runtime.binding.Binding;
-import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 
 class InstanceMethodBindingTest {
     @Test
     void test() {
         final MochaEngine<?> engine = MochaEngine.createStandard();
-        engine.scope().forceSet("instance", JavaObjectBinding.of(TestInstanceMethods.class, new TestInstanceMethods("UnnamedTeam")));
+        engine.bindInstance(TestInstanceMethods.class, new TestInstanceMethods("UnnamedTeam"), "instance");
         engine.eval("instance.print_name()");
         engine.compile("instance.print_name()").evaluate();
     }
 
-    @Binding("instance")
     public static final class TestInstanceMethods {
         private final String name;
 

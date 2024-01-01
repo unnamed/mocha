@@ -49,6 +49,10 @@ public final class JavaObjectBinding implements ObjectValue {
         this.names = requireNonNull(names, "names");
     }
 
+    JavaObjectBinding() {
+        this.names = new String[0];
+    }
+
     private static <T extends Value> T getBacking(final @Nullable Map<String, ObjectProperty> backingProperties, final @NotNull String functionName, final Class<T> valueType) {
         if (backingProperties != null) {
             final ObjectProperty property = backingProperties.get(functionName);
@@ -61,11 +65,11 @@ public final class JavaObjectBinding implements ObjectValue {
 
     public static <T> @NotNull JavaObjectBinding of(final @NotNull Class<T> clazz, final @Nullable T instance, final @Nullable ObjectValue backingObject) {
         final Binding binding = clazz.getDeclaredAnnotation(Binding.class);
-        if (binding == null) {
-            throw new IllegalArgumentException("Given " + clazz + " is not annotated with @Binding");
+        if (binding == null && instance == null) {
+            throw new IllegalArgumentException("Statically bound " + clazz + " is not annotated with @Binding");
         }
 
-        final JavaObjectBinding object = new JavaObjectBinding(binding.value());
+        final JavaObjectBinding object = binding != null ? new JavaObjectBinding(binding.value()) : new JavaObjectBinding();
         final Map<String, ObjectProperty> backingProperties = backingObject != null ? backingObject.entries() : null;
 
         {
