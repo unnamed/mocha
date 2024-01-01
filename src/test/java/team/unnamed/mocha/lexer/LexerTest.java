@@ -35,63 +35,6 @@ import static team.unnamed.mocha.lexer.TokenKind.*;
 
 public class LexerTest {
 
-    @Test
-    @DisplayName("Test lexing Molang")
-    public void test() throws IOException {
-        assertTokenization("unexpected $ \\ .", IDENTIFIER, ERROR, ERROR, DOT);
-        assertTokenization("1 -> 2", FLOAT, ARROW, FLOAT);
-        assertTokenization("(hello) * (world)", LPAREN, IDENTIFIER, RPAREN, STAR, LPAREN, IDENTIFIER, RPAREN);
-        assertTokenization("error & here", IDENTIFIER, ERROR, IDENTIFIER);
-        assertTokenization("this * is * 'string literal'", IDENTIFIER, STAR, IDENTIFIER, STAR, STRING);
-        assertTokenization("(whats true and false)", LPAREN, IDENTIFIER, TRUE, IDENTIFIER, FALSE, RPAREN);
-        assertTokenization("we_love && we_live || we_lie", IDENTIFIER, AMPAMP, IDENTIFIER, BARBAR, IDENTIFIER);
-        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, IDENTIFIER);
-        assertTokenization("q.get_equipped_item_name == 'stick'", IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING);
-        assertTokenization("q.is_sneaking || q.is_jumping", IDENTIFIER, DOT, IDENTIFIER, BARBAR, IDENTIFIER, DOT, IDENTIFIER);
-        assertTokenization("q.is_sneaking ? 5", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT);
-        assertTokenization("q.is_sneaking ? 10 : 3", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, COLON, FLOAT);
-        assertTokenization(
-                "q.is_sneaking && (q.get_equipped_item_name == 'stick' || q.get_equipped_item_name == 'diamond')",
-                IDENTIFIER, DOT, IDENTIFIER, AMPAMP, LPAREN, IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING, BARBAR, IDENTIFIER,
-                DOT, IDENTIFIER, EQEQ, STRING, RPAREN
-        );
-        assertTokenization(
-                "math.cos(query.anim_time * 38) * variable.rotation_scale + variable.x * variable.x * query.life_time;",
-                IDENTIFIER, DOT, IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, STAR, FLOAT, RPAREN, STAR, IDENTIFIER, DOT, IDENTIFIER,
-                PLUS, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON
-        );
-        assertTokenization(
-                "v.x = 0;\n" +
-                        "for_each(v.pig, query.get_nearby_entities(4, 'minecraft:pig'), {\n" +
-                        "    v.x = v.x + v.pig->query.get_relative_block_state(0, 1, 0, 'flammable');\n" +
-                        "});",
-                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
-                IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, COMMA, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, STRING, RPAREN, COMMA, LBRACE,
-                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, ARROW, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, FLOAT, COMMA, FLOAT, COMMA, STRING, RPAREN, SEMICOLON,
-                RBRACE, RPAREN, SEMICOLON
-        );
-        assertTokenization(
-                "v.x = 1;\n" +
-                        "v.y = 1;\n" +
-                        "loop(10, {\n" +
-                        "  t.x = v.x + v.y;\n" +
-                        "  v.x = v.y;\n" +
-                        "  v.y = t.x;\n" +
-                        "});",
-                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
-                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
-                IDENTIFIER, LPAREN, FLOAT, COMMA, LBRACE,
-                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
-                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
-                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
-                RBRACE, RPAREN, SEMICOLON
-        );
-        assertTokenization(
-                "variable.x = (variable.x ?? 1.2) + 0.3;",
-                IDENTIFIER, DOT, IDENTIFIER, EQ, LPAREN, IDENTIFIER, DOT, IDENTIFIER, QUESQUES, FLOAT, RPAREN, PLUS, FLOAT, SEMICOLON
-        );
-    }
-
     private static void assertTokenization(String expr, TokenKind... tokenKinds) throws IOException {
         List<Token> tokens = MolangLexer.tokenizeAll(expr);
         assertEquals(
@@ -152,6 +95,65 @@ public class LexerTest {
         if (different) {
             fail(differencesMessage.toString());
         }
+    }
+
+    @Test
+    @DisplayName("Test lexing Molang")
+    public void test() throws IOException {
+        assertTokenization("unexpected $ \\ .", IDENTIFIER, ERROR, ERROR, DOT);
+        assertTokenization("1 -> 2", FLOAT, ARROW, FLOAT);
+        assertTokenization("(hello) * (world)", LPAREN, IDENTIFIER, RPAREN, STAR, LPAREN, IDENTIFIER, RPAREN);
+        assertTokenization("error & here", IDENTIFIER, ERROR, IDENTIFIER);
+        assertTokenization("this * is * 'string literal'", IDENTIFIER, STAR, IDENTIFIER, STAR, STRING);
+        assertTokenization("(whats true and false)", LPAREN, IDENTIFIER, TRUE, IDENTIFIER, FALSE, RPAREN);
+        assertTokenization("we_love && we_live || we_lie", IDENTIFIER, AMPAMP, IDENTIFIER, BARBAR, IDENTIFIER);
+        assertTokenization("more + tests * on / this", IDENTIFIER, PLUS, IDENTIFIER, STAR, IDENTIFIER, SLASH, IDENTIFIER);
+        assertTokenization("q.get_equipped_item_name == 'stick'", IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING);
+        assertTokenization("q.is_sneaking || q.is_jumping", IDENTIFIER, DOT, IDENTIFIER, BARBAR, IDENTIFIER, DOT, IDENTIFIER);
+        assertTokenization("q.is_sneaking ? 5", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT);
+        assertTokenization("q.is_sneaking ? 10 : 3", IDENTIFIER, DOT, IDENTIFIER, QUES, FLOAT, COLON, FLOAT);
+        assertTokenization(
+                "q.is_sneaking && (q.get_equipped_item_name == 'stick' || q.get_equipped_item_name == 'diamond')",
+                IDENTIFIER, DOT, IDENTIFIER, AMPAMP, LPAREN, IDENTIFIER, DOT, IDENTIFIER, EQEQ, STRING, BARBAR, IDENTIFIER,
+                DOT, IDENTIFIER, EQEQ, STRING, RPAREN
+        );
+        assertTokenization(
+                "math.cos(query.anim_time * 38) * variable.rotation_scale + variable.x * variable.x * query.life_time;",
+                IDENTIFIER, DOT, IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, STAR, FLOAT, RPAREN, STAR, IDENTIFIER, DOT, IDENTIFIER,
+                PLUS, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, STAR, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON
+        );
+        assertTokenization(
+                "v.x = 0;\n" +
+                        "for_each(v.pig, query.get_nearby_entities(4, 'minecraft:pig'), {\n" +
+                        "    v.x = v.x + v.pig->query.get_relative_block_state(0, 1, 0, 'flammable');\n" +
+                        "});",
+                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
+                IDENTIFIER, LPAREN, IDENTIFIER, DOT, IDENTIFIER, COMMA, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, STRING, RPAREN, COMMA, LBRACE,
+                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, ARROW, IDENTIFIER, DOT, IDENTIFIER, LPAREN, FLOAT, COMMA, FLOAT, COMMA, FLOAT, COMMA, STRING, RPAREN, SEMICOLON,
+                RBRACE, RPAREN, SEMICOLON
+        );
+        assertTokenization(
+                "v.x = 1;\n" +
+                        "v.y = 1;\n" +
+                        "loop(10, {\n" +
+                        "  t.x = v.x + v.y;\n" +
+                        "  v.x = v.y;\n" +
+                        "  v.y = t.x;\n" +
+                        "});",
+                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
+                IDENTIFIER, DOT, IDENTIFIER, EQ, FLOAT, SEMICOLON,
+                IDENTIFIER, LPAREN, FLOAT, COMMA, LBRACE,
+                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, PLUS, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
+                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
+                IDENTIFIER, DOT, IDENTIFIER, EQ, IDENTIFIER, DOT, IDENTIFIER, SEMICOLON,
+                RBRACE, RPAREN, SEMICOLON
+        );
+        assertTokenization(
+                "variable.x = (variable.x ?? 1.2) + 0.3;",
+                IDENTIFIER, DOT, IDENTIFIER, EQ, LPAREN, IDENTIFIER, DOT, IDENTIFIER, QUESQUES, FLOAT, RPAREN, PLUS, FLOAT, SEMICOLON
+        );
+        assertTokenization("array.accessing[atIndex[0]]", IDENTIFIER, DOT, IDENTIFIER, LBRACKET, IDENTIFIER, LBRACKET, FLOAT, RBRACKET, RBRACKET);
+        assertTokenization("array.accessing[atIndex[0]] = 1", IDENTIFIER, DOT, IDENTIFIER, LBRACKET, IDENTIFIER, LBRACKET, FLOAT, RBRACKET, RBRACKET, EQ, FLOAT);
     }
 
 }
