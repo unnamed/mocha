@@ -25,6 +25,7 @@ package team.unnamed.mocha;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.MochaFunction;
@@ -34,6 +35,7 @@ import team.unnamed.mocha.runtime.binding.JavaObjectBinding;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.standard.MochaMath;
 import team.unnamed.mocha.runtime.value.MutableObjectBinding;
+import team.unnamed.mocha.runtime.value.ObjectValue;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -324,6 +326,46 @@ public interface MochaEngine<T> {
      * @since 3.0.0
      */
     <B> void bindInstance(final @NotNull Class<? super B> clazz, final @NotNull B instance, final @NotNull String name, final @NotNull String @NotNull ... aliases);
+    //#endregion
+
+    //#region CONFIGURATION API
+
+    /**
+     * Sets the boolean value for the "warn on reflective function usage"
+     * option.
+     *
+     * <p>When set to true, {@link #eval} may log a warning when evaluating
+     * code that includes a call to a function that was registered using only
+     * annotations, and for so, has to be called using Reflection, taking some
+     * extra time.</p>
+     *
+     * <p>Note that this behavior can be avoided by setting a {@link ObjectValue}
+     * when binding static or non-static methods and fields</p>
+     *
+     * <p>By default this is false.</p>
+     *
+     * @param warnOnReflectiveFunctionUsage The new value for the option
+     * @return This engine instance
+     * @since 3.0.0
+     */
+    @Contract("_ -> this")
+    @NotNull MochaEngine<T> warnOnReflectiveFunctionUsage(final boolean warnOnReflectiveFunctionUsage);
+
+    /**
+     * Sets the {@link ParseException} handler. This handler will be called
+     * whenever an internal call to the {@link #parse} method fails. These
+     * internal calls commonly include interpreting or compiling code.
+     *
+     * <p>Usually useful for logging/debugging purposes.</p>
+     *
+     * <p>By default this is null.</p>
+     *
+     * @param exceptionHandler The new parse exception handler
+     * @return This engine instance
+     * @since 3.0.0
+     */
+    @Contract("_ -> this")
+    @NotNull MochaEngine<T> handleParseExceptions(final @Nullable Consumer<@NotNull ParseException> exceptionHandler);
     //#endregion
 
     /**

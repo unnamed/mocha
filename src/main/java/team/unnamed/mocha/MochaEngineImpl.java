@@ -24,6 +24,7 @@
 package team.unnamed.mocha;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.MolangParser;
 import team.unnamed.mocha.parser.ParseException;
 import team.unnamed.mocha.parser.ast.Expression;
@@ -49,6 +50,9 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     private final T entity;
     private final MolangCompiler compiler;
 
+    private Consumer<@NotNull ParseException> parseExceptionHandler;
+    private boolean warnOnReflectiveFunctionUsage;
+
     public MochaEngineImpl(final T entity, final Consumer<Scope.Builder> scopeBuilder) {
         Scope.Builder builder = Scope.builder();
         scopeBuilder.accept(builder);
@@ -70,6 +74,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             localBindings.forceSet("t", temp);
         }
         ExpressionInterpreter<T> evaluator = new ExpressionInterpreter<>(entity, localBindings);
+        evaluator.warnOnReflectiveFunctionUsage(warnOnReflectiveFunctionUsage);
         Value lastResult = NumberValue.zero();
 
         for (Expression expression : expressions) {
@@ -92,6 +97,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(source);
         } catch (final ParseException e) {
             // parse errors just output zero
+            parseExceptionHandler.accept(e);
             return 0;
         } catch (final IOException e) {
             throw new UncheckedIOException("Failed to read from given reader", e);
@@ -106,6 +112,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(reader);
         } catch (final ParseException e) {
             // parse errors just output zero
+            parseExceptionHandler.accept(e);
             return () -> 0D;
         } catch (final IOException e) {
             throw new UncheckedIOException("Failed to read from given reader", e);
@@ -130,6 +137,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(code);
         } catch (final ParseException e) {
             // parse errors just output zero
+            parseExceptionHandler.accept(e);
             return new MochaFunction() {
                 @Override
                 public double evaluate() {
@@ -162,6 +170,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         try {
             parsed = parse(reader);
         } catch (final ParseException e) {
+            parseExceptionHandler.accept(e);
             parsed = Collections.emptyList();
         } catch (final IOException e) {
             throw new RuntimeException("Failed to read from given reader", e);
@@ -196,4 +205,15 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         return MolangParser.parser(reader).parseAll();
     }
 
+    @Override
+    public @NotNull MochaEngine<T> warnOnReflectiveFunctionUsage(final boolean warnOnReflectiveFunctionUsage) {
+        this.warnOnReflectiveFunctionUsage = warnOnReflectiveFunctionUsage;
+        return this;
+    }
+
+    @Override
+    public @NotNull MochaEngine<T> handleParseExceptions(final @Nullable Consumer<@NotNull ParseException> exceptionHandler) {
+        this.parseExceptionHandler = exceptionHandler;
+        return this;
+    }
 }

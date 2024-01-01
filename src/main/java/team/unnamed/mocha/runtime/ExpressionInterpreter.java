@@ -27,14 +27,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.ast.*;
-import team.unnamed.mocha.runtime.value.ArrayValue;
-import team.unnamed.mocha.runtime.value.Function;
-import team.unnamed.mocha.runtime.value.JavaValue;
-import team.unnamed.mocha.runtime.value.MutableObjectBinding;
-import team.unnamed.mocha.runtime.value.NumberValue;
-import team.unnamed.mocha.runtime.value.ObjectValue;
-import team.unnamed.mocha.runtime.value.StringValue;
-import team.unnamed.mocha.runtime.value.Value;
+import team.unnamed.mocha.runtime.binding.JavaFunction;
+import team.unnamed.mocha.runtime.value.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -125,6 +119,8 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
     private @Nullable Object flag;
     private @Nullable Value returnValue;
 
+    private boolean warnOnReflectiveFunctionUsage;
+
     public ExpressionInterpreter(final @Nullable T entity, final @NotNull Scope scope) {
         this.entity = entity;
         this.scope = requireNonNull(scope, "scope");
@@ -149,6 +145,10 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
                 () -> a.visit(evaluator).getAsNumber(),
                 () -> b.visit(evaluator).getAsNumber()
         ));
+    }
+
+    public void warnOnReflectiveFunctionUsage(final boolean warnOnReflectiveFunctionUsage) {
+        this.warnOnReflectiveFunctionUsage = warnOnReflectiveFunctionUsage;
     }
 
     @Override
@@ -295,9 +295,14 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
             }
         }
 
-        final Object function = expression.function().visit(this);
+        final Value function = functionExpr.visit(this);
         if (!(function instanceof Function)) {
-            return NumberValue.zero();
+            return Value.nil();
+        }
+
+        if (warnOnReflectiveFunctionUsage && function instanceof JavaFunction) {
+            final JavaFunction<?> javaFunction = (JavaFunction<?>) function;
+            System.err.println("Warning: Reflective function usage detected for method: " + javaFunction.method());
         }
 
         return ((Function<T>) function).evaluate(this, args);
