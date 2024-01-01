@@ -77,7 +77,7 @@ final class MolangParserImpl implements MolangParser {
                 Expression expression = MolangParserImpl.parseCompoundExpression(lexer, 0);
                 token = lexer.current();
                 if (token.kind() != TokenKind.RPAREN) {
-                    throw new ParseException("Non closed expression", null);
+                    throw new ParseException("Non closed expression", lexer.cursor());
                 }
                 lexer.next();
                 return expression;
@@ -92,10 +92,7 @@ final class MolangParserImpl implements MolangParser {
                         break;
                     } else if (token.kind() == TokenKind.EOF) {
                         // end reached but not closed yet, huh?
-                        throw new ParseException(
-                                "Found the end before the execution scope closing token",
-                                null
-                        );
+                        throw new ParseException("Found the end before the execution scope closing token", lexer.cursor());
                     } else if (token.kind() == TokenKind.ERROR) {
                         throw new ParseException("Found an invalid token (error): " + token.value(), lexer.cursor());
                     } else {
@@ -119,7 +116,7 @@ final class MolangParserImpl implements MolangParser {
                     token = lexer.next();
 
                     if (token.kind() != TokenKind.IDENTIFIER) {
-                        throw new ParseException("Unexpected token, expected a valid field token", null);
+                        throw new ParseException("Unexpected token, expected a valid field token", lexer.cursor());
                     }
 
                     expr = new AccessExpression(expr, token.value());
