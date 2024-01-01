@@ -23,8 +23,10 @@
  */
 package team.unnamed.mocha.runtime;
 
+import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtPrimitiveType;
+import javassist.NotFoundException;
 import javassist.bytecode.Bytecode;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +93,14 @@ public final class JavaTypes {
             return (short) value.getAsNumber();
         } else {
             return null;
+        }
+    }
+
+    public static @NotNull CtClass getClassUnchecked(final @NotNull ClassPool cp, final @NotNull Class<?> javaClass) {
+        try {
+            return cp.get(javaClass.getName());
+        } catch (final NotFoundException e) {
+            throw new IllegalStateException("CtClass not found for Java class: " + javaClass, e);
         }
     }
 
