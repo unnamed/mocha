@@ -39,7 +39,7 @@ class ParseErrorTest {
         final MochaEngine<?> engine = MochaEngine.createStandard();
         engine.bind(QueryImpl.class);
 
-        engine.handleParseExceptions(e -> assertEquals("Found error token: Unexpected token '\"', expected single quote (') to start a string literal\n\tat line 0, column 11", e.getMessage()));
+        engine.handleParseExceptions(e -> assertEquals("Found error token: Unexpected token '\"', expected single quote (') to start a string literal\n\tat line 1, column 11", e.getMessage()));
 
         // should error since strings only allow single quotes
         engine.eval("query.log(\"Hello world!\");");

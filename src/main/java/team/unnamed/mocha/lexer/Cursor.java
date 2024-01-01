@@ -38,7 +38,7 @@ import java.util.Objects;
  */
 public final class Cursor implements Cloneable {
     private int index = 0;
-    private int line = 0;
+    private int line = 1;
     private int column = 0;
 
     public Cursor(final int line, final int column) {
