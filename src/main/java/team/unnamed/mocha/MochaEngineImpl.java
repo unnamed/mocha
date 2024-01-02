@@ -96,7 +96,9 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(source);
         } catch (final ParseException e) {
             // parse errors just output zero
-            parseExceptionHandler.accept(e);
+            if (parseExceptionHandler != null) {
+                parseExceptionHandler.accept(e);
+            }
             return 0;
         } catch (final IOException e) {
             throw new UncheckedIOException("Failed to read from given reader", e);
@@ -111,7 +113,9 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(reader);
         } catch (final ParseException e) {
             // parse errors just output zero
-            parseExceptionHandler.accept(e);
+            if (parseExceptionHandler != null) {
+                parseExceptionHandler.accept(e);
+            }
             return () -> 0D;
         } catch (final IOException e) {
             throw new UncheckedIOException("Failed to read from given reader", e);
@@ -136,7 +140,9 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             parsed = parse(code);
         } catch (final ParseException e) {
             // parse errors just output zero
-            parseExceptionHandler.accept(e);
+            if (parseExceptionHandler != null) {
+                parseExceptionHandler.accept(e);
+            }
             return new MochaFunction() {
                 @Override
                 public double evaluate() {
@@ -169,7 +175,9 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         try {
             parsed = parse(reader);
         } catch (final ParseException e) {
-            parseExceptionHandler.accept(e);
+            if (parseExceptionHandler != null) {
+                parseExceptionHandler.accept(e);
+            }
             parsed = Collections.emptyList();
         } catch (final IOException e) {
             throw new RuntimeException("Failed to read from given reader", e);
