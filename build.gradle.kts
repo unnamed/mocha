@@ -45,6 +45,9 @@ tasks {
         sourceCompatibility = "8"
         targetCompatibility = "8"
     }
+    javadoc {
+        isFailOnError = false
+    }
 }
 
 license {
@@ -54,6 +57,8 @@ license {
 }
 
 java {
+    withJavadocJar()
+    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
