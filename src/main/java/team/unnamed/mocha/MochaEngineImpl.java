@@ -23,6 +23,7 @@
  */
 package team.unnamed.mocha;
 
+import javassist.ClassPool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.mocha.parser.MolangParser;
@@ -183,6 +184,11 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             throw new RuntimeException("Failed to read from given reader", e);
         }
         return compiler.compile(parsed, interfaceType);
+    }
+
+    @Override
+    public @NotNull ClassPool classPool() {
+        return compiler.classPool();
     }
 
     @Override

@@ -79,6 +79,10 @@ public final class MolangCompiler {
         return entity;
     }
 
+    public @NotNull ClassPool classPool() {
+        return classPool;
+    }
+
     public void postCompile(final @Nullable Consumer<byte @NotNull []> postCompile) {
         this.postCompile = postCompile;
     }
