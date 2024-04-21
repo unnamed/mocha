@@ -665,6 +665,8 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                     continue;
                 }
 
+                // Set the expected type, then load
+                expectedType = ctParameters[i];
                 it.next().visit(this);
             }
 
