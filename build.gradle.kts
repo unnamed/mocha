@@ -26,7 +26,7 @@ dependencies {
 
     // performance comparison with other libraries
     jmhImplementation("com.bedrockk:molang:1.0-SNAPSHOT")
-    jmhImplementation("gg.moonflower:molang-compiler:3.0.4.16")
+    jmhImplementation("gg.moonflower:molang-compiler:3.1.1.19")
 }
 
 tasks {
