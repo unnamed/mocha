@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    api("org.javassist:javassist:3.30.1-GA")
+    api("org.javassist:javassist:3.30.2-GA")
     compileOnlyApi("org.jetbrains:annotations:24.0.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
