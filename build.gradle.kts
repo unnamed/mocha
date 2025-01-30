@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     signing
     id("org.cadixdev.licenser") version "0.6.1"
-    id("me.champeau.jmh") version "0.7.2"
+    id("me.champeau.jmh") version "0.7.3"
 }
 
 repositories {
