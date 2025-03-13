@@ -39,6 +39,7 @@ import team.unnamed.mocha.runtime.value.NumberValue;
 import team.unnamed.mocha.runtime.value.ObjectValue;
 import team.unnamed.mocha.runtime.value.Value;
 import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
+import team.unnamed.mocha.util.JavassistUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -503,7 +504,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
         }
 
         // convert to the expected type
-        JavaTypes.addCast(bytecode, parameterCtType, expectedType);
+        JavassistUtil.addCast(bytecode, parameterCtType, expectedType);
         return new CompileVisitResult(expectedType);
     }
 
@@ -706,7 +707,7 @@ final class MolangCompilingVisitor implements ExpressionVisitor<CompileVisitResu
                     bytecode.addConstZero(expectedType);
                 }
             } else if (!nativeMethod.getReturnType().getName().equals(expectedType.getName())) {
-                JavaTypes.addCast(bytecode, ctReturnType, expectedType);
+                JavassistUtil.addCast(bytecode, ctReturnType, expectedType);
             }
         } else {
             throw new UnsupportedOperationException("Not supporting non-Java functions yet");

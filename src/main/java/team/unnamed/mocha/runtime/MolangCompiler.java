@@ -43,6 +43,7 @@ import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction;
 import team.unnamed.mocha.runtime.compiled.Named;
 import team.unnamed.mocha.util.CaseInsensitiveStringHashMap;
+import team.unnamed.mocha.util.JavassistUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -147,7 +148,7 @@ public final class MolangCompiler {
             }
         }
 
-        final CtClass interfaceCtClass = JavaTypes.getClassUnchecked(classPool, clazz);
+        final CtClass interfaceCtClass = JavassistUtil.getClassUnchecked(classPool, clazz);
         final String scriptClassName = getClass().getPackage().getName() + ".MolangFunctionImpl_" + clazz.getSimpleName() + "_" + implementedMethod.getName()
                 + "_" + Long.toHexString(System.currentTimeMillis()) + "_" + Integer.toHexString(RANDOM.nextInt(2024));
 
@@ -156,7 +157,7 @@ public final class MolangCompiler {
         scriptCtClass.setModifiers(Modifier.PUBLIC);
 
         final Class<?> returnType = implementedMethod.getReturnType();
-        final CtClass returnCtType = JavaTypes.getClassUnchecked(classPool, returnType);
+        final CtClass returnCtType = JavassistUtil.getClassUnchecked(classPool, returnType);
 
         final Bytecode bytecode = new Bytecode(scriptCtClass.getClassFile().getConstPool());
         final FunctionCompileState compileState = new FunctionCompileState(this, classPool, scriptCtClass, bytecode, implementedMethod, scope, argumentParameterIndexes);
@@ -190,7 +191,7 @@ public final class MolangCompiler {
 
             if (lastVisitResult == null || !lastVisitResult.returned()) {
                 if (lastVisitResult == null || lastVisitResult.lastPushedType() != returnCtType) {
-                    JavaTypes.addCast(
+                    JavassistUtil.addCast(
                             bytecode,
                             lastVisitResult == null ? CtClass.doubleType : lastVisitResult.lastPushedType(),
                             returnCtType
@@ -231,7 +232,7 @@ public final class MolangCompiler {
         for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
             final String fieldName = entry.getKey();
             final Object fieldValue = entry.getValue();
-            final CtClass fieldType = JavaTypes.getClassUnchecked(classPool, fieldValue.getClass());
+            final CtClass fieldType = JavassistUtil.getClassUnchecked(classPool, fieldValue.getClass());
             try {
                 scriptCtClass.addField(new CtField(fieldType, fieldName, scriptCtClass));
             } catch (final CannotCompileException e) {
@@ -243,7 +244,7 @@ public final class MolangCompiler {
         final CtClass[] constructorParameterCtTypes = new CtClass[requirements.size()];
         int j = 0;
         for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
-            constructorParameterCtTypes[j] = JavaTypes.getClassUnchecked(classPool, entry.getValue().getClass());
+            constructorParameterCtTypes[j] = JavassistUtil.getClassUnchecked(classPool, entry.getValue().getClass());
             ++j;
         }
 
@@ -251,7 +252,7 @@ public final class MolangCompiler {
             final CtConstructor ctConstructor = new CtConstructor(constructorParameterCtTypes, scriptCtClass);
             final Bytecode constructorBytecode = new Bytecode(scriptCtClass.getClassFile().getConstPool());
             constructorBytecode.addAload(0); // load this
-            constructorBytecode.addInvokespecial(JavaTypes.getClassUnchecked(classPool, Object.class), "<init>", "()V"); // invoke superclass constructor
+            constructorBytecode.addInvokespecial(JavassistUtil.getClassUnchecked(classPool, Object.class), "<init>", "()V"); // invoke superclass constructor
             // put!
             int parameterIndex = 0;
             for (final Map.Entry<String, Object> entry : requirements.entrySet()) {
@@ -259,7 +260,7 @@ public final class MolangCompiler {
                 final Object fieldValue = entry.getValue();
                 constructorBytecode.addAload(0); // load this
                 constructorBytecode.addAload(parameterIndex + 1); // load parameter
-                constructorBytecode.addPutfield(scriptCtClass, fieldName, Descriptor.of(JavaTypes.getClassUnchecked(classPool, fieldValue.getClass()))); // set!
+                constructorBytecode.addPutfield(scriptCtClass, fieldName, Descriptor.of(JavassistUtil.getClassUnchecked(classPool, fieldValue.getClass()))); // set!
                 parameterIndex++;
             }
             constructorBytecode.addReturn(null); // return
