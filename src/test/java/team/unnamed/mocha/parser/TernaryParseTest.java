@@ -26,9 +26,12 @@ package team.unnamed.mocha.parser;
 import org.junit.jupiter.api.Test;
 import team.unnamed.mocha.parser.ast.AccessExpression;
 import team.unnamed.mocha.parser.ast.BinaryExpression;
+import team.unnamed.mocha.parser.ast.CallExpression;
 import team.unnamed.mocha.parser.ast.DoubleExpression;
 import team.unnamed.mocha.parser.ast.IdentifierExpression;
 import team.unnamed.mocha.parser.ast.TernaryConditionalExpression;
+
+import java.util.Collections;
 
 import static team.unnamed.mocha.MochaAssertions.assertCreateTree;
 
@@ -48,6 +51,26 @@ class TernaryParseTest {
                         new IdentifierExpression("Geometry"),
                         "default"
                 )
+        ));
+
+        assertCreateTree("query.test() ? 1+1 : 2+2", new TernaryConditionalExpression(
+                new CallExpression(
+                        new AccessExpression(
+                                new IdentifierExpression("query"),
+                                "test"
+                        ),
+                        Collections.emptyList()
+                ),
+                new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(1), new DoubleExpression(1)),
+                new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(2), new DoubleExpression(2))
+        ));
+
+        assertCreateTree("3 + 3 == 6 ? 1 : 2", new TernaryConditionalExpression(
+                new BinaryExpression(BinaryExpression.Op.EQ,
+                        new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(3), new DoubleExpression(3)),
+                        new DoubleExpression(6)),
+                new DoubleExpression(1),
+                new DoubleExpression(2)
         ));
     }
 }
