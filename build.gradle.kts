@@ -21,7 +21,7 @@ repositories {
 dependencies {
     api("org.javassist:javassist:3.30.2-GA")
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // performance comparison with other libraries
