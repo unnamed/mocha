@@ -228,13 +228,19 @@ final class MolangParserImpl implements MolangParser {
                 return new CallExpression(left, arguments);
             }
             case QUES: {
+                // ternary precedence is the same as the conditional operator
+                final int ternaryPrecedence = BinaryExpression.Op.CONDITIONAL.precedence();
+                if (lastPrecedence >= ternaryPrecedence) {
+                    return left;
+                }
+
                 lexer.next();
                 final Expression trueValue = MolangParserImpl.parseCompoundExpression(lexer, 0);
 
                 if (lexer.current().kind() == TokenKind.COLON) {
                     // then it's a ternary expression, since there is a ':', indicating the next expression
                     lexer.next();
-                    return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parseCompoundExpression(lexer, 0));
+                    return new TernaryConditionalExpression(left, trueValue, MolangParserImpl.parseCompoundExpression(lexer, ternaryPrecedence));
                 } else {
                     return new BinaryExpression(BinaryExpression.Op.CONDITIONAL, left, trueValue);
                 }
