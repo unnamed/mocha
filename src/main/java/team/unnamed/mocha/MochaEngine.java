@@ -145,7 +145,7 @@ public interface MochaEngine<T> {
      * @return The result of the evaluation.
      * @since 3.0.0
      */
-    double eval(final @NotNull List<Expression> expressions);
+    float eval(final @NotNull List<Expression> expressions);
 
     /**
      * Parses and evaluates the given Molang source.
@@ -162,7 +162,7 @@ public interface MochaEngine<T> {
      * @see #eval(List)
      * @since 3.0.0
      */
-    double eval(final @NotNull Reader source);
+    float eval(final @NotNull Reader source);
 
     /**
      * Parses and evaluates the given Molang source.
@@ -179,7 +179,7 @@ public interface MochaEngine<T> {
      * @see #eval(List)
      * @since 3.0.0
      */
-    default double eval(final @NotNull String source) {
+    default float eval(final @NotNull String source) {
         requireNonNull(source, "script");
         try (final StringReader reader = new StringReader(source)) {
             return eval(reader);

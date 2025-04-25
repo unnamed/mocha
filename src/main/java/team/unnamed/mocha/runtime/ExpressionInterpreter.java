@@ -59,8 +59,8 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
             arithmetic((a, b) -> {
                 // Molang allows division by zero,
                 // which is always equal to 0
-                final double dividend = a.eval();
-                final double divisor = b.eval();
+                final float dividend = a.eval();
+                final float divisor = b.eval();
                 if (divisor == 0) return 0;
                 else return dividend / divisor;
             }),
@@ -228,9 +228,9 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
             if ("loop".equals(identifierName)) {
                 // loop built-in function
                 // Parameters:
-                // - double:           How many times should we loop
+                // - float:           How many times should we loop
                 // - CallableBinding:  The looped expressions
-                int n = Math.round((float) args.next().eval().getAsNumber());
+                int n = Math.round(args.next().eval().getAsNumber());
                 Value expr = args.next().eval();
 
                 if (expr instanceof Function) {
@@ -309,7 +309,7 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
     }
 
     @Override
-    public @NotNull Value visitDouble(final @NotNull DoubleExpression expression) {
+    public @NotNull Value visitFloat(final @NotNull FloatExpression expression) {
         return NumberValue.of(expression.value());
     }
 
@@ -406,17 +406,17 @@ public final class ExpressionInterpreter<T> implements ExpressionVisitor<Value>,
         boolean eval();
     }
 
-    interface LazyEvaluableDouble {
-        double eval();
+    interface LazyEvaluableFloat {
+        float eval();
     }
 
     private interface Comparator {
-        boolean compare(LazyEvaluableDouble a, LazyEvaluableDouble b);
+        boolean compare(LazyEvaluableFloat a, LazyEvaluableFloat b);
 
     }
 
     private interface ArithmeticOperator {
-        double operate(LazyEvaluableDouble a, LazyEvaluableDouble b);
+        float operate(LazyEvaluableFloat a, LazyEvaluableFloat b);
     }
 
     public static class FunctionArguments implements Function.Arguments {

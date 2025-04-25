@@ -193,7 +193,7 @@ public final class MolangCompiler {
                 if (lastVisitResult == null || lastVisitResult.lastPushedType() != returnCtType) {
                     JavassistUtil.addCast(
                             bytecode,
-                            lastVisitResult == null ? CtClass.doubleType : lastVisitResult.lastPushedType(),
+                            lastVisitResult == null ? CtClass.floatType : lastVisitResult.lastPushedType(),
                             returnCtType
                     );
                 }
@@ -289,7 +289,7 @@ public final class MolangCompiler {
         final Class<?> compiledClass;
         try {
             compiledClass = classPool.toClass(scriptCtClass, getClass(), classLoader, null);
-        } catch (final CannotCompileException e) {
+        } catch (final Exception e) {
             throw new IllegalStateException("Couldn't compile script class", e);
         }
 

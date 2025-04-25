@@ -39,11 +39,11 @@ class MathCompiledRuntimeTest {
             // 1: invokestatic
             // 4: dreturn
             final MathFunction cos = engine.compile("math.cos(x)", MathFunction.class);
-            assertEquals(1D, cos.apply(0), 0.0001);
-            assertEquals(4D / 5D, cos.apply(37), 0.01);
-            assertEquals(3D / 5D, cos.apply(53), 0.01);
-            assertEquals(0D, cos.apply(90), 0.0001);
-            assertEquals(-1D, cos.apply(180), 0.0001);
+            assertEquals(1F, cos.apply(0), 0.0001);
+            assertEquals(4F / 5D, cos.apply(37), 0.01);
+            assertEquals(3F / 5D, cos.apply(53), 0.01);
+            assertEquals(0F, cos.apply(90), 0.0001);
+            assertEquals(-1F, cos.apply(180), 0.0001);
         }
         {
             // 0: dload_1
@@ -51,14 +51,14 @@ class MathCompiledRuntimeTest {
             // 4: l2d
             // 5: dreturn
             final MathFunction round = engine.compile("math.round(x)", MathFunction.class);
-            assertEquals(5.0D, round.apply(5.4D));
-            assertEquals(6.0D, round.apply(5.5D));
-            assertEquals(6.0D, round.apply(5.6D));
-            assertEquals(-5.0D, round.apply(-5.4D));
+            assertEquals(5.0F, round.apply(5.4F));
+            assertEquals(6.0F, round.apply(5.5F));
+            assertEquals(6.0F, round.apply(5.6F));
+            assertEquals(-5.0F, round.apply(-5.4F));
         }
     }
 
     public interface MathFunction extends MochaCompiledFunction {
-        double apply(@Named("x") double x);
+        float apply(@Named("x") float x);
     }
 }

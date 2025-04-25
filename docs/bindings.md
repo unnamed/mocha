@@ -9,7 +9,7 @@ annotating everything with `@Binding`, see the example below
 public class RandomBinding {
     // random.select(a, b)
     @Binding("select")
-    public static double select(double a, double b) {
+    public static float select(float a, float b) {
         return Math.random() < 0.5 ? a : b;
     }
 }

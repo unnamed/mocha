@@ -26,7 +26,7 @@ package team.unnamed.mocha.runtime;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.mocha.parser.ast.BinaryExpression;
 import team.unnamed.mocha.parser.ast.CallExpression;
-import team.unnamed.mocha.parser.ast.DoubleExpression;
+import team.unnamed.mocha.parser.ast.FloatExpression;
 import team.unnamed.mocha.parser.ast.Expression;
 import team.unnamed.mocha.parser.ast.ExpressionVisitor;
 import team.unnamed.mocha.parser.ast.TernaryConditionalExpression;
@@ -46,7 +46,7 @@ final class ExpressionInliner implements ExpressionVisitor<@NotNull Expression> 
     public @NotNull Expression visitBinary(final @NotNull BinaryExpression expression) {
         if (IsConstantExpression.test(expression, scope)) {
             // can be evaluated in compile-time
-            return new DoubleExpression(expression.visit(interpreter).getAsNumber());
+            return FloatExpression.of(expression.visit(interpreter).getAsNumber());
         }
         return expression;
     }
@@ -71,7 +71,7 @@ final class ExpressionInliner implements ExpressionVisitor<@NotNull Expression> 
     public @NotNull Expression visitCall(final @NotNull CallExpression expression) {
         if (IsConstantExpression.test(expression, scope)) {
             // can be evaluated in compile-time
-            return new DoubleExpression(expression.visit(interpreter).getAsNumber());
+            return FloatExpression.of(expression.visit(interpreter).getAsNumber());
         }
         return expression;
     }

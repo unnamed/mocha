@@ -57,11 +57,11 @@ final class ReflectiveFunction<T> implements Function<T> {
         if (any instanceof Value) {
             return (Value) any;
         } else if (any instanceof Number) {
-            return NumberValue.of(((Number) any).doubleValue());
+            return NumberValue.of(((Number) any).floatValue());
         } else if (any instanceof String) {
             return StringValue.of((String) any);
         } else if (any instanceof Boolean) {
-            return (Boolean) any ? NumberValue.of(1D) : NumberValue.zero();
+            return (Boolean) any ? NumberValue.one() : NumberValue.zero();
         } else {
             if (any != null && any.getClass().isArray()) {
                 // array types

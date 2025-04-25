@@ -61,16 +61,16 @@ final class MolangParserImpl implements MolangParser {
         switch (token.kind()) {
             case FLOAT:
                 lexer.next();
-                return new DoubleExpression(Double.parseDouble(token.value()));
+                return FloatExpression.of(Float.parseFloat(token.value()));
             case STRING:
                 lexer.next();
                 return new StringExpression(token.value());
             case TRUE:
                 lexer.next();
-                return DoubleExpression.ONE;
+                return FloatExpression.ONE;
             case FALSE:
                 lexer.next();
-                return DoubleExpression.ZERO;
+                return FloatExpression.ZERO;
             case LPAREN:
                 lexer.next();
                 // wrapped expression: (expression)
@@ -126,9 +126,9 @@ final class MolangParserImpl implements MolangParser {
             case SUB:
                 lexer.next();
                 final Expression operatedExpression = parseSingle(lexer);
-                if (operatedExpression instanceof DoubleExpression) {
+                if (operatedExpression instanceof FloatExpression) {
                     // NEGATE(A) is just parsed as (-A)
-                    return new DoubleExpression(-((DoubleExpression) operatedExpression).value());
+                    return FloatExpression.of(-((FloatExpression) operatedExpression).value());
                 }
                 return new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, operatedExpression);
             case BANG:
@@ -139,7 +139,7 @@ final class MolangParserImpl implements MolangParser {
                 return new UnaryExpression(UnaryExpression.Op.RETURN, MolangParserImpl.parseCompoundExpression(lexer, 0));
         }
 
-        return DoubleExpression.ZERO;
+        return FloatExpression.ZERO;
     }
 
     static @NotNull Expression parseCompoundExpression(

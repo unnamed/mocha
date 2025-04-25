@@ -24,12 +24,7 @@
 package team.unnamed.mocha.parser;
 
 import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.parser.ast.AccessExpression;
-import team.unnamed.mocha.parser.ast.ArrayAccessExpression;
-import team.unnamed.mocha.parser.ast.BinaryExpression;
-import team.unnamed.mocha.parser.ast.CallExpression;
-import team.unnamed.mocha.parser.ast.DoubleExpression;
-import team.unnamed.mocha.parser.ast.IdentifierExpression;
+import team.unnamed.mocha.parser.ast.*;
 
 import java.util.Collections;
 
@@ -41,7 +36,7 @@ class ArrayAccessParseTest {
     void test() {
         assertCreateTree("materials[0]", new ArrayAccessExpression(
                 new IdentifierExpression("materials"),
-                new DoubleExpression(0D)
+                FloatExpression.of(0D)
         ));
 
         assertCreateTree("array.my_geos[math.cos(query.anim_time * 12.3 + 41.9) * 10 + 0.6]", new ArrayAccessExpression(
@@ -66,14 +61,14 @@ class ArrayAccessParseTest {
                                                                 new IdentifierExpression("query"),
                                                                 "anim_time"
                                                         ),
-                                                        new DoubleExpression(12.3D)
+                                                        FloatExpression.of(12.3D)
                                                 ),
-                                                new DoubleExpression(41.9D)
+                                                FloatExpression.of(41.9D)
                                         ))
                                 ),
-                                new DoubleExpression(10D)
+                                FloatExpression.of(10D)
                         ),
-                        new DoubleExpression(0.6D)
+                        FloatExpression.of(0.6D)
                 )
         ));
     }

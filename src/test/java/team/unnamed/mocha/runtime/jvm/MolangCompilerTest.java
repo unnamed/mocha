@@ -47,12 +47,12 @@ public class MolangCompilerTest {
         final ScriptType script3 = engine.compile("(a > b) ? a : b", ScriptType.class);
         assertEquals(10, script3.eval(10, 5));
         assertEquals(50, script3.eval(50, -20));
-        assertEquals(3, script3.eval(3D, 3D));
+        assertEquals(3, script3.eval(3F, 3F));
 
         final ScriptType script4 = engine.compile("(a < b) ? a : b", ScriptType.class);
         assertEquals(5, script4.eval(10, 5));
         assertEquals(-20, script4.eval(50, -20));
-        assertEquals(3, script4.eval(3D, 3D));
+        assertEquals(3, script4.eval(3F, 3F));
     }
 
     @Test
@@ -63,6 +63,6 @@ public class MolangCompilerTest {
     }
 
     public interface ScriptType extends MochaCompiledFunction {
-        int eval(@Named("a") double a, @Named("b") double b);
+        int eval(@Named("a") float a, @Named("b") float b);
     }
 }

@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BreakContinueTest {
     @Test
     void test_break() {
-        final double value = MochaEngine.createStandard().eval(String.join("\n",
+        final float value = MochaEngine.createStandard().eval(String.join("\n",
                 "t.i = 0;",
                 "loop(10, {",
                 "    t.i = t.i + 1;",
@@ -39,12 +39,12 @@ class BreakContinueTest {
                 "});",
                 "return t.i;"
         ));
-        assertEquals(5.0D, value);
+        assertEquals(5.0F, value);
     }
 
     @Test
     void test_continue() {
-        final double value = MochaEngine.createStandard().eval(
+        final float value = MochaEngine.createStandard().eval(
                 "t.i = 0;" +
                         "t.sum = 0;" +
                         "loop(20, {" +
@@ -54,6 +54,6 @@ class BreakContinueTest {
                         "});" +
                         "return t.sum;"
         );
-        assertEquals(125.0D, value);
+        assertEquals(125.0F, value);
     }
 }

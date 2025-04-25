@@ -39,15 +39,15 @@ class ArrayAccessRuntimeTest {
             return engine;
         };
 
-        assertEvaluates(5D, "query.values[0]", configurer);
-        assertEvaluates(10D, "query.values[1]", configurer);
-        assertEvaluates(100D, "query.values[2]", configurer);
-        assertEvaluates(100D, "q.values[20 + 3]", configurer);
-        assertEvaluates(5D, "query.values[-1]", configurer);
-        assertEvaluates(5D, "q.values[-1000]", configurer);
-        assertEvaluates(5D, "q.values[0.5]", configurer);
-        assertEvaluates(10D, "q.values[0.5 + 0.5]", configurer);
-        assertEvaluates(100D, "q.values[math.pi - 1]", configurer);
+        assertEvaluates(5F, "query.values[0]", configurer);
+        assertEvaluates(10F, "query.values[1]", configurer);
+        assertEvaluates(100F, "query.values[2]", configurer);
+        assertEvaluates(100F, "q.values[20 + 3]", configurer);
+        assertEvaluates(5F, "query.values[-1]", configurer);
+        assertEvaluates(5F, "q.values[-1000]", configurer);
+        assertEvaluates(5F, "q.values[0.5]", configurer);
+        assertEvaluates(10F, "q.values[0.5 + 0.5]", configurer);
+        assertEvaluates(100F, "q.values[math.pi - 1]", configurer);
     }
 
     @Binding({"query", "q"})

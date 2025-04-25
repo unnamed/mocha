@@ -47,7 +47,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction gt = engine.compile("a > b", ComparisonFunction.class);
             assertTrue(gt.compare(10, 5));
             assertFalse(gt.compare(-50, -20));
-            assertFalse(gt.compare(3D, 3D));
+            assertFalse(gt.compare(3F, 3F));
         }
 
         {
@@ -62,7 +62,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction lt = engine.compile("a < b", ComparisonFunction.class);
             assertFalse(lt.compare(10, 5));
             assertTrue(lt.compare(-50, -20));
-            assertFalse(lt.compare(3D, 3D));
+            assertFalse(lt.compare(3F, 3F));
         }
 
         {
@@ -77,7 +77,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction gte = engine.compile("a >= b", ComparisonFunction.class);
             assertTrue(gte.compare(10, 5));
             assertFalse(gte.compare(-50, -20));
-            assertTrue(gte.compare(3D, 3D));
+            assertTrue(gte.compare(3F, 3F));
         }
 
         {
@@ -92,7 +92,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction lte = engine.compile("a <= b", ComparisonFunction.class);
             assertFalse(lte.compare(10, 5));
             assertTrue(lte.compare(-50, -20));
-            assertTrue(lte.compare(3D, 3D));
+            assertTrue(lte.compare(3F, 3F));
         }
 
         {
@@ -107,7 +107,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction eq = engine.compile("a == b", ComparisonFunction.class);
             assertFalse(eq.compare(10, 5));
             assertFalse(eq.compare(-50, -20));
-            assertTrue(eq.compare(3D, 3D));
+            assertTrue(eq.compare(3F, 3F));
         }
 
         {
@@ -122,7 +122,7 @@ class ArithmeticCompiledRuntimeTest {
             final ComparisonFunction neq = engine.compile("a != b", ComparisonFunction.class);
             assertTrue(neq.compare(10, 5));
             assertTrue(neq.compare(-50, -20));
-            assertFalse(neq.compare(3D, 3D));
+            assertFalse(neq.compare(3F, 3F));
         }
 
         // requiring casting
@@ -138,16 +138,16 @@ class ArithmeticCompiledRuntimeTest {
             final StupidLongComparisonFunction gt = engine.compile("a > b", StupidLongComparisonFunction.class);
             assertEquals(1L, gt.compare(10, 5));
             assertEquals(0L, gt.compare(-50, -20));
-            assertEquals(0L, gt.compare(3D, 3D));
+            assertEquals(0L, gt.compare(3F, 3F));
         }
     }
 
     public interface ComparisonFunction extends MochaCompiledFunction {
-        boolean compare(@Named("a") double a, @Named("b") double b);
+        boolean compare(@Named("a") float a, @Named("b") float b);
     }
 
     // like why would someone need long?
     public interface StupidLongComparisonFunction extends MochaCompiledFunction {
-        long compare(@Named("a") double a, @Named("b") double b);
+        long compare(@Named("a") float a, @Named("b") float b);
     }
 }

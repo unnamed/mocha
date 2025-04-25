@@ -24,12 +24,7 @@
 package team.unnamed.mocha.parser;
 
 import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.parser.ast.AccessExpression;
-import team.unnamed.mocha.parser.ast.BinaryExpression;
-import team.unnamed.mocha.parser.ast.CallExpression;
-import team.unnamed.mocha.parser.ast.DoubleExpression;
-import team.unnamed.mocha.parser.ast.IdentifierExpression;
-import team.unnamed.mocha.parser.ast.StringExpression;
+import team.unnamed.mocha.parser.ast.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,7 +64,7 @@ class CallParseTest {
                                 new IdentifierExpression("query"),
                                 "anim_time"
                         ),
-                        new DoubleExpression(38)
+                        FloatExpression.of(38)
                 ))
         ));
 
@@ -79,9 +74,9 @@ class CallParseTest {
                         "clamp"
                 ),
                 Arrays.asList(
-                        new DoubleExpression(5),
-                        new DoubleExpression(10),
-                        new DoubleExpression(20)
+                        FloatExpression.of(5),
+                        FloatExpression.of(10),
+                        FloatExpression.of(20)
                 )
         ));
     }

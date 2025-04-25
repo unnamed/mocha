@@ -63,7 +63,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
     }
 
     @Override
-    public double eval(final @NotNull List<Expression> expressions) {
+    public float eval(final @NotNull List<Expression> expressions) {
         // create bindings that just apply for this evaluation
         final Scope local = scope.copy();
         {
@@ -87,11 +87,11 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
         }
 
         // ensure returned value is a number
-        return lastResult == null ? 0D : lastResult.getAsNumber();
+        return lastResult == null ? 0F : lastResult.getAsNumber();
     }
 
     @Override
-    public double eval(final @NotNull Reader source) {
+    public float eval(final @NotNull Reader source) {
         final List<Expression> parsed;
         try {
             parsed = parse(source);
@@ -117,13 +117,13 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             if (parseExceptionHandler != null) {
                 parseExceptionHandler.accept(e);
             }
-            return () -> 0D;
+            return () -> 0F;
         } catch (final IOException e) {
             throw new UncheckedIOException("Failed to read from given reader", e);
         }
         return new MochaFunction() {
             @Override
-            public double evaluate() {
+            public float evaluate() {
                 return eval(parsed);
             }
 
@@ -146,8 +146,8 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
             }
             return new MochaFunction() {
                 @Override
-                public double evaluate() {
-                    return 0D;
+                public float evaluate() {
+                    return 0F;
                 }
 
                 @Override
@@ -159,7 +159,7 @@ final class MochaEngineImpl<T> implements MochaEngine<T> {
 
         return new MochaFunction() {
             @Override
-            public double evaluate() {
+            public float evaluate() {
                 return eval(parsed);
             }
 

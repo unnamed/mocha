@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IntCompiledFunctionTest {
     @Test
     void test() throws Exception {
-        final var function = MochaEngine.createStandard().compile("math.mod(value / 20, 3)", IntFunction.class);
+        final IntFunction function = MochaEngine.createStandard().compile("math.mod(value / 20, 3)", IntFunction.class);
 
         assertEquals(0, function.get(0));
         assertEquals(1, function.get(20));

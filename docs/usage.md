@@ -18,10 +18,10 @@ To evaluate expressions we can just use the `eval` method.
 
 <!--@formatter:off-->
 ```java
-double result = mocha.eval("math.sqrt(3 * 3 + 4 * 4)");
+float result = mocha.eval("math.sqrt(3 * 3 + 4 * 4)");
 // evaluates to 5.0
 
-double result2 = mocha.eval("math.abs(-5) + 5");
+float result2 = mocha.eval("math.abs(-5) + 5");
 // evaluates to 10.0
 ```
 <!--@formatter:on-->

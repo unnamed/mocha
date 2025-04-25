@@ -67,27 +67,27 @@ public interface ObjectValue extends Value {
     }
 
     // :) overloads
-    default void setFunction(final @NotNull String name, final @NotNull DoubleFunction1 function) {
+    default void setFunction(final @NotNull String name, final @NotNull ObjectValue.FloatFunction1 function) {
         set(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber())));
     }
 
-    default void setFunction(final @NotNull String name, final @NotNull DoubleFunction2 function) {
+    default void setFunction(final @NotNull String name, final @NotNull ObjectValue.FloatFunction2 function) {
         set(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber(), args.next().eval().getAsNumber())));
     }
 
-    default void setFunction(final @NotNull String name, final @NotNull DoubleFunction3 function) {
+    default void setFunction(final @NotNull String name, final @NotNull ObjectValue.FloatFunction3 function) {
         set(name, (Function<?>) (ctx, args) -> NumberValue.of(function.apply(args.next().eval().getAsNumber(), args.next().eval().getAsNumber(), args.next().eval().getAsNumber())));
     }
 
-    interface DoubleFunction1 {
-        double apply(double n);
+    interface FloatFunction1 {
+        float apply(float n);
     }
 
-    interface DoubleFunction2 {
-        double apply(double n1, double n2);
+    interface FloatFunction2 {
+        float apply(float n1, float n2);
     }
 
-    interface DoubleFunction3 {
-        double apply(double n1, double n2, double n3);
+    interface FloatFunction3 {
+        float apply(float n1, float n2, float n3);
     }
 }

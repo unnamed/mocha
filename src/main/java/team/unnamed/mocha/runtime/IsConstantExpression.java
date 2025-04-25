@@ -63,7 +63,7 @@ public final class IsConstantExpression implements ExpressionVisitor<@NotNull Bo
     }
 
     @Override
-    public @NotNull Boolean visitDouble(final @NotNull DoubleExpression expression) {
+    public @NotNull Boolean visitFloat(final @NotNull FloatExpression expression) {
         // literals are constants
         return true;
     }

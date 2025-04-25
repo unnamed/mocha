@@ -38,19 +38,19 @@ class CaseSensitivityTest {
         assertEvaluatesAndCompiles(Math.PI, "MATH.pi");
         assertEvaluatesAndCompiles(Math.PI, "MATH.Pi");
 
-        assertEvaluatesAndCompiles(20D, "MATH.ABS(-20)");
-        assertEvaluatesAndCompiles(20D, "math.ABS(-20)");
-        assertEvaluatesAndCompiles(20D, "Math.ABS(-20)");
-        assertEvaluatesAndCompiles(20D, "Math.abs(-20)");
+        assertEvaluatesAndCompiles(20F, "MATH.ABS(-20)");
+        assertEvaluatesAndCompiles(20F, "math.ABS(-20)");
+        assertEvaluatesAndCompiles(20F, "Math.ABS(-20)");
+        assertEvaluatesAndCompiles(20F, "Math.abs(-20)");
 
-        assertEvaluatesAndCompiles(50D, "Math.clamp(10, 50, 100)");
-        assertEvaluatesAndCompiles(50D, "Math.CLAMP(10, 50, 100)");
-        assertEvaluatesAndCompiles(50D, "math.clamp(10, 50, 100)");
-        assertEvaluatesAndCompiles(50D, "math.CLAMP(10, 50, 100)");
+        assertEvaluatesAndCompiles(50F, "Math.clamp(10, 50, 100)");
+        assertEvaluatesAndCompiles(50F, "Math.CLAMP(10, 50, 100)");
+        assertEvaluatesAndCompiles(50F, "math.clamp(10, 50, 100)");
+        assertEvaluatesAndCompiles(50F, "math.CLAMP(10, 50, 100)");
 
         assertEvaluatesAndCompiles(108.1415, "MATH.ABS(-100) + Math.sqrt(25) + math.PI");
 
-        assertEvaluatesAndCompiles(1D, "tEMP.x = 1; return Temp.X;");
-        assertEvaluatesAndCompiles(1D, "temp.X = 2; tEMp.y = 3; return TEMP.Y - Temp.x;");
+        assertEvaluatesAndCompiles(1F, "tEMP.x = 1; return Temp.X;");
+        assertEvaluatesAndCompiles(1F, "temp.X = 2; tEMp.y = 3; return TEMP.Y - Temp.x;");
     }
 }

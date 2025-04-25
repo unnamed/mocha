@@ -38,12 +38,12 @@ class ValueOfTest {
         assertEquals(NumberValue.zero(), Value.of(new Object()));
         assertEquals(ArrayValue.of(), Value.of(new Object[0]));
         assertEquals(ArrayValue.of(), Value.of(new int[0]));
-        assertEquals(ArrayValue.of(), Value.of(new double[0]));
+        assertEquals(ArrayValue.of(), Value.of(new float[0]));
         assertEquals(ArrayValue.of(NumberValue.of(1)), Value.of(new int[]{1}));
-        assertEquals(ArrayValue.of(NumberValue.of(1)), Value.of(new double[]{1}));
+        assertEquals(ArrayValue.of(NumberValue.of(1)), Value.of(new float[]{1}));
         assertEquals(ArrayValue.of(NumberValue.of(1)), Value.of(new Object[]{1}));
         assertEquals(ArrayValue.of(NumberValue.of(1), NumberValue.of(2)), Value.of(new int[]{1, 2}));
-        assertEquals(ArrayValue.of(NumberValue.of(1), NumberValue.of(2)), Value.of(new double[]{1, 2}));
+        assertEquals(ArrayValue.of(NumberValue.of(1), NumberValue.of(2)), Value.of(new float[]{1, 2}));
         assertEquals(ArrayValue.of(NumberValue.of(1), StringValue.of("hello"), NumberValue.zero()), Value.of(new Object[]{1, "hello", false}));
     }
 }

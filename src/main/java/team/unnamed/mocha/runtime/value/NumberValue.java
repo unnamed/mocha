@@ -27,16 +27,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class NumberValue implements Value {
-    private static final NumberValue ZERO = new NumberValue(0D);
+    private static final NumberValue ONE = new NumberValue(1F);
+    private static final NumberValue ZERO = new NumberValue(0F);
 
-    private final double value;
+    private final float value;
 
-    private NumberValue(final double value) {
+    private NumberValue(final float value) {
         this.value = normalize(value);
     }
 
     public static @NotNull NumberValue of(final double value) {
+        return NumberValue.of((float) value);
+    }
+
+    public static @NotNull NumberValue of(final float value) {
+        if (value == ONE.value()) return ONE;
+        if (value == ZERO.value()) return ZERO;
         return new NumberValue(value);
+    }
+
+    public static @NotNull NumberValue one() {
+        return ONE;
     }
 
     public static @NotNull NumberValue zero() {
@@ -47,7 +58,11 @@ public final class NumberValue implements Value {
         return Double.isNaN(value) || Double.isInfinite(value) ? 0D : value;
     }
 
-    public double value() {
+    public static float normalize(final float value) {
+        return Float.isNaN(value) || Float.isInfinite(value) ? 0F : value;
+    }
+
+    public float value() {
         return value;
     }
 
@@ -61,12 +76,11 @@ public final class NumberValue implements Value {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final NumberValue that = (NumberValue) o;
-        return Double.compare(that.value, value) == 0;
+        return Float.compare(that.value, value) == 0;
     }
 
     @Override
     public int hashCode() {
-        long temp = Double.doubleToLongBits(value);
-        return (int) (temp ^ (temp >>> 32));
+        return Float.hashCode(value);
     }
 }

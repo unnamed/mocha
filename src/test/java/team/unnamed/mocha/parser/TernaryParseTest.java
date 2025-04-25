@@ -24,12 +24,7 @@
 package team.unnamed.mocha.parser;
 
 import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.parser.ast.AccessExpression;
-import team.unnamed.mocha.parser.ast.BinaryExpression;
-import team.unnamed.mocha.parser.ast.CallExpression;
-import team.unnamed.mocha.parser.ast.DoubleExpression;
-import team.unnamed.mocha.parser.ast.IdentifierExpression;
-import team.unnamed.mocha.parser.ast.TernaryConditionalExpression;
+import team.unnamed.mocha.parser.ast.*;
 
 import java.util.Collections;
 
@@ -42,7 +37,7 @@ class TernaryParseTest {
                 new BinaryExpression(BinaryExpression.Op.EQ, new AccessExpression(
                         new IdentifierExpression("query"),
                         "mark_variant"
-                ), new DoubleExpression(1)),
+                ), FloatExpression.of(1)),
                 new AccessExpression(
                         new IdentifierExpression("Geometry"),
                         "robot"
@@ -61,16 +56,16 @@ class TernaryParseTest {
                         ),
                         Collections.emptyList()
                 ),
-                new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(1), new DoubleExpression(1)),
-                new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(2), new DoubleExpression(2))
+                new BinaryExpression(BinaryExpression.Op.ADD, FloatExpression.of(1), FloatExpression.of(1)),
+                new BinaryExpression(BinaryExpression.Op.ADD, FloatExpression.of(2), FloatExpression.of(2))
         ));
 
         assertCreateTree("3 + 3 == 6 ? 1 : 2", new TernaryConditionalExpression(
                 new BinaryExpression(BinaryExpression.Op.EQ,
-                        new BinaryExpression(BinaryExpression.Op.ADD, new DoubleExpression(3), new DoubleExpression(3)),
-                        new DoubleExpression(6)),
-                new DoubleExpression(1),
-                new DoubleExpression(2)
+                        new BinaryExpression(BinaryExpression.Op.ADD, FloatExpression.of(3), FloatExpression.of(3)),
+                        FloatExpression.of(6)),
+                FloatExpression.of(1),
+                FloatExpression.of(2)
         ));
     }
 }

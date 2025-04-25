@@ -24,7 +24,7 @@
 package team.unnamed.mocha.parser;
 
 import org.junit.jupiter.api.Test;
-import team.unnamed.mocha.parser.ast.DoubleExpression;
+import team.unnamed.mocha.parser.ast.FloatExpression;
 import team.unnamed.mocha.parser.ast.IdentifierExpression;
 import team.unnamed.mocha.parser.ast.UnaryExpression;
 
@@ -33,11 +33,11 @@ import static team.unnamed.mocha.MochaAssertions.assertCreateTree;
 class DoubleParseTest {
     @Test
     void test() {
-        assertCreateTree("1", new DoubleExpression(1D));
-        assertCreateTree("   1   ", new DoubleExpression(1D));
-        assertCreateTree("1.0", new DoubleExpression(1D));
-        assertCreateTree("3.14", new DoubleExpression(3.14D));
-        assertCreateTree("5.8", new DoubleExpression(5.8D));
+        assertCreateTree("1", FloatExpression.of(1D));
+        assertCreateTree("   1   ", FloatExpression.of(1D));
+        assertCreateTree("1.0", FloatExpression.of(1D));
+        assertCreateTree("3.14", FloatExpression.of(3.14D));
+        assertCreateTree("5.8", FloatExpression.of(5.8D));
 
         // these are not valid doubles and are parsed as identifiers
         assertCreateTree("Infinity", new IdentifierExpression("Infinity"));
@@ -45,9 +45,9 @@ class DoubleParseTest {
         assertCreateTree("-Infinity", new UnaryExpression(UnaryExpression.Op.ARITHMETICAL_NEGATION, new IdentifierExpression("Infinity")));
 
         // NEGATE A should be parsed just as -A
-        assertCreateTree("-1", new DoubleExpression(-1D));
-        assertCreateTree("-3.14", new DoubleExpression(-3.14D));
-        assertCreateTree("--3.14", new DoubleExpression(3.14D));
-        assertCreateTree("---3.14", new DoubleExpression(-3.14D));
+        assertCreateTree("-1", FloatExpression.of(-1D));
+        assertCreateTree("-3.14", FloatExpression.of(-3.14D));
+        assertCreateTree("--3.14", FloatExpression.of(3.14D));
+        assertCreateTree("---3.14", FloatExpression.of(-3.14D));
     }
 }

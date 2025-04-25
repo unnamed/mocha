@@ -43,9 +43,9 @@ public interface MochaFunction extends MochaCompiledFunction {
      * @return The result of the evaluation.
      * @since 3.0.0
      */
-    double evaluate();
+    float evaluate();
 }
 
 final class NopMochaFunctionHolder {
-    static final MochaFunction NOP = () -> 0D;
+    static final MochaFunction NOP = () -> 0F;
 }

@@ -47,24 +47,24 @@ class ArrowOperatorTest {
         engine.bind(QueryImpl.class);
         engine.scope().set("self", new JavaValue(self));
 
-        final double result = engine.eval(
+        final float result = engine.eval(
                 "v.result = 0;\n"
                         + "for_each(t.nearby, self->q.get_nearby_entities(5), {\n"
                         + "    v.result = v.result + t.nearby->q.get_location();\n"
                         + "});\n"
                         + "return v.result;"
         );
-        assertEquals(17D, result);
+        assertEquals(17F, result);
 
 
-        final double result2 = engine.eval(
+        final float result2 = engine.eval(
                 "v.result = 0;\n"
                         + "for_each(t.nearby, self->q.get_nearby_entities(500), {\n" // Same code but 500 instead of 5
                         + "    v.result = v.result + t.nearby->q.get_location();\n"
                         + "});\n"
                         + "return v.result;"
         );
-        assertEquals(32D, result2);
+        assertEquals(32F, result2);
     }
 
     @Binding({"query", "q"})

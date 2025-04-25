@@ -37,11 +37,11 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
         if (any instanceof Value) {
             return (Value) any;
         } else if (any instanceof Number) {
-            return NumberValue.of(((Number) any).doubleValue());
+            return NumberValue.of(((Number) any).floatValue());
         } else if (any instanceof String) {
             return StringValue.of((String) any);
         } else if (any instanceof Boolean) {
-            return (Boolean) any ? NumberValue.of(1D) : NumberValue.zero();
+            return (Boolean) any ? NumberValue.one() : NumberValue.zero();
         } else {
             if (any != null && any.getClass().isArray()) {
                 // array types
@@ -58,11 +58,15 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
     }
 
     static @NotNull Value of(final boolean bool) {
-        return bool ? NumberValue.of(1D) : NumberValue.zero();
+        return bool ? NumberValue.one() : NumberValue.zero();
     }
 
     static @NotNull Value of(final double _double) {
         return NumberValue.of(_double);
+    }
+
+    static @NotNull Value of(final float _float) {
+        return NumberValue.of(_float);
     }
 
     static @NotNull Value of(final @Nullable String string) {
@@ -73,7 +77,7 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
         return NumberValue.zero();
     }
 
-    default double getAsNumber() {
+    default float getAsNumber() {
         if (this instanceof NumberValue) {
             return ((NumberValue) this).value();
         } else {
@@ -83,7 +87,7 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
 
     default boolean getAsBoolean() {
         if (this instanceof NumberValue) {
-            return ((NumberValue) this).value() != 0D;
+            return ((NumberValue) this).value() != 0F;
         } else if (this instanceof StringValue) {
             return !((StringValue) this).value().isEmpty();
         } else if (this instanceof ArrayValue) {
@@ -103,7 +107,7 @@ public /* sealed */ interface Value /* permits Function, ObjectValue, ArrayValue
         if (this instanceof StringValue) {
             return ((StringValue) this).value();
         } else if (this instanceof NumberValue) {
-            return Double.toString(((NumberValue) this).value());
+            return Float.toString(((NumberValue) this).value());
         } else if (this instanceof ArrayValue) {
             final Value[] values = ((ArrayValue) this).values();
             final StringJoiner joiner = new StringJoiner(", ", "[", "]");
